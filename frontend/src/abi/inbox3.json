@@ -1,0 +1,112 @@
+{
+  "address": "0xf1768eb79d367572b8e436f8e3bcfecf938eeaf6656a65f73773c50c43b71d67",
+  "name": "Inbox3",
+  "friends": [],
+  "exposed_functions": [
+    {
+      "name": "create_inbox",
+      "visibility": "public",
+      "is_entry": true,
+      "is_view": false,
+      "generic_type_params": [],
+      "params": ["&signer"],
+      "return": []
+    },
+    {
+      "name": "send_message",
+      "visibility": "public",
+      "is_entry": true,
+      "is_view": false,
+      "generic_type_params": [],
+      "params": ["&signer", "address", "vector<u8>"],
+      "return": []
+    },
+    {
+      "name": "mark_read",
+      "visibility": "public",
+      "is_entry": true,
+      "is_view": false,
+      "generic_type_params": [],
+      "params": ["&signer", "u64"],
+      "return": []
+    },
+    {
+      "name": "inbox_of",
+      "visibility": "public",
+      "is_entry": false,
+      "is_view": true,
+      "generic_type_params": [],
+      "params": ["address"],
+      "return": ["vector<Message>"]
+    },
+    {
+      "name": "get_message_count",
+      "visibility": "public",
+      "is_entry": false,
+      "is_view": true,
+      "generic_type_params": [],
+      "params": ["address"],
+      "return": ["u64"]
+    },
+    {
+      "name": "get_message",
+      "visibility": "public",
+      "is_entry": false,
+      "is_view": true,
+      "generic_type_params": [],
+      "params": ["address", "u64"],
+      "return": ["Message"]
+    },
+    {
+      "name": "inbox_exists",
+      "visibility": "public",
+      "is_entry": false,
+      "is_view": true,
+      "generic_type_params": [],
+      "params": ["address"],
+      "return": ["bool"]
+    }
+  ],
+  "structs": [
+    {
+      "name": "Message",
+      "is_native": false,
+      "abilities": ["copy", "drop", "store"],
+      "generic_type_params": [],
+      "fields": [
+        {
+          "name": "sender",
+          "type": "address"
+        },
+        {
+          "name": "cid",
+          "type": "vector<u8>"
+        },
+        {
+          "name": "timestamp",
+          "type": "u64"
+        },
+        {
+          "name": "read",
+          "type": "bool"
+        }
+      ]
+    },
+    {
+      "name": "Inbox",
+      "is_native": false,
+      "abilities": ["key"],
+      "generic_type_params": [],
+      "fields": [
+        {
+          "name": "messages",
+          "type": "Table<u64, Message>"
+        },
+        {
+          "name": "next_id",
+          "type": "u64"
+        }
+      ]
+    }
+  ]
+}
