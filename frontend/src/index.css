@@ -26,6 +26,25 @@
   --shadow-lg: 0 10px 15px -3px rgb(0 0 0 / 0.1), 0 4px 6px -4px rgb(0 0 0 / 0.1);
 }
 
+/* Dark theme */
+[data-theme="dark"] {
+  --primary-blue: #5B82FF;
+  --primary-blue-hover: #4F7CFF;
+  --primary-blue-light: #1E293B;
+  --text-primary: #F8FAFC;
+  --text-secondary: #CBD5E1;
+  --text-muted: #94A3B8;
+  --border-color: #334155;
+  --bg-gray: #0F172A;
+  --bg-white: #1E293B;
+  --success-green: #22C55E;
+  --warning-yellow: #EAB308;
+  --error-red: #EF4444;
+  --shadow-sm: 0 1px 2px 0 rgb(0 0 0 / 0.3);
+  --shadow-md: 0 4px 6px -1px rgb(0 0 0 / 0.4), 0 2px 4px -2px rgb(0 0 0 / 0.3);
+  --shadow-lg: 0 10px 15px -3px rgb(0 0 0 / 0.5), 0 4px 6px -4px rgb(0 0 0 / 0.4);
+}
+
 body {
   font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
   background-color: var(--bg-gray);
@@ -656,6 +675,7 @@ body {
   align-items: center;
   justify-content: center;
   padding: 20px;
+  position: relative;
 }
 
 .welcome-card {

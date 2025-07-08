@@ -4,6 +4,7 @@ import { Aptos, AptosConfig, Network } from '@aptos-labs/ts-sdk'
 import SendMessage from './components/SendMessage'
 import Inbox from './components/Inbox'
 import NotificationSystem from './components/NotificationSystem'
+import ThemeSwitcher from './components/ThemeSwitcher'
 import { getRealtimeService, type RealtimeMessage } from './lib/realtime'
 import { useNotifications } from './lib/notifications'
 import logo from '/public/logo.png'
@@ -195,6 +196,9 @@ function App() {
     return (
       <div className="welcome-container">
         <div className="welcome-card">
+          <div className="absolute top-4 right-4">
+            <ThemeSwitcher />
+          </div>
           <img src={logo} alt="Inbox3 Logo" className="welcome-logo-img" />
           <p className="welcome-subtitle">
             Secure, decentralized messaging powered by blockchain technology.
@@ -298,6 +302,7 @@ function App() {
                   <span className={`inline-block h-4 w-4 transform rounded-full bg-white transition-transform ${realtimeEnabled ? 'translate-x-6' : 'translate-x-1'}`} />
                 </button>
               </div>
+              <ThemeSwitcher />
               <button onClick={disconnect} className="btn btn-outline text-sm">
                 Disconnect
               </button>
