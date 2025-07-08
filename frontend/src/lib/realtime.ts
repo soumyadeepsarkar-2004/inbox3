@@ -1,7 +1,3 @@
-import { Aptos, AptosConfig, Network } from '@aptos-labs/ts-sdk';
-const aptosConfig = new AptosConfig({ network: Network.DEVNET });
-const aptos = new Aptos(aptosConfig);
-
 export interface RealtimeMessage {
   type: 'message_sent' | 'message_received';
   sender: string;
