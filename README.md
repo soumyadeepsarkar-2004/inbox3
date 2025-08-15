@@ -1,4 +1,4 @@
-# 🎉 Inbox3 - Decentralized Messaging on Aptos (FULLY WORKING!)
+# Inbox3 - Decentralized Messaging on Aptos
 
 A decentralized messaging application built on the Aptos blockchain with IPFS storage for message content and end-to-end encryption.
 
