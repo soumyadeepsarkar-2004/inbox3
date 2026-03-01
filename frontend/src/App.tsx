@@ -397,7 +397,7 @@ function App() {
                         <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3">
                             <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z" />
                         </svg>
-                        Terminal
+                        Messages
                     </button>
                     <button
                         onClick={() => setCurrentView('groups')}
@@ -408,7 +408,7 @@ function App() {
                         <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3">
                             <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2" /><circle cx="9" cy="7" r="4" />
                         </svg>
-                        Network
+                        Groups
                     </button>
                 </div>
             </div>
@@ -487,7 +487,7 @@ function App() {
             </div>
 
             {/* Profile Card */}
-            <div className="bg-white dark:bg-(--bg-card) rounded-[2.5rem] p-8 text-center shadow-sm border border-(--border-color)/50">
+            <div className="bg-white dark:bg-(--bg-card) rounded-3xl p-6 text-center shadow-sm border border-(--border-color)/50">
                 <div className="flex justify-center mb-6">
                     <Avatar
                         address={account?.address?.toString() || ''}
@@ -555,22 +555,22 @@ function App() {
                 <div className="grid grid-cols-2 gap-4">
                     <button
                         onClick={() => setIsContactsOpen(true)}
-                        className="p-8 bg-white dark:bg-(--bg-card) border border-(--border-color)/50 rounded-4xl flex flex-col items-center justify-center gap-4 group hover:border-indigo-500/50 hover:shadow-xl hover:shadow-indigo-500/5 transition-all w-full"
+                        className="p-5 bg-white dark:bg-(--bg-card) border border-(--border-color)/50 rounded-2xl flex flex-col items-center justify-center gap-3 group hover:border-indigo-500/50 hover:shadow-lg hover:shadow-indigo-500/5 transition-all w-full"
                     >
-                        <div className="w-14 h-14 rounded-2xl bg-gray-50 dark:bg-(--bg-secondary) text-indigo-500 flex items-center justify-center group-hover:bg-indigo-500 group-hover:text-white transition-all">
-                            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5"><path d="M16 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2" /><circle cx="9" cy="7" r="4" /></svg>
+                        <div className="w-11 h-11 rounded-xl bg-gray-50 dark:bg-(--bg-secondary) text-indigo-500 flex items-center justify-center group-hover:bg-indigo-500 group-hover:text-white transition-all">
+                            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5"><path d="M16 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2" /><circle cx="9" cy="7" r="4" /></svg>
                         </div>
-                        <span className="text-sm font-bold text-(--text-primary)">Contacts</span>
+                        <span className="text-xs font-bold text-(--text-primary)">Contacts</span>
                     </button>
 
                     <button
                         onClick={() => setIsQRModalOpen(true)}
-                        className="p-8 bg-white dark:bg-(--bg-card) border border-(--border-color)/50 rounded-4xl flex flex-col items-center justify-center gap-4 group hover:border-indigo-500/50 hover:shadow-xl hover:shadow-indigo-500/5 transition-all w-full"
+                        className="p-5 bg-white dark:bg-(--bg-card) border border-(--border-color)/50 rounded-2xl flex flex-col items-center justify-center gap-3 group hover:border-indigo-500/50 hover:shadow-lg hover:shadow-indigo-500/5 transition-all w-full"
                     >
-                        <div className="w-14 h-14 rounded-2xl bg-gray-50 dark:bg-(--bg-secondary) text-(--text-muted) flex items-center justify-center group-hover:bg-indigo-500 group-hover:text-white transition-all">
-                            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5"><rect x="3" y="3" width="7" height="7" /><rect x="14" y="3" width="7" height="7" /><rect x="3" y="14" width="7" height="7" /><rect x="14" y="14" width="3" height="3" /></svg>
+                        <div className="w-11 h-11 rounded-xl bg-gray-50 dark:bg-(--bg-secondary) text-(--text-muted) flex items-center justify-center group-hover:bg-indigo-500 group-hover:text-white transition-all">
+                            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5"><rect x="3" y="3" width="7" height="7" /><rect x="14" y="3" width="7" height="7" /><rect x="3" y="14" width="7" height="7" /><rect x="14" y="14" width="3" height="3" /></svg>
                         </div>
-                        <span className="text-sm font-bold text-(--text-primary)">QR Code</span>
+                        <span className="text-xs font-bold text-(--text-primary)">QR Code</span>
                     </button>
                 </div>
             </div>
@@ -579,7 +579,7 @@ function App() {
             <div className="mt-auto pt-4">
                 <button
                     onClick={() => setIsSettingsOpen(true)}
-                    className="w-full py-5 bg-white dark:bg-(--bg-card) border border-(--border-color)/50 rounded-3xl text-sm font-bold text-(--text-primary) hover:border-indigo-500/50 hover:text-indigo-600 transition-all flex items-center justify-center gap-3 shadow-sm"
+                    className="w-full py-3 bg-white dark:bg-(--bg-card) border border-(--border-color)/50 rounded-xl text-sm font-semibold text-(--text-primary) hover:border-indigo-500/50 hover:text-indigo-600 transition-all flex items-center justify-center gap-2.5 shadow-sm"
                 >
                     <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
                         <circle cx="12" cy="12" r="3" /><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z" />
@@ -589,7 +589,7 @@ function App() {
             </div>
 
             {/* Network Vitals */}
-            <div className="bg-linear-to-br from-indigo-600 to-purple-700 rounded-[2.5rem] p-8 text-white relative overflow-hidden shadow-xl shadow-indigo-500/20">
+            <div className="bg-linear-to-br from-indigo-600 to-purple-700 rounded-3xl p-6 text-white relative overflow-hidden shadow-lg shadow-indigo-500/20">
                 <div className="absolute top-0 right-0 w-32 h-32 -mr-16 -mt-16 bg-white/10 rounded-full blur-3xl animate-pulse"></div>
                 <div className="relative z-10">
                     <div className="flex items-center gap-3 mb-6">
@@ -600,7 +600,7 @@ function App() {
                         </div>
                         <div>
                             <h4 className="text-[10px] font-black uppercase tracking-[0.2em] opacity-80">Protocol Status</h4>
-                            <p className="text-sm font-black tracking-tight uppercase italic">Aptos Mainnet</p>
+                            <p className="text-sm font-bold tracking-tight uppercase">{NETWORK.charAt(0).toUpperCase() + NETWORK.slice(1)}</p>
                         </div>
                     </div>
 
@@ -676,9 +676,10 @@ function App() {
 
                     <button
                         onClick={disconnect}
-                        className="px-6 py-3 rounded-xl text-[10px] font-black uppercase tracking-[0.2em] bg-red-500 text-white shadow-lg shadow-red-500/20 hover:shadow-red-500/40 hover:-translate-y-0.5 transition-all active:scale-95 flex items-center justify-center min-w-[140px]"
+                        className="px-5 py-2.5 rounded-xl text-xs font-semibold border border-red-200 dark:border-red-500/30 text-red-500 hover:bg-red-50 dark:hover:bg-red-500/10 transition-all active:scale-95 flex items-center gap-2"
                     >
-                        Terminal Reset
+                        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4" /><polyline points="16 17 21 12 16 7" /><line x1="21" y1="12" x2="9" y2="12" /></svg>
+                        Disconnect
                     </button>
                 </div>
             }
@@ -747,7 +748,7 @@ function App() {
                     <div className="max-w-lg text-center">
                         <h2 className="text-5xl font-black text-(--text-primary) tracking-tighter mb-6 leading-tight">
                             Private. Secure.<br />
-                            <span className="bg-linear-to-r from-(--primary-brand) to-purple-500 bg-clip-text text-fill-transparent font-black">Decentralized.</span>
+                            <span className="bg-linear-to-r from-(--primary-brand) to-purple-500 bg-clip-text text-transparent font-black">Decentralized.</span>
                         </h2>
                         <div className="grid grid-cols-2 gap-4">
                             <div className="p-6 bento-card text-left space-y-3">
@@ -862,16 +863,16 @@ function App() {
                                 ) : (
                                     <div className="h-full flex items-center justify-center p-8">
                                         <div className="text-center max-w-sm w-full">
-                                            <div className="w-10 h-10 rounded-xl bg-linear-to-br from-orange-400 to-orange-600 flex items-center justify-center mx-auto mb-6 shadow-lg shadow-orange-500/20">
-                                                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2.5">
+                                            <div className="w-14 h-14 rounded-2xl bg-linear-to-br from-orange-400 to-orange-600 flex items-center justify-center mx-auto mb-5 shadow-lg shadow-orange-500/20">
+                                                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2.5">
                                                     <path d="M22 2L11 13M22 2L15 22L11 13L2 9L22 2Z" />
                                                 </svg>
                                             </div>
-                                            <h2 className="text-xl font-black text-(--text-primary) mb-2 tracking-tight">Your Digital HQ</h2>
-                                            <p className="text-[11px] text-(--text-muted) mb-6 uppercase font-bold tracking-wider">Secure communication layer</p>
+                                            <h2 className="text-2xl font-bold text-(--text-primary) mb-2 tracking-tight">No conversation selected</h2>
+                                            <p className="text-sm text-(--text-muted) mb-6">Choose a contact from the sidebar or start a new message</p>
                                             <Button
                                                 onClick={() => setSelectedRecipient(' ')}
-                                                className="rounded-lg! px-6! py-2! bg-(--primary-brand)! text-white! font-black text-[10px] uppercase tracking-widest"
+                                                className="rounded-xl! px-6! py-2.5! bg-(--primary-brand)! text-white! font-semibold text-sm!"
                                             >
                                                 New Message
                                             </Button>
@@ -901,10 +902,10 @@ function App() {
                                                 </div>
                                             </div>
 
-                                            <h2 className="text-4xl font-black text-(--text-primary) mb-3 tracking-tight uppercase">
+                                            <h2 className="text-3xl font-bold text-(--text-primary) mb-3 tracking-tight">
                                                 Decentralized Groups
                                             </h2>
-                                            <p className="text-(--text-secondary) mb-10 text-lg font-medium max-w-sm mx-auto leading-relaxed">
+                                            <p className="text-(--text-secondary) mb-8 text-base font-normal max-w-sm mx-auto leading-relaxed">
                                                 Secure, community-owned communication spaces powered by blockchain technology.
                                             </p>
 

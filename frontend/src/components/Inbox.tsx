@@ -252,7 +252,7 @@ export default function Inbox({ refreshKey, onMessages, onSelectContact, filterB
           <input
             ref={searchInputRef}
             type="text"
-            placeholder="Search protocol stream..."
+            placeholder="Search messages..."
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
             className="w-full pl-11 pr-11 py-3 bg-gray-50 dark:bg-(--bg-secondary)/50 border border-(--border-color)/40 rounded-xl text-xs font-bold focus:bg-white dark:focus:bg-(--bg-card) focus:border-(--primary-brand)/50 focus:ring-4 focus:ring-(--primary-brand)/10 outline-none transition-all placeholder:text-(--text-muted)/50"
