@@ -32,5 +32,5 @@ let moveToml = fs.readFileSync(moveTomlPath, 'utf8');
 moveToml = moveToml.replace(/inbox3 = ".*"/, `inbox3 = "${address}"`);
 fs.writeFileSync(moveTomlPath, moveToml);
 
-console.log('SUCCESS');
-console.log('MainnetAddress=', address);
+// write output to file
+fs.writeFileSync(path.resolve(__dirname, 'address.txt'), address);
