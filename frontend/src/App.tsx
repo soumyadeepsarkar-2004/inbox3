@@ -23,7 +23,7 @@ import ExportChat from './components/ExportChat'
 import { useDrafts, DraftsModal } from './components/DraftManager'
 import ComponentShowcase from './components/ComponentShowcase'
 import PerformanceDashboard from './components/PerformanceDashboard'
-import ProfileEditor from './components/ProfileEditor'
+import ProfileEditor, { resolveAvatarUrl } from './components/ProfileEditor'
 import { CallInterface, IncomingCallModal } from './components/CallInterface'
 import { profileManager, type UserProfile } from './lib/profileManager'
 import { getRealtimeService, type RealtimeMessage } from './lib/realtime'
@@ -491,7 +491,7 @@ function App() {
                 <div className="flex justify-center mb-6">
                     <Avatar
                         address={account?.address?.toString() || ''}
-                        src={userProfile?.avatar ? `https://gateway.pinata.cloud/ipfs/${userProfile.avatar}` : undefined}
+                        src={resolveAvatarUrl(userProfile?.avatar)}
                         size="xl"
                         status="online"
                         showStatus={true}
