@@ -551,11 +551,11 @@ function App() {
 
             {/* Quick Actions */}
             <div className="space-y-4">
-                <h3 className="text-[11px] font-black font-semibold text-(--text-muted) uppercase tracking-[0.2em] px-1">Quick Actions</h3>
+                <h3 className="text-[11px] font-black text-(--text-muted) uppercase tracking-[0.2em] px-1">Quick Actions</h3>
                 <div className="grid grid-cols-2 gap-4">
                     <button
                         onClick={() => setIsContactsOpen(true)}
-                        className="p-8 bg-white dark:bg-(--bg-card) border border-(--border-color)/50 rounded-[2rem] flex flex-col items-center justify-center gap-4 group hover:border-indigo-500/50 hover:shadow-xl hover:shadow-indigo-500/5 transition-all w-full"
+                        className="p-8 bg-white dark:bg-(--bg-card) border border-(--border-color)/50 rounded-4xl flex flex-col items-center justify-center gap-4 group hover:border-indigo-500/50 hover:shadow-xl hover:shadow-indigo-500/5 transition-all w-full"
                     >
                         <div className="w-14 h-14 rounded-2xl bg-gray-50 dark:bg-(--bg-secondary) text-indigo-500 flex items-center justify-center group-hover:bg-indigo-500 group-hover:text-white transition-all">
                             <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5"><path d="M16 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2" /><circle cx="9" cy="7" r="4" /></svg>
@@ -565,7 +565,7 @@ function App() {
 
                     <button
                         onClick={() => setIsQRModalOpen(true)}
-                        className="p-8 bg-white dark:bg-(--bg-card) border border-(--border-color)/50 rounded-[2rem] flex flex-col items-center justify-center gap-4 group hover:border-indigo-500/50 hover:shadow-xl hover:shadow-indigo-500/5 transition-all w-full"
+                        className="p-8 bg-white dark:bg-(--bg-card) border border-(--border-color)/50 rounded-4xl flex flex-col items-center justify-center gap-4 group hover:border-indigo-500/50 hover:shadow-xl hover:shadow-indigo-500/5 transition-all w-full"
                     >
                         <div className="w-14 h-14 rounded-2xl bg-gray-50 dark:bg-(--bg-secondary) text-(--text-muted) flex items-center justify-center group-hover:bg-indigo-500 group-hover:text-white transition-all">
                             <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5"><rect x="3" y="3" width="7" height="7" /><rect x="14" y="3" width="7" height="7" /><rect x="3" y="14" width="7" height="7" /><rect x="14" y="14" width="3" height="3" /></svg>
@@ -579,7 +579,7 @@ function App() {
             <div className="mt-auto pt-4">
                 <button
                     onClick={() => setIsSettingsOpen(true)}
-                    className="w-full py-5 bg-white dark:bg-(--bg-card) border border-(--border-color)/50 rounded-[1.5rem] text-sm font-bold text-(--text-primary) hover:border-indigo-500/50 hover:text-indigo-600 transition-all flex items-center justify-center gap-3 shadow-sm"
+                    className="w-full py-5 bg-white dark:bg-(--bg-card) border border-(--border-color)/50 rounded-3xl text-sm font-bold text-(--text-primary) hover:border-indigo-500/50 hover:text-indigo-600 transition-all flex items-center justify-center gap-3 shadow-sm"
                 >
                     <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
                         <circle cx="12" cy="12" r="3" /><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z" />
@@ -589,7 +589,7 @@ function App() {
             </div>
 
             {/* Network Vitals */}
-            <div className="bg-gradient-to-br from-indigo-600 to-purple-700 rounded-[2.5rem] p-8 text-white relative overflow-hidden shadow-xl shadow-indigo-500/20">
+            <div className="bg-linear-to-br from-indigo-600 to-purple-700 rounded-[2.5rem] p-8 text-white relative overflow-hidden shadow-xl shadow-indigo-500/20">
                 <div className="absolute top-0 right-0 w-32 h-32 -mr-16 -mt-16 bg-white/10 rounded-full blur-3xl animate-pulse"></div>
                 <div className="relative z-10">
                     <div className="flex items-center gap-3 mb-6">
@@ -728,14 +728,14 @@ function App() {
                         <div className="flex flex-col gap-4">
                             <Button
                                 onClick={() => { setWalletModalMode('wallet'); setIsWalletModalOpen(true); }}
-                                className="w-full !py-4 !rounded-2xl font-bold !bg-[#FF6B35] !text-white shadow-lg shadow-orange-500/20 active:scale-[0.98] transition-all"
+                                className="w-full py-4! rounded-2xl! font-bold bg-[#FF6B35]! text-white! shadow-lg shadow-orange-500/20 active:scale-[0.98] transition-all"
                             >
                                 Connect Wallet
                             </Button>
                             <Button
                                 onClick={() => { setWalletModalMode('social'); setIsWalletModalOpen(true); }}
                                 variant="outline"
-                                className="w-full !py-4 !rounded-2xl font-bold !border-gray-200 dark:!border-white/10 !text-(--text-primary) hover:!bg-gray-50 dark:hover:!bg-white/5 transition-all"
+                                className="w-full py-4! rounded-2xl! font-bold border-gray-200! dark:border-white/10! text-(--text-primary)! hover:bg-gray-50! dark:hover:bg-white/5! transition-all"
                             >
                                 Social Sign-in
                             </Button>
@@ -783,7 +783,7 @@ function App() {
                     <div className="w-24 h-24 bg-(--primary-brand-light) rounded-3xl flex items-center justify-center mx-auto text-(--primary-brand)"><svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z" /><polyline points="22,6 12,13 2,6" /></svg></div>
                     <h1 className="text-4xl font-black tracking-tighter">Setup Required</h1>
                     <p className="text-lg text-(--text-secondary)">Your account does not have a decentralized inbox yet. Initializing one will allow you to participate in private messaging.</p>
-                    <Button onClick={createInbox} loading={loading} className="w-full !py-5 text-xl font-bold !rounded-2xl shadow-xl shadow-(--primary-brand)/20">Initialize My Inbox</Button>
+                    <Button onClick={createInbox} loading={loading} className="w-full py-5! text-xl font-bold rounded-2xl! shadow-xl shadow-(--primary-brand)/20">Initialize My Inbox</Button>
                 </Card>
             </div>
         )
@@ -811,7 +811,7 @@ function App() {
                             <div className="h-full flex flex-col overflow-hidden">
                                 {selectedRecipient && selectedRecipient.trim().length > 5 ? (
                                     <div className="flex-1 flex flex-col min-h-0 bg-(--bg-main)/30">
-                                        <div className="px-5 py-3 border-b border-(--border-color)/30 bg-(--bg-card)/40 backdrop-blur-md flex justify-between items-center transition-all flex-shrink-0">
+                                        <div className="px-5 py-3 border-b border-(--border-color)/30 bg-(--bg-card)/40 backdrop-blur-md flex justify-between items-center transition-all shrink-0">
                                             <div className="flex items-center gap-3">
                                                 <Avatar address={selectedRecipient} size="sm" status="online" />
                                                 <div className="min-w-0">
@@ -862,7 +862,7 @@ function App() {
                                 ) : (
                                     <div className="h-full flex items-center justify-center p-8">
                                         <div className="text-center max-w-sm w-full">
-                                            <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-orange-400 to-orange-600 flex items-center justify-center mx-auto mb-6 shadow-lg shadow-orange-500/20">
+                                            <div className="w-10 h-10 rounded-xl bg-linear-to-br from-orange-400 to-orange-600 flex items-center justify-center mx-auto mb-6 shadow-lg shadow-orange-500/20">
                                                 <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2.5">
                                                     <path d="M22 2L11 13M22 2L15 22L11 13L2 9L22 2Z" />
                                                 </svg>
@@ -871,7 +871,7 @@ function App() {
                                             <p className="text-[11px] text-(--text-muted) mb-6 uppercase font-bold tracking-wider">Secure communication layer</p>
                                             <Button
                                                 onClick={() => setSelectedRecipient(' ')}
-                                                className="!rounded-lg !px-6 !py-2 !bg-(--primary-brand) !text-white font-black text-[10px] uppercase tracking-widest"
+                                                className="rounded-lg! px-6! py-2! bg-(--primary-brand)! text-white! font-black text-[10px] uppercase tracking-widest"
                                             >
                                                 New Message
                                             </Button>
@@ -891,7 +891,7 @@ function App() {
                                             {/* Modern Icon Container */}
                                             <div className="relative inline-block mb-8">
                                                 <div className="absolute inset-0 bg-purple-500/20 blur-3xl rounded-full" />
-                                                <div className="relative w-24 h-24 rounded-[2rem] bg-gradient-to-br from-purple-500 to-indigo-600 flex items-center justify-center mx-auto shadow-2xl shadow-purple-500/10 border border-white/10">
+                                                <div className="relative w-24 h-24 rounded-4xl bg-linear-to-br from-purple-500 to-indigo-600 flex items-center justify-center mx-auto shadow-2xl shadow-purple-500/10 border border-white/10">
                                                     <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
                                                         <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2" />
                                                         <circle cx="9" cy="7" r="4" />
@@ -917,7 +917,7 @@ function App() {
                                                 </button>
                                                 <button
                                                     onClick={() => setIsCreateGroupModalOpen(true)}
-                                                    className="w-full sm:w-auto px-10 py-4 rounded-2xl bg-gradient-to-r from-purple-600 to-indigo-600 text-white font-black text-[10px] uppercase tracking-[0.2em] shadow-xl shadow-purple-500/20 hover:shadow-purple-500/40 hover:-translate-y-0.5 transition-all"
+                                                    className="w-full sm:w-auto px-10 py-4 rounded-2xl bg-linear-to-r from-purple-600 to-indigo-600 text-white font-black text-[10px] uppercase tracking-[0.2em] shadow-xl shadow-purple-500/20 hover:shadow-purple-500/40 hover:-translate-y-0.5 transition-all"
                                                 >
                                                     + Create New
                                                 </button>
