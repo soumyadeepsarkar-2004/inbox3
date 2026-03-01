@@ -158,7 +158,11 @@ export default function GroupChat({ contractAddress, groupAddr, onBack }: GroupC
                 })
             )
 
-            setMessages(processedMessages)
+            // Filter out messages that failed to load from IPFS
+            const validMessages = processedMessages.filter(
+                m => m.content !== 'Failed to load message' && !m.content.startsWith('⚠️')
+            )
+            setMessages(validMessages)
         } catch (error) {
             console.error('Error fetching messages:', error)
         }

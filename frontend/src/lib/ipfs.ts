@@ -168,11 +168,7 @@ export const download = async (rawCid: string): Promise<string> => {
     return text;
   } catch (error) {
     console.error('[IPFS] All gateways failed for CID:', cid, error);
-    return JSON.stringify({
-      content: '⚠️  Unable to retrieve message — IPFS gateways unavailable. Check your connection.',
-      sender: 'Network',
-      timestamp: Date.now()
-    });
+    throw new Error(`IPFS_UNAVAILABLE:${cid}`);
   }
 };
 

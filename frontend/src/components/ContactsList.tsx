@@ -85,11 +85,11 @@ export default function ContactsList({ onSelectContact }: ContactsListProps) {
             <div className="flex items-center justify-between mb-6 bg-(--bg-secondary) p-4 rounded-lg border border-(--border-color)">
                 <div>
                     <h2 className="text-xl font-black text-(--text-primary) tracking-tight uppercase">Contacts</h2>
-                    <p className="text-[10px] text-(--text-secondary) font-bold mt-0.5">MANAGE YOUR ADDRESS BOOK</p>
+                    <p className="text-[10px] text-(--text-secondary) font-medium mt-0.5">Add and manage your contacts</p>
                 </div>
                 <button
                     onClick={() => setShowAddForm(!showAddForm)}
-                    className={`btn ${showAddForm ? 'btn--ghost' : 'btn--primary'} !py-2 !px-5 !rounded-lg text-xs font-black uppercase tracking-widest`}
+                    className={`btn ${showAddForm ? 'btn--ghost' : 'btn--primary'} py-2! px-5! rounded-lg! text-xs font-black uppercase tracking-widest`}
                 >
                     {showAddForm ? 'Cancel' : '+ Add New'}
                 </button>
@@ -109,11 +109,11 @@ export default function ContactsList({ onSelectContact }: ContactsListProps) {
             {/* Add Contact Form */}
             {showAddForm && (
                 <div className="mb-6 p-6 bg-white dark:bg-(--bg-card) rounded-[2.5rem] border border-(--primary-brand)/20 shadow-xl shadow-indigo-500/5 animate-scale-in">
-                    <h3 className="text-xs font-black uppercase tracking-widest mb-5 text-(--primary-brand)">Establish Connection</h3>
+                    <h3 className="text-xs font-black uppercase tracking-widest mb-5 text-(--primary-brand)">New Contact</h3>
 
                     <div className="space-y-4">
                         <div className="space-y-1.5">
-                            <label className="block text-[10px] font-black uppercase tracking-wider text-(--text-muted) ml-1">Protocol Address *</label>
+                            <label className="block text-[10px] font-black uppercase tracking-wider text-(--text-muted) ml-1">Wallet Address *</label>
                             <input
                                 type="text"
                                 value={newContact.address}
@@ -124,7 +124,7 @@ export default function ContactsList({ onSelectContact }: ContactsListProps) {
                         </div>
 
                         <div className="space-y-1.5">
-                            <label className="block text-[10px] font-black uppercase tracking-wider text-(--text-muted) ml-1">Alias / Identity *</label>
+                            <label className="block text-[10px] font-black uppercase tracking-wider text-(--text-muted) ml-1">Name *</label>
                             <input
                                 type="text"
                                 value={newContact.username}
@@ -136,7 +136,7 @@ export default function ContactsList({ onSelectContact }: ContactsListProps) {
                         </div>
 
                         <div className="space-y-1.5">
-                            <label className="block text-[10px] font-black uppercase tracking-wider text-(--text-muted) ml-1">Metadata (Optional)</label>
+                            <label className="block text-[10px] font-black uppercase tracking-wider text-(--text-muted) ml-1">Notes (optional)</label>
                             <textarea
                                 value={newContact.notes}
                                 onChange={(e) => setNewContact({ ...newContact, notes: e.target.value })}
@@ -148,9 +148,9 @@ export default function ContactsList({ onSelectContact }: ContactsListProps) {
 
                         <button
                             onClick={handleAddContact}
-                            className="w-full mt-2 py-4 bg-gradient-to-br from-indigo-400 to-indigo-600 text-white rounded-2xl font-black text-[11px] uppercase tracking-[0.15em] shadow-lg shadow-indigo-500/20 hover:shadow-indigo-500/40 hover:-translate-y-0.5 transition-all active:scale-[0.98]"
+                            className="w-full mt-2 py-4 bg-linear-to-br from-indigo-400 to-indigo-600 text-white rounded-2xl font-black text-[11px] uppercase tracking-[0.15em] shadow-lg shadow-indigo-500/20 hover:shadow-indigo-500/40 hover:-translate-y-0.5 transition-all active:scale-[0.98]"
                         >
-                            Authorize & Save Contact
+                            Add Contact
                         </button>
                     </div>
                 </div>
@@ -168,7 +168,7 @@ export default function ContactsList({ onSelectContact }: ContactsListProps) {
                     type="text"
                     value={searchQuery}
                     onChange={(e) => setSearchQuery(e.target.value)}
-                    placeholder="Search characters, addresses, aliases..."
+                    placeholder="Search contacts..."
                     className="w-full pl-12 pr-12 py-4 bg-gray-50 dark:bg-(--bg-secondary)/50 border border-(--border-color)/50 rounded-2xl focus:bg-white dark:focus:bg-(--bg-card) focus:border-(--primary-brand)/50 focus:ring-4 focus:ring-(--primary-brand)/10 outline-none transition-all text-sm text-(--text-primary) placeholder:text-(--text-muted)/50 font-medium"
                 />
                 {searchQuery && (
@@ -195,7 +195,7 @@ export default function ContactsList({ onSelectContact }: ContactsListProps) {
                         <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" className="text-(--text-muted)"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2" /><circle cx="12" cy="7" r="4" /></svg>
                     </div>
                     <p className="text-xs font-bold uppercase tracking-widest text-(--text-secondary)">
-                        {searchQuery ? 'Zero matches found in index' : 'Directory is currently empty'}
+                        {searchQuery ? 'No contacts found' : 'No contacts yet'}
                     </p>
                 </div>
             ) : (
@@ -210,12 +210,12 @@ export default function ContactsList({ onSelectContact }: ContactsListProps) {
                                     <div className="relative">
                                         {contact.avatar ? (
                                             <img
-                                                src={`https://gateway.pinata.cloud/ipfs/${contact.avatar}`}
+                                                src={contact.avatar?.startsWith('data:') || contact.avatar?.startsWith('http') ? contact.avatar : `https://gateway.pinata.cloud/ipfs/${contact.avatar}`}
                                                 alt={contact.username}
                                                 className="w-12 h-12 rounded-2xl object-cover border-2 border-(--bg-secondary) shadow-sm"
                                             />
                                         ) : (
-                                            <div className="w-12 h-12 rounded-2xl bg-gradient-to-br from-gray-50 to-gray-100 dark:from-white/5 dark:to-white/10 flex items-center justify-center border border-(--border-color)/50">
+                                            <div className="w-12 h-12 rounded-2xl bg-linear-to-br from-gray-50 to-gray-100 dark:from-white/5 dark:to-white/10 flex items-center justify-center border border-(--border-color)/50">
                                                 <span className="text-sm text-(--text-primary) font-black">
                                                     {contact.username.charAt(0).toUpperCase()}
                                                 </span>
@@ -224,7 +224,7 @@ export default function ContactsList({ onSelectContact }: ContactsListProps) {
                                         <div className="absolute -bottom-1 -right-1 w-4 h-4 rounded-full bg-green-500 border-2 border-white dark:border-(--bg-card)"></div>
                                     </div>
                                     <div className="min-w-0">
-                                        <h3 className="text-sm font-black text-(--text-primary) tracking-tight truncate uppercase">{contact.username}</h3>
+                                        <h3 className="text-sm font-semibold text-(--text-primary) tracking-tight truncate">{contact.username}</h3>
                                         <p className="text-[10px] font-mono text-(--text-muted) truncate mt-0.5 opacity-60 tracking-wider font-bold">{contact.address}</p>
                                     </div>
                                 </div>
@@ -234,7 +234,7 @@ export default function ContactsList({ onSelectContact }: ContactsListProps) {
                                         <button
                                             onClick={() => onSelectContact(contact.address)}
                                             className="w-10 h-10 rounded-xl bg-indigo-50 dark:bg-indigo-500/10 text-indigo-500 flex items-center justify-center hover:bg-indigo-500 hover:text-white transition-all active:scale-90"
-                                            title="Initialize Secure Tunnel"
+                                            title="Send message"
                                         >
                                             <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
                                                 <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z" />
@@ -244,7 +244,7 @@ export default function ContactsList({ onSelectContact }: ContactsListProps) {
                                     <button
                                         onClick={() => handleRemoveContact(contact.address)}
                                         className="w-10 h-10 rounded-xl bg-red-50 dark:bg-red-500/10 text-red-500 flex items-center justify-center hover:bg-red-500 hover:text-white transition-all active:scale-90"
-                                        title="Sever Connection"
+                                        title="Remove contact"
                                     >
                                         <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
                                             <path d="M3 6h18M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2" />
@@ -268,7 +268,7 @@ export default function ContactsList({ onSelectContact }: ContactsListProps) {
 
             <div className="mt-8 pt-6 border-t border-(--border-color) text-center">
                 <p className="text-xs font-bold text-(--text-secondary) uppercase tracking-widest">
-                    Active Registry: {filteredContacts.length} Authorized Entities
+                    {filteredContacts.length} {filteredContacts.length === 1 ? 'contact' : 'contacts'}
                 </p>
             </div>
         </div>

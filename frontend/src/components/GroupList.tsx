@@ -97,7 +97,7 @@ export default function GroupList({ contractAddress, onSelectGroup, onCreateGrou
                 <div className="flex items-center justify-between mb-6 px-1">
                     <div>
                         <h3 className="text-xl font-black text-(--text-primary) tracking-tight uppercase">Squads</h3>
-                        <p className="text-[9px] text-(--text-muted) font-black tracking-[0.2em] uppercase">Private collectives</p>
+                        <p className="text-[9px] text-(--text-muted) font-medium tracking-wide uppercase">Your group chats</p>
                     </div>
                     <div className="flex gap-2">
                         <button
@@ -108,7 +108,7 @@ export default function GroupList({ contractAddress, onSelectGroup, onCreateGrou
                         </button>
                         <button
                             onClick={onCreateGroup}
-                            className="px-3 py-1.5 rounded-lg bg-gradient-to-r from-purple-500 to-indigo-600 text-white text-[10px] font-black uppercase tracking-widest shadow-lg shadow-purple-500/20 hover:shadow-purple-500/40 transition-all"
+                            className="px-3 py-1.5 rounded-lg bg-linear-to-r from-purple-500 to-indigo-600 text-white text-[10px] font-black uppercase tracking-widest shadow-lg shadow-purple-500/20 hover:shadow-purple-500/40 transition-all"
                         >
                             + New
                         </button>
@@ -140,7 +140,7 @@ export default function GroupList({ contractAddress, onSelectGroup, onCreateGrou
                                 type="text"
                                 value={searchQuery}
                                 onChange={(e) => setSearchQuery(e.target.value)}
-                                placeholder="Search squads by name or hash..."
+                                placeholder="Search groups..."
                                 className="w-full pl-11 pr-11 py-3 bg-gray-50 dark:bg-(--bg-secondary)/40 border border-(--border-color)/40 rounded-2xl text-xs font-bold focus:bg-white dark:focus:bg-(--bg-card) focus:border-purple-500/50 focus:ring-4 focus:ring-purple-500/10 outline-none transition-all placeholder:text-(--text-muted)/50"
                             />
                             {searchQuery && (
@@ -161,14 +161,14 @@ export default function GroupList({ contractAddress, onSelectGroup, onCreateGrou
                         </div>
 
                         {filteredGroups.length === 0 ? (
-                            <div className="text-center py-12 px-6 bg-(--bg-secondary)/10 rounded-[2rem] border-2 border-dashed border-(--border-color)">
+                            <div className="text-center py-12 px-6 bg-(--bg-secondary)/10 rounded-4xl border-2 border-dashed border-(--border-color)">
                                 <div className="w-12 h-12 rounded-2xl bg-(--bg-secondary) flex items-center justify-center mx-auto mb-4 opacity-50">
                                     <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" className="text-(--text-muted)">
                                         <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2" /><circle cx="9" cy="7" r="4" />
                                     </svg>
                                 </div>
                                 <p className="text-[10px] font-black uppercase tracking-[0.15em] text-(--text-muted) mb-4">
-                                    {searchQuery ? 'No matching squads found' : 'No squads detected in registry'}
+                                    {searchQuery ? 'No groups found' : 'No groups yet'}
                                 </p>
                             </div>
                         ) : (
