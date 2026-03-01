@@ -44,12 +44,42 @@ module inbox3::Inbox3Tests {
 
         // 4. User1 sends a message
         let cid = b"QmTest123";
-        Inbox3::send_group_message(user1, group_addr, cid);
+        let parent_id = vector::empty<u8>();
+        Inbox3::send_group_message(user1, group_addr, cid, parent_id);
         
         // 5. Verify message
         let messages = Inbox3::get_group_messages(group_addr);
         // Note: In a real test we would inspect the message content, 
         // but the view function returns a custom struct that might be hard to inspect directly in test without accessors.
         // Assuming implementation correctness if no error was thrown.
+    }
+    #[test(user1 = @0x123, user2 = @0x456)]
+    public entry fun test_send_and_read_message(user1: &signer, user2: &signer) {
+        let user1_addr = signer::address_of(user1);
+        let user2_addr = signer::address_of(user2);
+        
+        account::create_account_for_test(user1_addr);
+        account::create_account_for_test(user2_addr);
+        timestamp::set_time_has_started_for_testing(account::create_signer_for_test(@0x1));
+        
+        Inbox3::create_inbox(user1);
+        Inbox3::create_inbox(user2);
+        
+        let cid = b"QmTestCID123";
+        Inbox3::send_message(user1, user2_addr, cid);
+        
+        let msg_count_u2 = Inbox3::get_message_count(user2_addr);
+        assert!(msg_count_u2 == 1, 100);
+        
+        let msg_count_u1 = Inbox3::get_message_count(user1_addr);
+        assert!(msg_count_u1 == 1, 101); // sent message count includes outbox
+
+        // Check unread
+        assert!(!Inbox3::is_cid_read(user2_addr, cid), 102);
+        
+        // Mark read
+        Inbox3::mark_read(user2, 0); // message id 0
+        
+        assert!(Inbox3::is_cid_read(user2_addr, cid), 103);
     }
 }
