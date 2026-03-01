@@ -1,41 +1,92 @@
 #!/bin/bash
 
-# Aptos Smart Contract Deployment Script
+# Inbox3 Smart Contract Deployment Script
+# Supports both Testnet and Mainnet deployment
 
-echo "🚀 Deploying Inbox3 Smart Contract to Aptos..."
+set -e  # Exit on any error
 
-# Check if aptos CLI is installed
+TARGET_NETWORK="${1:-testnet}"  # Default to testnet; pass "mainnet" to deploy to mainnet
+
+echo "========================================"
+echo " Inbox3 Smart Contract Deployment"
+echo " Target Network: ${TARGET_NETWORK}"
+echo "========================================"
+
+# --- Safety guard for mainnet ---
+if [ "$TARGET_NETWORK" = "mainnet" ]; then
+    echo ""
+    echo "⚠️  WARNING: You are about to deploy to APTOS MAINNET."
+    echo "    This will cost real APT for gas fees."
+    echo "    Make sure your mainnet profile in .aptos/config.yaml is correct."
+    echo ""
+    read -p "Type 'yes' to confirm mainnet deployment: " CONFIRM
+    if [ "$CONFIRM" != "yes" ]; then
+        echo "❌ Deployment cancelled."
+        exit 1
+    fi
+fi
+
+# --- Validate environment ---
 if ! command -v aptos &> /dev/null; then
-    echo "❌ Aptos CLI not found. Please install it first:"
-    echo "curl -fsSL 'https://aptos.dev/scripts/install_cli.py' | python3"
+    echo "❌ Aptos CLI not found. Install it:"
+    echo "   curl -fsSL 'https://aptos.dev/scripts/install_cli.py' | python3"
     exit 1
 fi
 
-# Check if Move.toml exists
 if [ ! -f "Move.toml" ]; then
-    echo "❌ Move.toml not found. Please run this script from the smart-contract directory."
+    echo "❌ Move.toml not found. Run this script from the smart-contract directory."
     exit 1
 fi
 
-# Compile the contract
+# --- Compile ---
+echo ""
 echo "📦 Compiling Move contract..."
-aptos move compile
+aptos move compile --named-addresses inbox3=default
 
 if [ $? -ne 0 ]; then
-    echo "❌ Contract compilation failed!"
+    echo "❌ Compilation failed!"
     exit 1
 fi
+echo "✅ Compilation successful!"
 
-echo "✅ Contract compiled successfully!"
+# --- Run tests (only on testnet deploy) ---
+if [ "$TARGET_NETWORK" != "mainnet" ]; then
+    echo ""
+    echo "🧪 Running Move tests..."
+    aptos move test --named-addresses inbox3=default
+    if [ $? -ne 0 ]; then
+        echo "❌ Tests failed! Fix tests before deploying."
+        exit 1
+    fi
+    echo "✅ All tests passed!"
+fi
 
-# Deploy to testnet
-echo "🌐 Deploying to Aptos Testnet..."
-aptos move publish --named-addresses inbox3=default --network testnet
+# --- Deploy ---
+echo ""
+echo "🌐 Deploying to Aptos ${TARGET_NETWORK}..."
+
+PROFILE="default"
+if [ "$TARGET_NETWORK" = "mainnet" ]; then
+    PROFILE="mainnet"
+fi
+
+aptos move publish \
+    --named-addresses inbox3=${PROFILE} \
+    --profile ${PROFILE} \
+    --network ${TARGET_NETWORK} \
+    --assume-yes
 
 if [ $? -eq 0 ]; then
-    echo "✅ Contract deployed successfully!"
-    echo "📝 IMPORTANT: Update CONTRACT_ADDRESS in frontend/src/config.ts and inbox3 address in Move.toml with your new address!"
+    echo ""
+    echo "✅ Contract deployed successfully to ${TARGET_NETWORK}!"
+    echo ""
+    echo "📝 NEXT STEPS:"
+    echo "   1. Copy your deployed account address"
+    echo "   2. Update CONTRACT_ADDRESS in frontend/.env:"
+    echo "      VITE_CONTRACT_ADDRESS=<your-mainnet-account-address>"
+    echo "   3. Update Move.toml [addresses] inbox3 = \"<your-mainnet-account-address>\""
+    echo "   4. Rebuild and redeploy the frontend"
 else
-    echo "❌ Contract deployment failed!"
+    echo "❌ Deployment failed!"
     exit 1
 fi

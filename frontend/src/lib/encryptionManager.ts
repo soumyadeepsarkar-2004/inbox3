@@ -3,6 +3,15 @@ import nacl from 'tweetnacl';
 /**
  * Enhanced Encryption Manager with proper key management
  * Uses NaCl (TweetNaCl) for secure end-to-end encryption
+ *
+ * ⚠️ SECURITY THREAT MODEL & LIMITATIONS:
+ * 1. Storage: Keys are currently stored directly in `localStorage` encoded in Base64.
+ * 2. XSS Risk: If the frontend is compromised by Cross-Site Scripting (XSS), an attacker
+ *    could potentially exfiltrate these keys from localStorage.
+ * 3. Mitigation: For a true production deployment, keys should be wrapped (encrypted) 
+ *    using window.crypto.subtle, protected by a passphrase, or stored in IndexedDB 
+ *    with extractable: false. They are left in localStorage here for frictionless UX 
+ *    without requiring a password prompt on every load.
  */
 
 const STORAGE_KEY_PREFIX = 'inbox3_key_';

@@ -56,34 +56,34 @@ export default function GiphyPicker({ onSelect, onClose }: GiphyPickerProps) {
     }, [search])
 
     return (
-        <div className="absolute bottom-full mb-2 left-0 w-80 bg-(--bg-card) rounded-2xl shadow-xl border border-(--border-color) overflow-hidden animate-scale-in z-120">
-            <div className="p-3 border-b border-(--border-color) bg-(--bg-secondary) flex items-center gap-2">
+        <div className="absolute bottom-full right-0 mb-3 w-[320px] bg-(--bg-card) rounded-2xl shadow-2xl border border-(--border-color) overflow-hidden animate-slide-up z-50">
+            <div className="p-2 border-b border-(--border-color) bg-(--bg-secondary) flex items-center gap-2">
                 <div className="relative flex-1">
                     <input
                         type="text"
                         value={search}
                         onChange={(e) => setSearch(e.target.value)}
                         placeholder="Search GIFs..."
-                        className="w-full pl-8 pr-3 py-2 text-sm bg-(--bg-card) rounded-lg border-none outline-none focus:ring-2 focus:ring-(--primary-brand)"
+                        className="w-full pl-8 pr-3 py-1.5 text-xs bg-(--bg-card) rounded-lg border-none outline-none focus:ring-1 focus:ring-(--primary-brand)"
                         autoFocus
                     />
-                    <svg className="absolute left-2.5 top-2.5 text-(--text-muted)" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                    <svg className="absolute left-2 top-2 text-(--text-muted)" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
                         <circle cx="11" cy="11" r="8"></circle>
                         <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
                     </svg>
                 </div>
                 <button
                     onClick={onClose}
-                    className="p-1.5 rounded-lg hover:bg-(--bg-card) transition-colors"
+                    className="p-1 rounded-lg hover:bg-black/5 text-(--text-muted) transition-colors"
                 >
-                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3">
                         <line x1="18" y1="6" x2="6" y2="18" />
                         <line x1="6" y1="6" x2="18" y2="18" />
                     </svg>
                 </button>
             </div>
 
-            <div className="h-64 overflow-y-auto p-2">
+            <div className="h-60 overflow-y-auto p-2 custom-scrollbar">
                 <div className="grid grid-cols-2 gap-2">
                     {gifs.map(gif => (
                         <button
@@ -92,19 +92,19 @@ export default function GiphyPicker({ onSelect, onClose }: GiphyPickerProps) {
                                 onSelect(gif.images.fixed_height.url)
                                 onClose()
                             }}
-                            className="relative aspect-square rounded-lg overflow-hidden hover:opacity-90 transition-opacity group"
+                            className="relative aspect-video rounded-lg overflow-hidden hover:opacity-90 transition-opacity group bg-(--bg-secondary)"
                         >
                             <img
                                 src={gif.images.fixed_height.url}
                                 alt={gif.title}
                                 className="w-full h-full object-cover"
                             />
-                            <div className="absolute inset-0 bg-black/0 group-hover:bg-black/20 transition-colors" />
+                            <div className="absolute inset-0 bg-black/0 group-hover:bg-black/10 transition-colors" />
                         </button>
                     ))}
                 </div>
-                <div className="mt-4 text-center">
-                    <p className="text-[10px] text-(--text-muted)">Powered by GIPHY (Demo Mode)</p>
+                <div className="py-3 text-center border-t border-(--border-color)/30 mt-2">
+                    <p className="text-[9px] font-black uppercase tracking-tighter text-(--text-muted) opacity-50">Powered by GIPHY</p>
                 </div>
             </div>
         </div>

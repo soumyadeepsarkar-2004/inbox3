@@ -1,7 +1,7 @@
 export interface BadgeProps {
     children: React.ReactNode
     variant?: 'default' | 'primary' | 'success' | 'warning' | 'danger' | 'info'
-    size?: 'sm' | 'md'
+    size?: 'xs' | 'sm' | 'md'
     dot?: boolean
     className?: string
 }
@@ -23,6 +23,7 @@ export function Badge({
     }
 
     const sizeStyles = {
+        xs: 'px-1 py-0 text-[9px] leading-tight',
         sm: 'px-1.5 py-0.5 text-[10px]',
         md: 'px-2 py-0.5 text-xs'
     }

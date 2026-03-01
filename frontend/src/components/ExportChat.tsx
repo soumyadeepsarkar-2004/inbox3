@@ -54,7 +54,7 @@ export default function ExportChat({ messages, chatName, isOpen, onClose }: Expo
             if (options.includeTimestamps) {
                 content += `[${new Date(msg.timestamp).toLocaleString()}] `
             }
-            content += `${msg.sender.slice(0, 8)}...: ${msg.content}\n`
+            content += `${msg.sender.slice(0, 8)}...: ${msg.content || msg.plain || ''}\n`
         })
 
         return content

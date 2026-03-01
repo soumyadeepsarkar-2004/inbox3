@@ -85,7 +85,7 @@ export function SavedSearches({
         persistSearches(savedSearches.filter(s => s.id !== id))
     }
 
-    const useSearch = (search: SavedSearch) => {
+    const handleSelectSearch = (search: SavedSearch) => {
         // Update last used timestamp
         const updated = savedSearches.map(s =>
             s.id === search.id ? { ...s, usedAt: Date.now() } : s
@@ -140,7 +140,7 @@ export function SavedSearches({
                             key={search.id}
                             variant="outlined"
                             className="p-3 hover:bg-(--bg-secondary) transition-colors cursor-pointer group"
-                            onClick={() => useSearch(search)}
+                            onClick={() => handleSelectSearch(search)}
                         >
                             <div className="flex items-start justify-between gap-2">
                                 <div className="flex-1 min-w-0">

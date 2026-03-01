@@ -1,0 +1,5 @@
+{
+  "dependencies": {
+    "petra-plugin-wallet-adapter": "^0.4.5"
+  }
+}

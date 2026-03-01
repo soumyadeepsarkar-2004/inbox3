@@ -1,2 +1,9 @@
-.aptos/
+# Compiled artifacts
 build/
+
+# Aptos CLI local config contains private keys — NEVER commit real config
+# We commit config.yaml as a TEMPLATE with placeholder values only.
+# If it contains real keys, add it to the git exclude:
+# echo ".aptos/config.yaml" >> .git/info/exclude
+.aptos/*.key
+.aptos/*.pem

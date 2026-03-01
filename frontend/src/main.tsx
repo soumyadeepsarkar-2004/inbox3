@@ -98,13 +98,13 @@ try {
     <StrictMode>
       <ErrorBoundary>
         <AptosWalletAdapterProvider
-          autoConnect={false}
+          autoConnect={true}
           dappConfig={{
             network: NETWORK,
             aptosConnectDappId: 'inbox3-dapp'
           }}
           onError={(error) => {
-            console.error('Wallet error:', error)
+            console.error('Wallet adapter error:', error)
           }}
         >
           <App />

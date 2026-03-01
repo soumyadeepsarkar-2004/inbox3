@@ -99,40 +99,34 @@ export function AppShell({ topNav, sidebar, children, rightPane }: AppShellProps
                     {topNav}
                 </header>
 
-                {/* Main Layout Container */}
-                <div className="app-shell__body">
-                    {/* Sidebar - Collapsible */}
-                    {sidebar && (
-                        <>
-                            {/* Mobile Overlay */}
-                            {isMobile && sidebarOpen && (
-                                <div
-                                    className="app-shell__overlay"
-                                    onClick={() => setSidebarOpen(false)}
-                                    aria-hidden="true"
-                                />
-                            )}
-                            <aside
-                                className={`app-shell__sidebar ${sidebarOpen ? 'app-shell__sidebar--open' : ''}`}
-                                aria-label="Sidebar navigation"
-                            >
-                                {sidebar}
-                            </aside>
-                        </>
-                    )}
+                {/* Main Layout Container - CSS Grid Implementation */}
+                <div className="app-shell__grid">
+                    {/* Left Pane - Navigation & Inbox (3 cols) */}
+                    <aside
+                        className={`app-shell__left-pane ${isMobile && !sidebarOpen ? 'hidden' : ''} ${isMobile ? 'app-shell__left-pane--mobile-overlay' : ''}`}
+                    >
+                        {sidebar}
+                    </aside>
 
-                    {/* Center Pane - Main Content */}
-                    <main className="app-shell__center" id="main-content" role="main">
-                        {children}
+                    {/* Center Pane - Main Content (6 cols) */}
+                    <main className="app-shell__center-pane" id="main-content">
+                        <div className="app-shell__content-scroller">
+                            {children}
+                        </div>
                     </main>
 
-                    {/* Right Pane - Profile/Tools */}
-                    {rightPane && (isDesktop || (isTablet && rightPaneOpen)) && (
-                        <aside className="app-shell__right" aria-label="Tools panel">
-                            {rightPane}
-                        </aside>
-                    )}
+                    {/* Right Pane - Utilities (3 cols) */}
+                    <aside
+                        className={`app-shell__right-pane ${!rightPaneOpen && !isDesktop ? 'hidden' : ''}`}
+                    >
+                        {rightPane}
+                    </aside>
                 </div>
+
+                {/* Mobile Tablet Navigation Bar (Optional/Custom) */}
+                {isMobile && sidebarOpen && (
+                    <div className="app-shell__mobile-overlay" onClick={() => setSidebarOpen(false)} />
+                )}
             </div>
         </LayoutContext.Provider>
     )

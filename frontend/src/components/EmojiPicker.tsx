@@ -65,6 +65,7 @@ export default function EmojiPicker({ onSelect, position = 'bottom' }: EmojiPick
                     <div className="flex gap-1 p-3 border-b border-(--border-color) bg-(--bg-secondary)">
                         {QUICK_REACTIONS.map(emoji => (
                             <button
+                                type="button"
                                 key={emoji}
                                 onClick={() => handleEmojiClick(emoji)}
                                 className="flex-1 text-xl hover:scale-125 transition-transform p-1 rounded-lg hover:bg-(--bg-card)"
@@ -90,6 +91,7 @@ export default function EmojiPicker({ onSelect, position = 'bottom' }: EmojiPick
                         <div className="flex gap-1 p-2 border-b border-(--border-color) overflow-x-auto">
                             {Object.keys(EMOJI_CATEGORIES).map((cat) => (
                                 <button
+                                    type="button"
                                     key={cat}
                                     onClick={() => setActiveCategory(cat as keyof typeof EMOJI_CATEGORIES)}
                                     className={`px-3 py-1 text-xs rounded-full whitespace-nowrap transition-colors ${activeCategory === cat
@@ -107,6 +109,7 @@ export default function EmojiPicker({ onSelect, position = 'bottom' }: EmojiPick
                     <div className="p-2 h-48 overflow-y-auto grid grid-cols-8 gap-1">
                         {filteredEmojis.map((emoji, index) => (
                             <button
+                                type="button"
                                 key={`${emoji}-${index}`}
                                 onClick={() => handleEmojiClick(emoji)}
                                 className="text-xl p-1 rounded-lg hover:bg-(--bg-secondary) hover:scale-110 transition-all"

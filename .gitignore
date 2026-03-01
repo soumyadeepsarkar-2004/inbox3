@@ -104,3 +104,9 @@ temp/
 wallet.json
 private-key.json
 *.private
+
+# Aptos CLI config — may contain private keys
+# The config.yaml is committed as a TEMPLATE (placeholder values).
+# If you populate it with real keys, protect it with:
+#   echo "smart-contract/.aptos/config.yaml" >> .git/info/exclude
+smart-contract/.aptos/config.yaml

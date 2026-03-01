@@ -4,7 +4,7 @@ import { useState, useEffect, useCallback } from 'react'
 interface UnreadBadgeProps {
     count: number
     showZero?: boolean
-    size?: 'sm' | 'md' | 'lg'
+    size?: 'xs' | 'sm' | 'md' | 'lg'
     animate?: boolean
 }
 
@@ -25,6 +25,7 @@ export function UnreadBadge({ count, showZero = false, size = 'md', animate = tr
     if (count === 0 && !showZero) return null
 
     const sizeClasses = {
+        xs: 'min-w-[14px] h-3.5 text-[9px] px-1',
         sm: 'min-w-[16px] h-4 text-[10px] px-1',
         md: 'min-w-[20px] h-5 text-xs px-1.5',
         lg: 'min-w-[24px] h-6 text-sm px-2'

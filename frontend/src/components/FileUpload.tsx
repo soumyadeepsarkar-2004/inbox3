@@ -2,13 +2,14 @@ import { useState, useRef } from 'react'
 import { uploadFile } from '../lib/ipfs'
 
 interface FileUploadProps {
-    onFileUploaded: (url: string, type: 'image' | 'file', fileName: string) => void
+    onFileUploaded: (url: string, type: 'image' | 'video' | 'file', fileName: string) => void
     disabled?: boolean
 }
 
-const MAX_FILE_SIZE = 10 * 1024 * 1024 // 10MB
+const MAX_FILE_SIZE = 50 * 1024 * 1024 // 50MB for video support
 const ALLOWED_IMAGE_TYPES = ['image/jpeg', 'image/png', 'image/gif', 'image/webp']
-const ALLOWED_FILE_TYPES = [...ALLOWED_IMAGE_TYPES, 'application/pdf', 'text/plain', 'application/json']
+const ALLOWED_VIDEO_TYPES = ['video/mp4', 'video/webm', 'video/ogg', 'video/quicktime']
+const ALLOWED_FILE_TYPES = [...ALLOWED_IMAGE_TYPES, ...ALLOWED_VIDEO_TYPES, 'application/pdf', 'text/plain', 'application/json']
 
 export default function FileUpload({ onFileUploaded, disabled }: FileUploadProps) {
     const [isUploading, setIsUploading] = useState(false)
@@ -24,14 +25,19 @@ export default function FileUpload({ onFileUploaded, disabled }: FileUploadProps
 
         // Validate file size
         if (file.size > MAX_FILE_SIZE) {
-            setError('File too large. Maximum size is 10MB.')
+            setError('File too large. Maximum size is 50MB.')
             return
         }
 
         // Validate file type
         if (!ALLOWED_FILE_TYPES.includes(file.type)) {
-            setError('File type not supported. Use images, PDF, or text files.')
-            return
+            // Check extension if type is missing (common on some OS)
+            const ext = file.name.split('.').pop()?.toLowerCase();
+            const isVideoExt = ['mp4', 'mov', 'webm', 'ogg'].includes(ext || '');
+            if (!isVideoExt) {
+                setError('File type not supported. Use images, videos, or documents.');
+                return
+            }
         }
 
         setIsUploading(true)
@@ -40,7 +46,13 @@ export default function FileUpload({ onFileUploaded, disabled }: FileUploadProps
         try {
             const cid = await uploadFile(file)
             const url = `https://gateway.pinata.cloud/ipfs/${cid}`
-            const fileType = ALLOWED_IMAGE_TYPES.includes(file.type) ? 'image' : 'file'
+
+            let fileType: 'image' | 'video' | 'file' = 'file'
+            if (ALLOWED_IMAGE_TYPES.includes(file.type)) {
+                fileType = 'image'
+            } else if (ALLOWED_VIDEO_TYPES.includes(file.type) || file.type.startsWith('video/')) {
+                fileType = 'video'
+            }
 
             setUploadProgress('Upload complete!')
             onFileUploaded(url, fileType, file.name)
@@ -78,8 +90,8 @@ export default function FileUpload({ onFileUploaded, disabled }: FileUploadProps
                 onClick={() => fileInputRef.current?.click()}
                 disabled={disabled || isUploading}
                 className={`p-2 rounded-lg transition-colors ${isUploading
-                        ? 'bg-(--bg-secondary) text-(--text-muted) cursor-wait'
-                        : 'hover:bg-(--bg-secondary) text-(--text-secondary) hover:text-(--primary-brand)'
+                    ? 'bg-(--bg-secondary) text-(--text-muted) cursor-wait'
+                    : 'hover:bg-(--bg-secondary) text-(--text-secondary) hover:text-(--primary-brand)'
                     }`}
                 title="Attach file or image"
             >

@@ -5,26 +5,53 @@ import { aptos } from '../config'
 import EmojiPicker from './EmojiPicker'
 import FileUpload from './FileUpload'
 import GiphyPicker from './GiphyPicker'
-import StickerPicker from './StickerPicker'
-import { Button, Input, Textarea, Card, Spinner } from './ui'
+import { Spinner } from './ui'
+import { useMetrics } from './PerformanceDashboard'
+import ChatComposer from './ChatComposer'
+
+const normalizeAddress = (addr: string) => {
+  if (!addr) return addr
+  const clean = addr.trim().startsWith('0x') ? addr.trim().slice(2) : addr.trim()
+  return '0x' + clean.padStart(64, '0')
+}
+
+export interface ProcessedMessage {
+  sender: string;
+  content: string;
+  timestamp: number;
+  read: boolean;
+  id: number;
+  cid: string;
+  type?: 'text' | 'audio';
+  plain?: string;
+}
 
 interface SendMessageProps {
   contractAddress: string
   onMessageSent: () => void
+  onClose?: () => void
   initialRecipient?: string
 }
 
-export default function SendMessage({ contractAddress, onMessageSent, initialRecipient }: SendMessageProps) {
+interface AttachedFile {
+  url: string
+  type: 'image' | 'file' | 'video'
+  name: string
+  id: string
+}
+
+export default function SendMessage({ contractAddress, onMessageSent, onClose, initialRecipient }: SendMessageProps) {
   const { account, signAndSubmitTransaction } = useWallet()
   const [recipient, setRecipient] = useState(initialRecipient ?? '')
   const [message, setMessage] = useState('')
   const [loading, setLoading] = useState(false)
   const [currentStep, setCurrentStep] = useState('')
-  const [ipfsHash, setIpfsHash] = useState('')
   const [isRecording, setIsRecording] = useState(false)
   const [recordingTime, setRecordingTime] = useState(0)
   const [showGiphy, setShowGiphy] = useState(false)
-  const [showStickers, setShowStickers] = useState(false)
+  const [selectedGif, setSelectedGif] = useState<string | null>(null)
+  const [attachedFiles, setAttachedFiles] = useState<AttachedFile[]>([])
+  const { incrementMessagesSent, addDataUsage } = useMetrics()
   const mediaRecorderRef = useRef<MediaRecorder | null>(null)
   const audioChunksRef = useRef<Blob[]>([])
   const timerRef = useRef<ReturnType<typeof setInterval> | null>(null)
@@ -119,29 +146,40 @@ export default function SendMessage({ contractAddress, onMessageSent, initialRec
     }
 
     setLoading(true)
-    setCurrentStep('Uploading audio...')
+    setCurrentStep('Checking recipient...')
 
     try {
-      // 1. Upload audio file
+      const normalizedRecipient = normalizeAddress(recipient)
+      const existsRes = await aptos.view({
+        payload: {
+          function: `${contractAddress}::Inbox3::inbox_exists`,
+          functionArguments: [normalizedRecipient]
+        }
+      })
+
+      if (!existsRes[0]) {
+        throw new Error('3')
+      }
+
       const audioCid = await uploadFile(audioBlob)
       const audioUrl = `https://gateway.pinata.cloud/ipfs/${audioCid}`
+      addDataUsage(audioBlob.size)
 
-      // 2. Upload metadata JSON
       const metadataCid = await uploadToPinata(audioUrl, account.address.toString(), 'audio')
 
       setCurrentStep('Storing on blockchain...')
 
-      // 3. Send transaction
       const response = await signAndSubmitTransaction({
         data: {
           function: `${contractAddress}::Inbox3::send_message`,
           typeArguments: [],
-          functionArguments: [recipient, Array.from(new TextEncoder().encode(metadataCid))]
+          functionArguments: [normalizeAddress(recipient), Array.from(new TextEncoder().encode(metadataCid))]
         }
       })
 
       await aptos.waitForTransaction({ transactionHash: response.hash })
 
+      incrementMessagesSent()
       setCurrentStep('Audio message sent!')
       setTimeout(() => setCurrentStep(''), 3000)
       onMessageSent()
@@ -155,242 +193,277 @@ export default function SendMessage({ contractAddress, onMessageSent, initialRec
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
-    if (!account || !recipient.trim() || !message.trim()) return
+    if (!account || !recipient.trim() || (!message.trim() && !selectedGif && attachedFiles.length === 0 && !isRecording)) return
 
     setLoading(true)
-    setCurrentStep('Encrypting message...')
-    setIpfsHash('')
+    setCurrentStep('Checking recipient...')
 
     try {
-      // Step 1: Encrypt message data
+      const normalizedRecipient = normalizeAddress(recipient)
+      const existsRes = await aptos.view({
+        payload: {
+          function: `${contractAddress}::Inbox3::inbox_exists`,
+          functionArguments: [normalizedRecipient]
+        }
+      })
+
+      if (!existsRes[0]) {
+        throw new Error('3')
+      }
+
+      setCurrentStep('Encrypting message...')
+
+      let finalContent = message
+
+      if (selectedGif) {
+        finalContent = finalContent ? `${finalContent}\n![GIF](${selectedGif})` : `![GIF](${selectedGif})`
+      }
+
+      attachedFiles.forEach(file => {
+        const md = file.type === 'image'
+          ? `![${file.name}](${file.url})`
+          : file.type === 'video'
+            ? `[Video: ${file.name}](${file.url})`
+            : `[${file.name}](${file.url})`
+        finalContent = finalContent ? `${finalContent}\n${md}` : md
+      })
+
+      await handleSend(finalContent)
+
+    } finally {
+      setLoading(false)
+    }
+  }
+
+  const handleSend = async (content: string) => {
+    if (!account || !recipient.trim() || !content.trim()) return
+
+    setLoading(true)
+    setCurrentStep('Checking recipient...')
+
+    try {
+      const normalizedRecipient = normalizeAddress(recipient)
+      const existsRes = await aptos.view({
+        payload: {
+          function: `${contractAddress}::Inbox3::inbox_exists`,
+          functionArguments: [normalizedRecipient]
+        }
+      })
+
+      if (!existsRes[0]) {
+        throw new Error('3')
+      }
+
+      setCurrentStep('Encrypting block...')
+
       const messageData = {
         sender: account.address.toString(),
-        content: message,
+        content: content,
         timestamp: Date.now(),
         type: 'text'
       }
 
-      setCurrentStep('Uploading to IPFS...')
-      console.log('🔐 Encrypting message data:', messageData)
-
-      // Step 2: Upload to IPFS
+      setCurrentStep('Syncing to IPFS...')
       const cid = await upload(JSON.stringify(messageData))
-      setIpfsHash(cid)
-      console.log('📦 IPFS Upload complete! Hash:', cid)
+      addDataUsage(new Blob([JSON.stringify(messageData)]).size)
 
-      setCurrentStep('Storing on blockchain...')
-
-      // Step 3: Store on blockchain
+      setCurrentStep('Validating...')
       const response = await signAndSubmitTransaction({
         data: {
           function: `${contractAddress}::Inbox3::send_message`,
           typeArguments: [],
-          functionArguments: [recipient, Array.from(new TextEncoder().encode(cid))]
+          functionArguments: [normalizeAddress(recipient), Array.from(new TextEncoder().encode(cid))]
         }
       })
-      console.log('🚀 Transaction submitted:', response);
 
-      setCurrentStep('Confirming transaction...')
       await aptos.waitForTransaction({ transactionHash: response.hash })
-      console.log('✅ Transaction confirmed:', response.hash);
+      incrementMessagesSent()
 
-      setCurrentStep('Message sent successfully!')
-      setTimeout(() => {
-        setCurrentStep('')
-        setIpfsHash('')
-      }, 3000)
+      setCurrentStep('Sent!')
+      setTimeout(() => setCurrentStep(''), 2000)
 
-      setRecipient('')
-      setMessage('')
-
-      alert('Message sent successfully! The inbox will refresh automatically.')
-
-      console.log('Calling onMessageSent callback to refresh inbox')
       onMessageSent()
     } catch (error) {
       console.error('Error sending message:', error)
-
       let errorMessage = 'Failed to send message'
       if (error instanceof Error) {
         if (error.message.includes('3')) {
-          errorMessage = 'The recipient does not have an inbox yet. They need to create one first.'
+          errorMessage = 'The recipient does not have an inbox yet.'
         } else if (error.message.includes('insufficient')) {
-          errorMessage = 'Insufficient balance to send the message.'
+          errorMessage = 'Insufficient balance.'
         }
       }
-
       alert(errorMessage)
     } finally {
       setLoading(false)
     }
   }
 
-  return (
-    <Card variant="default" className="p-6 animate-fade-in">
-      <form onSubmit={handleSubmit} className="space-y-4">
-        <Input
-          label="Recipient Address"
-          type="text"
-          value={recipient}
-          onChange={(e) => setRecipient(e.target.value)}
-          placeholder="0x..."
-          hint="Enter the recipient's wallet address (starts with 0x)"
-          required
+  const isCompactMode = !!initialRecipient && initialRecipient.trim().length > 5
+
+  if (isCompactMode) {
+    return (
+      <div className="flex flex-col border-t border-(--border-color)/30 bg-(--bg-card)/50 backdrop-blur-xl group relative">
+        {loading && currentStep && (
+          <div className="absolute top-0 left-0 right-0 -translate-y-full px-5 py-2 flex items-center gap-3 bg-gradient-to-r from-blue-600/90 to-blue-500/90 backdrop-blur-md text-white z-50">
+            <Spinner size="xs" />
+            <span className="text-[10px] font-black uppercase tracking-[0.2em]">{currentStep}</span>
+          </div>
+        )}
+        <ChatComposer
+          onSend={handleSend}
+          onSendAudio={sendAudioMessage}
+          disabled={loading}
+          placeholder="Type your secure message..."
         />
+        <div className="px-5 py-2 border-t border-(--border-color)/20 flex justify-between items-center opacity-60">
+          <div className="flex items-center gap-1.5 px-2 py-0.5 rounded-full bg-green-500/10 border border-green-500/10">
+            <div className="w-1 h-1 rounded-full bg-green-500 shadow-[0_0_5px_rgba(34,197,94,0.5)]" />
+            <span className="text-[8px] font-black uppercase tracking-widest text-green-600">E2E Secured Connection</span>
+          </div>
+          <span className="text-[8px] font-black uppercase tracking-[0.2em] text-(--text-muted)">Aptos Network Layer</span>
+        </div>
+      </div>
+    )
+  }
 
-        <div className="form-group">
-          <label className="block text-sm font-medium text-(--text-primary) mb-1.5">Message</label>
-          <div className="flex flex-col gap-2">
-            <div className="relative">
-              <Textarea
-                value={message}
-                onChange={(e) => setMessage(e.target.value)}
-                placeholder="Type your secure message..."
-                className="min-h-[100px] pr-20"
-                required={!isRecording}
-                disabled={isRecording}
-              />
-              <div className="absolute right-2 top-2 flex gap-1">
-                {/* GIF Button */}
-                <div className="relative">
-                  <button
-                    type="button"
-                    onClick={() => {
-                      setShowGiphy(!showGiphy)
-                      setShowStickers(false)
-                    }}
-                    className="p-2 rounded-lg hover:bg-(--bg-secondary) text-(--text-muted) hover:text-(--text-primary) transition-colors"
-                  >
-                    <span className="font-bold text-xs border border-current rounded px-0.5">GIF</span>
-                  </button>
-                  {showGiphy && (
-                    <GiphyPicker
-                      onSelect={(url) => {
-                        setMessage(prev => prev + `\n![GIF](${url})`)
-                        setShowGiphy(false)
-                      }}
-                      onClose={() => setShowGiphy(false)}
-                    />
-                  )}
-                </div>
-
-                {/* Sticker Button */}
-                <div className="relative">
-                  <button
-                    type="button"
-                    onClick={() => {
-                      setShowStickers(!showStickers)
-                      setShowGiphy(false)
-                    }}
-                    className="p-2 rounded-lg hover:bg-(--bg-secondary) text-(--text-muted) hover:text-(--text-primary) transition-colors"
-                  >
-                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M12 22c5.523 0 10-4.477 10-10S17.523 2 12 2 2 6.477 2 12s4.477 10 10 10z" /><path d="M8 14s1.5 2 4 2 4-2 4-2" /><line x1="9" y1="9" x2="9.01" y2="9" /><line x1="15" y1="9" x2="15.01" y2="9" /></svg>
-                  </button>
-                  {showStickers && (
-                    <StickerPicker
-                      onSelect={(url) => {
-                        setMessage(prev => prev + `\n![Sticker](${url})`)
-                        setShowStickers(false)
-                      }}
-                      onClose={() => setShowStickers(false)}
-                    />
-                  )}
-                </div>
-
-                <EmojiPicker
-                  onSelect={(emoji) => setMessage(prev => prev + emoji)}
-                  position="bottom"
-                />
-                <FileUpload
-                  disabled={loading || isRecording}
-                  onFileUploaded={async (url, type, fileName) => {
-                    if (type === 'image') {
-                      setMessage(prev => prev + `\n[Image: ${fileName}](${url})`)
-                    } else {
-                      setMessage(prev => prev + `\n[File: ${fileName}](${url})`)
-                    }
-                  }}
-                />
+  return (
+    <div className="h-full flex flex-col items-center justify-center p-4">
+      <div className="w-full max-w-2xl bg-(--bg-card)/20 backdrop-blur-xl rounded-[2.5rem] border border-(--border-color)/30 shadow-2xl overflow-hidden animate-scale-in">
+        <form onSubmit={handleSubmit} className="p-8 flex flex-col gap-6">
+          <div className="flex items-center justify-between">
+            <div className="flex items-center gap-4">
+              <div className="w-12 h-12 rounded-2xl bg-gradient-to-br from-orange-400 to-orange-600 flex items-center justify-center shadow-lg shadow-orange-500/20">
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="3">
+                  <path d="M22 2L11 13M22 2L15 22L11 13L2 9L22 2Z" />
+                </svg>
+              </div>
+              <div>
+                <h2 className="text-xl font-black text-(--text-primary) tracking-tight">New Secure Channel</h2>
+                <p className="text-[10px] font-black uppercase tracking-widest text-orange-500/60">Quantum-Resistant Layer</p>
               </div>
             </div>
-            <div className="flex gap-2">
-              <Button
+            {onClose && (
+              <button type="button" onClick={onClose} className="p-2 rounded-xl hover:bg-black/5 hover:dark:bg-white/5 transition-all text-(--text-muted)">
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3"><path d="M18 6L6 18M6 6l12 12" /></svg>
+              </button>
+            )}
+          </div>
+
+          <div className="space-y-4">
+            <div className="space-y-1.5 px-1">
+              <label className="text-[10px] font-black uppercase tracking-wider text-(--text-muted) opacity-70">Recipient Address</label>
+              <input
+                type="text"
+                value={recipient}
+                onChange={(e) => setRecipient(e.target.value)}
+                placeholder="0x... (Aptos Address)"
+                className="w-full px-5 py-4 bg-(--bg-secondary)/50 border border-(--border-color)/40 rounded-2xl focus:border-(--primary-brand) outline-none transition-all text-sm font-mono"
+                required
+              />
+            </div>
+
+            <div className="space-y-1.5 px-1">
+              <label className="text-[10px] font-black uppercase tracking-wider text-(--text-muted) opacity-70">Message Content</label>
+              <div className="relative flex flex-col min-h-0 bg-(--bg-secondary)/30 border border-(--border-color)/40 rounded-[1.5rem] focus-within:border-(--primary-brand) transition-all">
+                <textarea
+                  value={message}
+                  onChange={(e) => setMessage(e.target.value)}
+                  placeholder="Start your conversation privately..."
+                  className="w-full min-h-[160px] px-5 py-4 bg-transparent text-(--text-primary) outline-none text-sm resize-none custom-scrollbar"
+                  required={!isRecording && !selectedGif && attachedFiles.length === 0}
+                  disabled={isRecording}
+                />
+
+                {(selectedGif || attachedFiles.length > 0) && (
+                  <div className="px-5 pb-4 flex flex-wrap gap-3 animate-scale-in">
+                    {selectedGif && (
+                      <div className="relative group">
+                        <img src={selectedGif} className="h-20 w-auto rounded-lg border-2 border-orange-500/30 shadow-sm" alt="GIF" />
+                        <button type="button" onClick={() => setSelectedGif(null)} className="absolute -top-2 -right-2 w-5 h-5 bg-red-500 text-white rounded-full flex items-center justify-center shadow-md"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3"><path d="M18 6L6 18M6 6l12 12" /></svg></button>
+                      </div>
+                    )}
+                    {attachedFiles.map(file => {
+                      const isImg = file.type === 'image' || /\.(jpg|jpeg|png|gif|webp|svg)/i.test(file.name);
+                      const isVid = file.type === 'video' || /\.(mp4|webm|ogg|mov|quicktime)/i.test(file.name);
+                      return (
+                        <div key={file.id} className="relative group">
+                          {isImg ? (
+                            <img src={file.url} className="h-20 w-auto rounded-lg border-2 border-orange-500/30 shadow-sm" alt="img" />
+                          ) : isVid ? (
+                            <div className="h-20 aspect-video rounded-lg bg-black/20 border-2 border-orange-500/30 flex items-center justify-center relative overflow-hidden">
+                              <video src={file.url} className="w-full h-full object-cover" />
+                              <svg width="20" height="20" viewBox="0 0 24 24" fill="white" className="absolute z-10"><path d="M8 5v14l11-7z" /></svg>
+                            </div>
+                          ) : (
+                            <div className="h-20 w-20 rounded-lg bg-black/10 flex items-center justify-center text-(--text-muted)"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M13 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V9z" /><polyline points="13 2 13 9 20 9" /></svg></div>
+                          )}
+                          <button type="button" onClick={() => setAttachedFiles(prev => prev.filter(f => f.id !== file.id))} className="absolute -top-2 -right-2 w-5 h-5 bg-red-500 text-white rounded-full flex items-center justify-center shadow-lg"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3"><path d="M18 6L6 18M6 6l12 12" /></svg></button>
+                        </div>
+                      );
+                    })}
+                  </div>
+                )}
+
+                <div className="flex items-center gap-2 p-2 border-t border-(--border-color)/20">
+                  <EmojiPicker onSelect={(emoji) => setMessage(prev => prev + emoji)} position="top" />
+                  <FileUpload disabled={loading || isRecording} onFileUploaded={async (url, type, fileName) => {
+                    setAttachedFiles(prev => [...prev, { url, type, name: fileName, id: Math.random().toString(36).substr(2, 9) }])
+                  }} />
+                  <button type="button" onClick={() => setShowGiphy(!showGiphy)} className={`px-4 py-1.5 rounded-lg font-black text-[10px] uppercase transition-all ${showGiphy ? 'bg-orange-500 text-white' : 'hover:bg-black/5 text-(--text-muted) border border-(--border-color)/40'}`}>GIF</button>
+                  {showGiphy && (
+                    <div className="absolute bottom-full left-0 mb-4 z-50">
+                      <GiphyPicker onSelect={(url) => { setSelectedGif(url); setShowGiphy(false); }} onClose={() => setShowGiphy(false)} />
+                    </div>
+                  )}
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div className="flex items-center justify-between pt-2">
+            <div className="flex items-center gap-2 px-4 py-2 rounded-full bg-green-500/5 border border-green-500/10">
+              <div className="w-1.5 h-1.5 rounded-full bg-green-500 animate-pulse shadow-[0_0_8px_rgba(34,197,94,0.4)]" />
+              <span className="text-[9px] font-black uppercase tracking-widest text-green-600 dark:text-green-400">E2E Secure</span>
+            </div>
+
+            <div className="flex gap-4">
+              <button
                 type="button"
                 onClick={isRecording ? stopRecording : startRecording}
-                variant={isRecording ? 'danger' : 'secondary'}
-                className={`min-w-[140px] ${isRecording ? 'animate-pulse' : ''}`}
-                icon={
-                  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                    {isRecording ? (
-                      <rect x="6" y="6" width="12" height="12" />
-                    ) : (
-                      <>
-                        <path d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3z" />
-                        <path d="M19 10v2a7 7 0 0 1-14 0v-2" />
-                        <line x1="12" y1="19" x2="12" y2="23" />
-                        <line x1="8" y1="23" x2="16" y2="23" />
-                      </>
-                    )}
-                  </svg>
-                }
+                className={`flex items-center gap-3 px-8 py-4 rounded-[1.5rem] font-black text-[12px] uppercase tracking-widest transition-all active:scale-95 shadow-lg ${isRecording
+                  ? 'bg-red-500 text-white animate-pulse shadow-red-500/40 ring-8 ring-red-500/10'
+                  : 'bg-(--bg-secondary) border border-(--border-color)/50 hover:bg-orange-500/10 hover:text-orange-500 hover:border-orange-500/30'}`}
               >
-                {isRecording ? `${formatTime(recordingTime)}` : 'Record Audio'}
-              </Button>
+                <div className={`w-2.5 h-2.5 rounded-full ${isRecording ? 'bg-white shadow-[0_0_10px_white]' : 'bg-red-500'} animate-pulse`} />
+                {isRecording ? formatTime(recordingTime) : 'Encrypted Audio'}
+              </button>
 
-              <Button
+              <button
                 type="submit"
-                disabled={loading || (!recipient.trim() && !isRecording) || (!message.trim() && !isRecording)}
-                loading={loading}
-                variant="primary"
-                className="flex-1"
-                icon={
-                  !loading ? (
-                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                      <path d="M22 2L11 13" />
-                      <path d="M22 2L15 22L11 13L2 9L22 2Z" />
-                    </svg>
-                  ) : undefined
-                }
+                disabled={loading || !recipient || (!message.trim() && !isRecording && !selectedGif && attachedFiles.length === 0)}
+                className="flex items-center gap-3 px-10 py-4 bg-gradient-to-br from-orange-400 via-orange-500 to-red-600 text-white rounded-[1.5rem] font-black text-[13px] uppercase tracking-[0.15em] shadow-2xl shadow-orange-500/30 hover:shadow-orange-500/60 hover:-translate-y-1.5 transition-all disabled:opacity-40 disabled:grayscale disabled:translate-y-0 active:scale-95"
               >
-                {loading ? (currentStep || 'Sending...') : 'Send Message'}
-              </Button>
-            </div>
-          </div>
-        </div>
-
-        {/* Status Indicator */}
-        {(loading || currentStep) && (
-          <Card variant="outlined" className="p-4 border-l-4 border-l-blue-500 bg-blue-50 dark:bg-blue-900/20">
-            <div className="flex items-center gap-3">
-              {loading && <Spinner size="sm" />}
-              <div>
-                <p className="font-medium text-sm text-blue-800 dark:text-blue-300">
-                  {currentStep || 'Processing...'}
-                </p>
-                {ipfsHash && (
-                  <p className="text-xs text-blue-600 dark:text-blue-400 mt-1 font-mono">
-                    IPFS Hash: {ipfsHash.slice(0, 20)}...
-                  </p>
+                {!loading ? (
+                  <>
+                    <span className="drop-shadow-md">Broadcast Message</span>
+                    <div className="flex items-center justify-center w-6 h-6 bg-white/20 rounded-xl backdrop-blur-sm">
+                      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="4">
+                        <path d="M22 2L11 13M22 2L15 22L11 13L2 9L22 2Z" />
+                      </svg>
+                    </div>
+                  </>
+                ) : (
+                  <div className="flex items-center gap-3">
+                    <Spinner size="sm" />
+                    <span className="text-xs">Securing...</span>
+                  </div>
                 )}
-              </div>
-            </div>
-          </Card>
-        )}
-
-        <Card variant="outlined" className="p-4 border-l-4 border-l-orange-500 bg-orange-50 dark:bg-orange-900/20">
-          <div className="flex items-center gap-3">
-            <div className="w-8 h-8 rounded-full bg-orange-100 dark:bg-orange-900/40 flex items-center justify-center text-orange-600 dark:text-orange-400 font-bold text-sm">
-              !
-            </div>
-            <div>
-              <p className="font-medium text-sm text-orange-800 dark:text-orange-300">Security Notice</p>
-              <p className="text-xs text-orange-600 dark:text-orange-400">
-                Messages are encrypted and stored on IPFS. Only the recipient can decrypt and read your message.
-              </p>
+              </button>
             </div>
           </div>
-        </Card>
-      </form>
-    </Card>
+        </form>
+      </div>
+    </div>
   )
 }

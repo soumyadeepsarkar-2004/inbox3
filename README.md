@@ -27,15 +27,16 @@
 
 ---
 
-**Inbox3 is now a complete, production-ready decentralized messaging platform with 40+ features!**
+**Inbox3 is a production-ready decentralized messaging platform with 40+ features!**
 
 ###  Core Infrastructure
--  Smart contract deployed to Aptos Testnet
--  All blockchain functions tested and working
--  IPFS integration with Pinata
+-  Smart contract deployable to **Aptos Mainnet**
+-  All blockchain functions tested and verified
+-  IPFS integration with Pinata (required in production)
 -  Real-time message synchronization
 -  Offline support with automatic sync
 -  Cross-browser compatibility
+-  WebRTC voice & video calling (requires signaling server)
 
 ---
 
@@ -104,15 +105,14 @@
 
 ## 🌐 Live Demo
 
-**Try Inbox3 now:** [https://inbox3-aptos.vercel.app](https://inbox3-aptos.vercel.app)
+**Try Inbox3now:** [https://inbox3-aptos.vercel.app](https://inbox3-aptos.vercel.app)
 
-### Getting Started with the Demo
+### Getting Started
 1. Visit the live demo link above
 2. Install [Petra Wallet](https://petra.app/) or [Martian Wallet](https://martianwallet.xyz/) browser extension
-3. Switch your wallet to **Aptos Testnet**
-4. Get free testnet tokens from the [Aptos Faucet](https://aptos.dev/en/network/faucet)
-5. Connect your wallet and create your inbox
-6. Start messaging!
+3. Switch your wallet to **Aptos Mainnet**
+4. Connect your wallet and create your inbox
+5. Start messaging!
 
 ---
 
@@ -171,14 +171,15 @@ inbox3::Inbox3
 └── inbox_exists()         - Check inbox status
 ```
 
-**Contract Address:** `0xf1768eb79d367572b8e436f8e3bcfecf938eeaf6656a65f73773c50c43b71d67`
+**Contract Address:** `<YOUR_MAINNET_CONTRACT_ADDRESS>` *(deploy with `./smart-contract/deploy.sh mainnet`)*
 
 ### Frontend Stack
 - **Framework:** React 19 + TypeScript + Vite
 - **Styling:** Tailwind CSS v4 with custom design system
 - **Blockchain:** Aptos SDK + Wallet Adapter
-- **Storage:** Pinata IPFS API
+- **Storage:** Pinata IPFS API *(required in production)*
 - **State:** React Hooks + localStorage
+- **Calling:** WebRTC + WebSocket Signaling Server
 
 ### Component Architecture
 ```
@@ -404,12 +405,16 @@ vercel --prod
 
 ### Environment Variables
 
-For production deployments, you may want to configure:
+Copy `frontend/.env.example` to `frontend/.env` and fill in:
 
-| Variable | Description | Default |
-|----------|-------------|---------|
-| `VITE_CONTRACT_ADDRESS` | Aptos smart contract address | Pre-configured for testnet |
-| `VITE_NETWORK` | Aptos network (testnet/mainnet) | `testnet` |
+| Variable | Description | Required |
+|----------|-------------|----------|
+| `VITE_CONTRACT_ADDRESS` | Deployed Aptos contract address | ✅ Yes |
+| `VITE_NETWORK` | `mainnet` \| `testnet` \| `devnet` | ✅ Yes |
+| `VITE_PINATA_API_KEY` | Pinata API key (IPFS storage) | ✅ Yes |
+| `VITE_PINATA_SECRET_KEY` | Pinata secret key | ✅ Yes |
+| `VITE_PINATA_GATEWAY` | Custom Pinata gateway URL | Optional |
+| `VITE_SIGNALING_SERVER_URL` | WebSocket relay for voice/video calls | Optional |
 
 ---
 
