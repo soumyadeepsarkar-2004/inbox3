@@ -66,7 +66,7 @@ export const upload = async (data: string): Promise<string> => {
     // Proactively cache for immediate retrieval
     try {
       localStorage.setItem(`ipfs-${result.IpfsHash}`, data);
-    } catch (e) {
+    } catch {
       // Cache failure is non-critical
     }
 

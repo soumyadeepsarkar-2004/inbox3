@@ -155,7 +155,7 @@ export const verifyKeyRotation = (
  * Gets the key version identifier for a given public key hex.
  * In future, this would look up a versioned key registry on-chain.
  */
-export const getKeyVersion = (_pubHex: string): number => {
+export const getKeyVersion = (_pubHex?: string): number => {
   // Version 1 — single active key per user address
   return 1;
 };

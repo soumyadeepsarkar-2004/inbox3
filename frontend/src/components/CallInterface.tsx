@@ -1,6 +1,6 @@
 import { useState, useEffect, useRef, useCallback } from 'react';
 import { getWebRTCService, type CallSession, type CallSignal, type CallType } from '../lib/webrtc';
-import { upload, getFromPinata } from '../lib/ipfs';
+import { getFromPinata } from '../lib/ipfs';
 
 interface CallInterfaceProps {
     isOpen: boolean;
@@ -30,27 +30,6 @@ export function CallInterface({
     const localVideoRef = useRef<HTMLVideoElement>(null);
     const remoteVideoRef = useRef<HTMLVideoElement>(null);
     const webrtcService = getWebRTCService();
-
-    // Handle signaling via IPFS (decentralized)
-    const handleOutgoingSignal = useCallback(async (signal: CallSignal) => {
-        try {
-            // Store signal on IPFS for the recipient to poll
-            const signalData = {
-                ...signal,
-                expiry: Date.now() + 60000 // Signal expires in 1 minute
-            };
-            const cid = await upload(JSON.stringify(signalData));
-
-            // Store the signal CID in localStorage for demo purposes
-            // In production, this would be sent via smart contract or websocket
-            const signalKey = `call_signal_${signal.to}_${Date.now()}`;
-            localStorage.setItem(signalKey, cid);
-
-            console.log('📤 Signal stored:', signal.type, cid);
-        } catch (error) {
-            console.error('Failed to send signal:', error);
-        }
-    }, []);
 
     // Poll for incoming signals
     const pollForSignals = useCallback(async () => {
@@ -104,8 +83,7 @@ export function CallInterface({
                 if (remoteVideoRef.current) {
                     remoteVideoRef.current.srcObject = remoteStream;
                 }
-            },
-            handleOutgoingSignal
+            }
         );
 
         // Start or accept call
@@ -121,7 +99,7 @@ export function CallInterface({
         return () => {
             clearInterval(signalPollInterval);
         };
-    }, [isOpen, localAddress, remoteAddress, callType, isIncoming, incomingSignal, webrtcService, onClose, handleOutgoingSignal, pollForSignals]);
+    }, [isOpen, localAddress, remoteAddress, callType, isIncoming, incomingSignal, webrtcService, onClose, pollForSignals]);
 
     // Update local video
     useEffect(() => {
@@ -164,11 +142,11 @@ export function CallInterface({
     if (!isOpen) return null;
 
     return (
-        <div className="fixed inset-0 z-[100] bg-black/95 backdrop-blur-xl flex flex-col animate-fade-in">
+        <div className="fixed inset-0 z-100 bg-black/95 backdrop-blur-xl flex flex-col animate-fade-in">
             {/* Header */}
-            <div className="flex items-center justify-between p-6 bg-gradient-to-b from-black/50 to-transparent">
+            <div className="flex items-center justify-between p-6 bg-linear-to-b from-black/50 to-transparent">
                 <div className="flex items-center gap-4">
-                    <div className="w-12 h-12 rounded-2xl bg-gradient-to-br from-indigo-500 to-purple-600 flex items-center justify-center text-white font-black text-lg">
+                    <div className="w-12 h-12 rounded-2xl bg-linear-to-br from-indigo-500 to-purple-600 flex items-center justify-center text-white font-black text-lg">
                         {remoteAddress.slice(2, 4).toUpperCase()}
                     </div>
                     <div>
@@ -223,10 +201,10 @@ export function CallInterface({
 
                         {/* No video from remote placeholder */}
                         {!remoteVideoRef.current?.srcObject && (
-                            <div className="absolute inset-0 flex items-center justify-center bg-gradient-to-br from-gray-900 to-black">
+                            <div className="absolute inset-0 flex items-center justify-center bg-linear-to-br from-gray-900 to-black">
                                 <div className="text-center">
-                                    <div className="w-32 h-32 rounded-full bg-gradient-to-br from-indigo-500/20 to-purple-600/20 flex items-center justify-center mx-auto mb-6 animate-pulse">
-                                        <div className="w-24 h-24 rounded-full bg-gradient-to-br from-indigo-500 to-purple-600 flex items-center justify-center text-white font-black text-4xl">
+                                    <div className="w-32 h-32 rounded-full bg-linear-to-br from-indigo-500/20 to-purple-600/20 flex items-center justify-center mx-auto mb-6 animate-pulse">
+                                        <div className="w-24 h-24 rounded-full bg-linear-to-br from-indigo-500 to-purple-600 flex items-center justify-center text-white font-black text-4xl">
                                             {remoteAddress.slice(2, 4).toUpperCase()}
                                         </div>
                                     </div>
@@ -237,7 +215,7 @@ export function CallInterface({
                     </>
                 ) : (
                     /* Voice Call UI */
-                    <div className="w-full h-full flex items-center justify-center bg-gradient-to-br from-indigo-900/50 via-purple-900/50 to-black">
+                    <div className="w-full h-full flex items-center justify-center bg-linear-to-br from-indigo-900/50 via-purple-900/50 to-black">
                         <div className="text-center">
                             {/* Animated waveform background */}
                             <div className="relative">
@@ -251,7 +229,7 @@ export function CallInterface({
                                     ))}
                                 </div>
 
-                                <div className="relative w-40 h-40 rounded-full bg-gradient-to-br from-indigo-500 to-purple-600 flex items-center justify-center mx-auto mb-8 shadow-2xl shadow-indigo-500/30">
+                                <div className="relative w-40 h-40 rounded-full bg-linear-to-br from-indigo-500 to-purple-600 flex items-center justify-center mx-auto mb-8 shadow-2xl shadow-indigo-500/30">
                                     <span className="text-white font-black text-5xl">
                                         {remoteAddress.slice(2, 4).toUpperCase()}
                                     </span>
@@ -302,7 +280,7 @@ export function CallInterface({
             </div>
 
             {/* Controls */}
-            <div className="p-8 bg-gradient-to-t from-black/80 to-transparent">
+            <div className="p-8 bg-linear-to-t from-black/80 to-transparent">
                 <div className="flex items-center justify-center gap-6">
                     {/* Mute Button */}
                     <button
@@ -389,8 +367,8 @@ export function IncomingCallModal({ isOpen, signal, onAccept, onReject }: Incomi
     if (!isOpen || !signal) return null;
 
     return (
-        <div className="fixed inset-0 z-[99] bg-black/80 backdrop-blur-xl flex items-center justify-center animate-fade-in">
-            <div className="bg-gradient-to-br from-gray-900 to-black rounded-[3rem] p-10 border border-white/10 shadow-2xl max-w-sm w-full mx-4 animate-scale-in">
+        <div className="fixed inset-0 z-99 bg-black/80 backdrop-blur-xl flex items-center justify-center animate-fade-in">
+            <div className="bg-linear-to-br from-gray-900 to-black rounded-[3rem] p-10 border border-white/10 shadow-2xl max-w-sm w-full mx-4 animate-scale-in">
                 {/* Animated rings */}
                 <div className="relative flex items-center justify-center mb-8">
                     {[...Array(3)].map((_, i) => (
@@ -400,7 +378,7 @@ export function IncomingCallModal({ isOpen, signal, onAccept, onReject }: Incomi
                             style={{ animationDelay: `${i * 0.3}s`, animationDuration: '1.5s' }}
                         />
                     ))}
-                    <div className="w-28 h-28 rounded-full bg-gradient-to-br from-indigo-500 to-purple-600 flex items-center justify-center shadow-2xl shadow-indigo-500/30">
+                    <div className="w-28 h-28 rounded-full bg-linear-to-br from-indigo-500 to-purple-600 flex items-center justify-center shadow-2xl shadow-indigo-500/30">
                         <span className="text-white font-black text-3xl">
                             {signal.from.slice(2, 4).toUpperCase()}
                         </span>

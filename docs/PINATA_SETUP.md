@@ -42,9 +42,9 @@ VITE_PINATA_API_KEY=your_actual_pinata_api_key_here
 VITE_PINATA_SECRET_KEY=your_actual_pinata_secret_key_here
 VITE_PINATA_GATEWAY=gateway.pinata.cloud
 
-# Environment
-VITE_APTOS_NETWORK=devnet
-VITE_CONTRACT_ADDRESS=0xf1768eb79d367572b8e436f8e3bcfecf938eeaf6656a65f73773c50c43b71d67
+# Aptos Network
+VITE_NETWORK=testnet
+VITE_CONTRACT_ADDRESS=0x2fb49669a943f53c7a0ab469e3fc475b273697f0151554e8321646895ca55d0e
 ```
 
 ### Step 4: Test the Setup

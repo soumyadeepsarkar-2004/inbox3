@@ -1,4 +1,4 @@
-# Inbox3 - Decentralized Messaging Platform
+# Inbox3 — Decentralized Messaging Platform
 
 <div align="center">
 
@@ -6,22 +6,13 @@
 [![Aptos](https://img.shields.io/badge/Aptos-Blockchain-00D4FF?style=for-the-badge)](https://aptoslabs.com/)
 [![IPFS](https://img.shields.io/badge/IPFS-Storage-65C2CB?style=for-the-badge)](https://ipfs.io/)
 [![Live Demo](https://img.shields.io/badge/Live_Demo-Vercel-000000?style=for-the-badge&logo=vercel)](https://inbox3-aptos.vercel.app)
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg?style=for-the-badge)](LICENSE)
 
-**A fully-featured decentralized messaging application built on Aptos blockchain with IPFS storage.**
-
-- ✅ Smart contract deployed to Aptos Testnet
-- ✅ All view functions working correctly  
-- ✅ All entry functions working correctly
-- ✅ Frontend integration complete
-- ✅ IPFS storage implemented (with Pinata)
-- ✅ Group Chat & Community Messaging
-- ✅ Error handling improved
-- ✅ Complete documentation provided
-- ✅ WebRTC Voice & Video calling
+**A fully-featured decentralized messaging application built on the Aptos blockchain with IPFS storage, WebRTC calls, and end-to-end encryption.**
 
 ### 🌐 [Try it Live →](https://inbox3-aptos.vercel.app)
 
-[Quick Start](#quick-start) • [Features](#features) • [Documentation](#documentation) • [Architecture](#architecture)
+[Quick Start](#-quick-start) • [Features](#-features-overview) • [Architecture](#-architecture) • [Documentation](#-documentation) • [Deployment](#-deployment)
 
 </div>
 
@@ -31,98 +22,110 @@
 
 ![Inbox3 App Mockup](frontend/public/chats-mockup.png)
 
-*Secure messaging reimagined — Connect your wallet, select your provider, and start messaging on the blockchain*
+*Secure messaging reimagined — Connect your wallet, select your provider, start messaging on the blockchain*
 
 </div>
 
 ---
 
-**Inbox3 is a production-ready decentralized messaging platform with 40+ features!**
+## ✅ Core Infrastructure
 
-###  Core Infrastructure
--  Smart contract deployable to **Aptos Mainnet**
--  All blockchain functions tested and verified
--  IPFS integration with Pinata (required in production)
--  Real-time message synchronization
--  Offline support with automatic sync
--  Cross-browser compatibility
--  WebRTC voice & video calling (requires signaling server)
+- Smart contract deployed to **Aptos Testnet**
+- All blockchain entry functions compiled and tested
+- IPFS integration via **Pinata** for decentralized message storage
+- Configurable real-time message sync (rate-limit safe)
+- Offline message queue with automatic sync on reconnect
+- WebRTC voice & video calls via lightweight signaling relay
+- Cross-browser compatible (Chrome, Edge, Firefox, Safari)
 
 ---
 
 ## 🚀 Features Overview
 
 ### 💬 Messaging Capabilities
-| Feature | Description |
-|---------|-------------|
-| **Direct Messages** | End-to-end encrypted 1-on-1 conversations |
-| **Group Chat** | Create and join unlimited group conversations |
-| **Voice Messages** | Record and send audio messages (WebM Opus) |
-| **File Attachments** | Share images (JPEG, PNG, GIF, WebP) and documents (PDF, TXT, JSON) up to 10MB |
-| **Message Reactions** | React to messages with emoji reactions |
-| **Message Threading** | Reply to specific messages in conversations |
-| **Link Previews** | Automatic preview of shared URLs |
-| **Quick Replies** | Pre-defined message templates for rapid responses |
-| **Draft Messages** | Auto-save unsent messages |
-| **Export Chat** | Download conversations in JSON, TXT, or CSV format |
+
+| Feature | Component | Description |
+|---------|-----------|-------------|
+| **Direct Messages** | `Inbox.tsx` | End-to-end encrypted 1-on-1 conversations |
+| **Group Chat** | `GroupChat.tsx` | Create and join unlimited group conversations |
+| **Voice & Video Calls** | `CallInterface.tsx` | WebRTC peer-to-peer calls |
+| **Voice Messages** | `FileUpload.tsx` | Record and send audio messages (WebM Opus) |
+| **File Attachments** | `FileUpload.tsx` | Images (JPEG, PNG, GIF, WebP) and documents (PDF, TXT, JSON) up to 10 MB |
+| **IPFS Uploads** | `IPFSUpload.tsx` | Upload files directly to IPFS via Pinata |
+| **Message Reactions** | `MessageReactions.tsx` | Emoji reactions on any message |
+| **Message Threading** | `MessageBubble.tsx` | Reply to specific messages |
+| **Link Previews** | `LinkPreview.tsx` | Automatic preview of shared URLs |
+| **Quick Replies** | `QuickReplies.tsx` | Pre-defined message templates |
+| **GIF Support** | `GiphyPicker.tsx` | Search and attach GIFs |
+| **Stickers** | `StickerPicker.tsx` | Send built-in sticker packs |
+| **Draft Messages** | `DraftManager.tsx` | Auto-save unsent messages per conversation |
+| **Export Chat** | `ExportChat.tsx` | Download conversations as JSON, TXT, or CSV |
 
 ### 👤 User Experience
-| Feature | Description |
-|---------|-------------|
-| **User Profiles** | Customizable username and avatar |
-| **Contact Management** | Save addresses with nicknames and notes |
-| **Message Search** | Advanced search and filtering |
-| **Unread Badges** | Visual indicators for unread messages |
-| **Typing Indicators** | See when others are typing |
-| **Read Receipts** | Track message delivery status |
-| **Connection Status** | Real-time network monitoring |
-| **Performance Dashboard** | View usage statistics and metrics |
+
+| Feature | Component | Description |
+|---------|-----------|-------------|
+| **User Profiles** | `ProfileEditor.tsx` | Customizable username and avatar, stored on IPFS |
+| **Contact Management** | `ContactsList.tsx` | Save addresses with nicknames and notes |
+| **Message Search** | `MessageSearch.tsx` | Full-text search with saved queries (`SavedSearches.tsx`) |
+| **Typing Indicators** | `RealtimeIndicators.tsx` | See when others are composing |
+| **Read Receipts** | `MessageIndicators.tsx` | Track sent / delivered / read status |
+| **Connection Status** | `ConnectionStatus.tsx` | Real-time network monitoring with offline queue |
+| **Notifications** | `NotificationSystem.tsx` | Toast alerts for new messages and events |
+| **Onboarding Tour** | `OnboardingTour.tsx` | Guided introduction for first-time users |
+| **Performance Dashboard** | `PerformanceDashboard.tsx` | Metrics: messages sent, data usage, uptime |
 
 ### 🎨 Interface & Design
-| Feature | Description |
-|---------|-------------|
-| **Dark Mode** | Toggle between light and dark themes |
-| **Mobile Responsive** | Optimized for all screen sizes |
-| **Glassmorphism** | Modern blurred glass effects |
-| **Smooth Animations** | Fade, slide, scale, bounce effects |
-| **Skeleton Loading** | Beautiful loading states |
-| **Emoji Picker** | 300+ emojis in 6 categories with search |
-| **QR Code Sharing** | Share wallet address via QR code |
-| **Onboarding Tour** | Guided introduction for new users |
+
+| Feature | Location | Description |
+|---------|----------|-------------|
+| **Dark / Light Mode** | `SettingsPanel.tsx` | Toggle themes; CSS custom properties throughout |
+| **Mobile Responsive** | `AppShell.tsx` | Fluid layout from 320 px to 4K |
+| **Glassmorphism** | `index.css` | Backdrop-blur glass cards |
+| **Smooth Animations** | `index.css` | Fade, slide, scale, bounce keyframes |
+| **Skeleton Loading** | `ui/Skeleton` → `Loading.tsx` | Beautiful loading placeholders |
+| **Emoji Picker** | `EmojiPicker.tsx` | 300+ emojis in 6 categories with search |
+| **QR Code Sharing** | `QRCodeModal.tsx` | Share wallet address as a QR code |
+| **Wallet Modal** | `WalletModal.tsx` | Wallet connect / switch flow |
+| **Component Showcase** | `ComponentShowcase.tsx` | Visual QA page for every UI primitive |
 
 ### ⚡ Power User Features
-| Feature | Description |
-|---------|-------------|
-| **Keyboard Shortcuts** | 8+ shortcuts for rapid navigation |
-| **Settings Panel** | Comprehensive app customization |
-| **Auto-refresh** | Configurable refresh intervals (15s - 2min) |
-| **Compact Mode** | Reduce spacing for more content |
-| **Performance Metrics** | Track messages, data usage, uptime |
-| **Offline Mode** | Queue messages when offline |
-| **Custom Templates** | Create and manage quick reply templates |
-| **Connection Indicator** | Visual network status |
+
+| Feature | Component | Description |
+|---------|-----------|-------------|
+| **Keyboard Shortcuts** | `KeyboardShortcuts.tsx` | 8+ shortcuts for rapid navigation |
+| **Settings Panel** | `SettingsPanel.tsx` | Comprehensive app customization |
+| **Auto-refresh** | `realtime.ts` | Configurable intervals (15 s – 2 min) |
+| **Offline Mode** | `ui/OfflineQueue.tsx` | Queue messages when offline, drain on reconnect |
+| **Transaction UX** | `TransactionUX.tsx` | Step-by-step wallet transaction feedback |
+| **Transaction Status** | `ui/TransactionStatus.tsx` | Live on-chain confirmation tracking |
+| **Security Badge** | `ui/SecurityBadge.tsx` | Encryption status indicator |
+| **Markdown Editor** | `ui/MarkdownEditor.tsx` | Compose messages with Markdown |
 
 ### 🔒 Security & Privacy
+
 | Feature | Description |
 |---------|-------------|
-| **Blockchain Security** | All messages recorded on Aptos |
-| **IPFS Storage** | Decentralized content storage |
-| **Wallet-based Auth** | No passwords, no accounts |
-| **End-to-end Encryption** | Messages encrypted via NaCl Box |
-| **No Central Server** | Truly decentralized architecture |
+| **Blockchain Storage** | All message CIDs recorded on Aptos — immutable and censorship-resistant |
+| **IPFS Content** | Message bodies stored on IPFS via Pinata; content-addressed by CID |
+| **Wallet-based Auth** | No passwords, no accounts — your wallet *is* your identity |
+| **End-to-end Encryption** | Messages encrypted with TweetNaCl Box (X25519-XSalsa20-Poly1305) |
+| **No Central Server** | Messaging path: wallet → Aptos chain → IPFS. Signaling server only used for call setup |
 
 ---
 
 ## 🌐 Live Demo
 
-**Try Inbox3now:** [https://inbox3-aptos.vercel.app](https://inbox3-aptos.vercel.app)
+**Try Inbox3 now:** [https://inbox3-aptos.vercel.app](https://inbox3-aptos.vercel.app)
 
-### Getting Started
+### Getting Started with the Demo
+
 1. Visit the live demo link above
-2. Install [Petra Wallet](https://petra.app/) or [Martian Wallet](https://martianwallet.xyz/) browser extension
-3. Switch your wallet to **Aptos Mainnet**
-4. Connect your wallet and create your inbox
-5. Start messaging!
+2. Install [Petra Wallet](https://petra.app/) or [Martian Wallet](https://martianwallet.xyz/)
+3. Switch your wallet to **Aptos Testnet**
+4. Get free testnet tokens from the [Aptos Faucet](https://aptos.dev/en/network/faucet)
+5. Connect your wallet and click **Create Inbox**
+6. Start messaging!
 
 ---
 
@@ -139,158 +142,207 @@
 ## 📦 Quick Start
 
 ### Prerequisites
-- Node.js 18+ and npm/pnpm
-- Aptos Wallet (Petra or Martian)
-- Pinata account (for IPFS)
+
+- **Node.js 18+** and **pnpm** (`npm install -g pnpm`)
+- **Aptos Wallet** (Petra or Martian) browser extension
+- **Pinata account** — free tier at [pinata.cloud](https://pinata.cloud) (for IPFS message storage)
+- **Aptos CLI** — only needed if you want to redeploy the smart contract
 
 ### Installation
 
 ```bash
-# Clone the repository
-git clone https://github.com/yourusername/inbox3.git
-cd inbox3/frontend
+# 1. Clone the repository
+git clone https://github.com/tumansutradhar/inbox-3.git
+cd inbox-3/frontend
 
-# Install dependencies
-npm install
+# 2. Install dependencies
+pnpm install
 
-# Configure environment
+# 3. Configure environment
 cp .env.example .env
-# Add your Pinata API keys to .env
+# Open .env and fill in your Pinata keys and (optionally) signaling server URL
+# See docs/PINATA_SETUP.md for details
 
-# Start development server
-npm run dev
+# 4. Start the development server
+pnpm dev
 ```
 
-Visit **http://localhost:5173** and connect your wallet!
+Open **http://localhost:5173** in your browser and connect your wallet.
+
+> **Note:** The smart contract is already deployed to Aptos Testnet.  
+> `VITE_CONTRACT_ADDRESS` in `.env.example` is pre-filled with the live address.  
+> You only need to redeploy if you want your own on-chain instance — see [Smart Contract Deployment](#smart-contract-deployment).
 
 ---
 
 ## 🏗️ Architecture
 
-### Smart Contract (Move)
+### Repository Layout
+
 ```
-inbox3::Inbox3
-├── create_inbox()          - Initialize user inbox
-├── send_message()          - Send DM to user
-├── mark_read()             - Mark message as read
-├── create_group()          - Create new group
-├── join_group()            - Join existing group
-├── send_group_message()    - Send message to group
-├── inbox_of()             - Get all DMs
-├── get_group_messages()   - Get group messages
-└── inbox_exists()         - Check inbox status
+inbox-3/
+├── frontend/                    # React 19 + TypeScript + Vite frontend
+│   ├── src/
+│   │   ├── App.tsx              # Root component & routing state
+│   │   ├── config.ts            # Network + contract address + Aptos client
+│   │   ├── components/          # Feature components (see below)
+│   │   │   ├── ui/              # Primitive UI library (25 components)
+│   │   │   └── layout/          # AppShell + ModalSystem
+│   │   ├── lib/                 # Business logic & services
+│   │   │   ├── crypto.ts        # NaCl Box encrypt/decrypt helpers
+│   │   │   ├── encryptionManager.ts
+│   │   │   ├── ipfs.ts          # Pinata upload/download
+│   │   │   ├── realtime.ts      # Conservative polling service
+│   │   │   ├── signaling.ts     # WebRTC signaling client
+│   │   │   ├── webrtc.ts        # WebRTC peer connection manager
+│   │   │   ├── notifications.ts
+│   │   │   ├── profileManager.ts
+│   │   │   ├── threadManager.ts
+│   │   │   ├── messageSearcher.ts
+│   │   │   └── analytics.ts
+│   │   ├── types/               # Shared TypeScript types
+│   │   ├── styles/              # Extra CSS (layout.css)
+│   │   └── abi/inbox3.json      # On-chain ABI for view functions
+│   ├── .env.example             # Environment variable template
+│   ├── tailwind.config.js
+│   ├── vite.config.ts
+│   └── vitest.config.ts
+├── smart-contract/              # Move smart contract (Aptos)
+│   ├── sources/
+│   │   ├── Inbox3.move          # Main contract
+│   │   └── Inbox3Tests.move     # Unit tests
+│   ├── Move.toml                # Package manifest & address binding
+│   └── deploy.sh                # One-command deploy (testnet or mainnet)
+├── signaling-server/            # Lightweight WebSocket relay for WebRTC
+│   ├── server.js
+│   └── package.json
+├── docs/                        # Extended documentation
+│   ├── HOW_TO_RUN.md
+│   ├── HOW_TO_VISUALS.md        # Design system & component guide
+│   ├── PINATA_SETUP.md
+│   ├── REALTIME_SYSTEM.md
+│   ├── RATE_LIMIT_FIX.md
+│   └── TROUBLESHOOTING.md
+└── README.md
 ```
 
-**Contract Address:** `<YOUR_MAINNET_CONTRACT_ADDRESS>` *(deploy with `./smart-contract/deploy.sh mainnet`)*
+### Smart Contract (Move)
+
+**Module:** `inbox3::Inbox3`  
+**Network:** Aptos Testnet  
+**Address:** `0x2fb49669a943f53c7a0ab469e3fc475b273697f0151554e8321646895ca55d0e`
+
+```
+Entry functions (callable from frontend)
+├── create_inbox(user)               — initialise inbox + UserGroups for caller
+├── send_message(sender, recipient, cid)  — store IPFS CID in recipient's inbox
+├── mark_read(user, message_id)      — mark a DM as read
+├── create_group(creator, name)      — deploy a new Group resource
+├── join_group(member, group_addr)   — append caller to members list
+└── send_group_message(sender, group_addr, cid, parent_id)
+
+View functions (read-only, no gas)
+├── inbox_of(addr)                   — return all received DMs
+├── sent_messages(addr)              — return all sent DMs
+├── get_group_messages(group_addr)   — return all group messages
+├── get_user_groups(addr)            — return groups user belongs to
+└── inbox_exists(addr)               — check whether inbox is initialised
+```
 
 ### Frontend Stack
-- **Framework:** React 19 + TypeScript + Vite
-- **Styling:** Tailwind CSS v4 with custom design system
-- **Blockchain:** Aptos SDK + Wallet Adapter
-- **Storage:** Pinata IPFS API *(required in production)*
-- **State:** React Hooks + localStorage
-- **Calling:** WebRTC + WebSocket Signaling Server
+
+| Layer | Technology |
+|-------|-----------|
+| Framework | React 19 + TypeScript 5.8 |
+| Build tool | Vite 7 |
+| Styling | Tailwind CSS v4 + custom design tokens |
+| Blockchain | `@aptos-labs/ts-sdk` 5.x + `@aptos-labs/wallet-adapter-react` |
+| IPFS | Pinata REST API |
+| Encryption | TweetNaCl (X25519-XSalsa20-Poly1305) |
+| Calls | WebRTC + custom WebSocket signaling relay |
+| Testing | Vitest + jsdom |
 
 ### Component Architecture
+
 ```
-App.tsx (Main)
-├── Header
-│   ├── ConnectionStatus
-│   ├── Settings / QR / Performance / Shortcuts
-│   └── Wallet Connection
-├── Messaging
-│   ├── SendMessage (+ EmojiPicker + FileUpload + QuickReplies)
-│   ├── Inbox (+ MessageReactions + LinkPreview)
-│   └── GroupChat (+ EmojiPicker + Reactions)
-├── Sidebar Tools
-│   ├── ProfileEditor
-│   ├── ContactsList
-│   └── MessageSearch
-└── Modals
-    ├── SettingsPanel
-    ├── QRCodeModal
-    ├── OnboardingTour
-    ├── PerformanceDashboard
-    ├── ShortcutsModal
-    ├── ExportChat
-    └── DraftsModal
+App.tsx
+├── layout/AppShell.tsx           — responsive shell, sidebar toggle
+├── layout/ModalSystem.tsx        — global modal portal
+│
+├── [Header area]
+│   ├── ConnectionStatus.tsx      — online/offline banner
+│   ├── WalletModal.tsx           — connect / switch wallet
+│   ├── QRCodeModal.tsx
+│   ├── SettingsPanel.tsx
+│   ├── KeyboardShortcuts.tsx
+│   └── PerformanceDashboard.tsx
+│
+├── [Left panel]
+│   ├── Sidebar.tsx               — nav tabs + collapse
+│   ├── ContactsList.tsx
+│   ├── GroupList.tsx
+│   ├── MessageSearch.tsx + SavedSearches.tsx
+│   └── ProfileEditor.tsx
+│
+├── [Main chat area]
+│   ├── ChatConversation.tsx      — DM thread
+│   │   ├── MessageList.tsx
+│   │   │   ├── MessageBubble.tsx
+│   │   │   ├── MessageReactions.tsx
+│   │   │   ├── MessageIndicators.tsx
+│   │   │   └── LinkPreview.tsx
+│   │   └── ChatComposer.tsx      — unified message input
+│   │       ├── MessageInput.tsx
+│   │       ├── EmojiPicker.tsx
+│   │       ├── GiphyPicker.tsx
+│   │       ├── StickerPicker.tsx
+│   │       ├── FileUpload.tsx
+│   │       ├── IPFSUpload.tsx
+│   │       └── QuickReplies.tsx
+│   │
+│   ├── GroupChat.tsx             — group thread (same sub-tree as above)
+│   │   ├── CreateGroupModal.tsx
+│   │   └── JoinGroupModal.tsx
+│   │
+│   └── Inbox.tsx                 — message list overview + SendMessage.tsx
+│
+├── [Overlays]
+│   ├── CallInterface.tsx         — WebRTC voice/video call UI
+│   ├── DraftManager.tsx
+│   ├── ExportChat.tsx
+│   ├── NotificationSystem.tsx
+│   ├── OnboardingTour.tsx
+│   ├── RealtimeIndicators.tsx
+│   └── TransactionUX.tsx
+│
+└── ui/                           — primitive component library
+    ├── Avatar.tsx       Badge.tsx      Breadcrumbs.tsx
+    ├── Button.tsx       Card.tsx       ConfirmDialog.tsx
+    ├── DateSeparator.tsx EmptyState.tsx IconButton.tsx
+    ├── Icons.tsx        Illustrations.tsx  Input.tsx
+    ├── ListItem.tsx     Loading.tsx    MarkdownEditor.tsx
+    ├── Modal.tsx        OfflineQueue.tsx   SecurityBadge.tsx
+    ├── SkipLink.tsx     StatusIndicator.tsx Toast.tsx
+    ├── Tooltip.tsx      TransactionStatus.tsx TypingIndicator.tsx
+    └── VirtualList.tsx
 ```
+
+### Signaling Server (WebRTC)
+
+A minimal Node.js WebSocket relay (`signaling-server/server.js`) that routes call setup messages between wallet addresses without relaying any media.
+
+```
+Protocol
+  Client → Server  { type: "register", address: "0x..." }
+  Client → Server  { type: "signal",   to: "0x...", payload: <CallSignal> }
+  Server → Client  { type: "signal",   from: "0x...", payload: <CallSignal> }
+```
+
+See [signaling-server/README.md](signaling-server/README.md) for deployment instructions (one-click free hosting on Render).
 
 ---
 
 ## ⌨️ Keyboard Shortcuts
-
-## Recent Updates
-
-### UI and Audio Recording Improvements
-
-#### Changes Made
-
-##### 1. Audio Recording Functionality Fixed
-
-**GroupChat.tsx**
-- **Enhanced audio recording quality**: Added audio constraints for echo cancellation, noise suppression, and 44.1kHz sample rate
-- **Better codec support**: Implemented fallback logic for audio codecs (prefers 'audio/webm;codecs=opus', falls back to 'audio/webm' or default)
-- **Proper stream cleanup**: Ensured audio tracks are stopped after recording completes
-- **Improved audio playback**: Enhanced audio element with multiple source types, better error handling, and direct IPFS URL links
-- **Fixed metadata storage**: Audio URLs are now properly stored in JSON format with type detection
-
-**SendMessage.tsx**
-- Applied same audio recording improvements as GroupChat.tsx
-- Enhanced codec detection and fallback logic
-- Better error handling and stream management
-
-##### 2. UI Improvements - Cleaner Design
-
-**Layout Changes in GroupChat.tsx**
-- **Repositioned controls**: Input field, recording, and send buttons now positioned side-by-side for better UX
-- **Reduced container height**: Changed from 600px to 550px to match inbox size
-- **Removed auto-scroll**: Chat no longer auto-scrolls on polling (only when sending messages)
-- **Removed heavy borders**: Replaced with subtle shadows and light border colors
-- **Better visual feedback**: Added emojis to status messages (🎤 Recording, ⬆️ Uploading, ✅ Sent, ❌ Error)
-- **Larger input area**: Increased input field to 56px height with bigger buttons for better usability
-
-**Global CSS Updates (index.css)**
-- `.card`: Removed heavy borders, replaced with lighter shadows
-- `.input`: Changed to subtle `rgba(0, 0, 0, 0.08)` borders
-- `.message-item`: Lighter borders and hover effects
-- Overall minimalist approach with reduced visual clutter
-
-##### 3. Design Philosophy
-- **Minimalist approach**: Reduced visual clutter by minimizing borders
-- **Subtle separators**: Used very light borders only where necessary
-- **Enhanced shadows**: Relied on subtle shadows for depth instead of borders
-- **Better spacing**: Improved visual hierarchy through spacing
-- **Focus states**: Maintained clear focus indicators for accessibility
-
-#### Testing Audio Recording
-
-1. Start the development server: `npm run dev` in the frontend directory
-2. Test audio recording:
-   - Click the microphone button
-   - Allow microphone permissions
-   - Record a message
-   - Stop recording
-   - Verify audio playback in the message thread
-   - Use "Open in new tab" link if browser playback fails
-3. Check UI improvements:
-   - Verify reduced border usage throughout the app
-   - Confirm recording and send buttons are positioned side-by-side
-   - Check that inputs are larger and more visible
-
-#### Browser Compatibility
-
-Audio recording now supports:
-- Chrome/Edge: `audio/webm;codecs=opus` (best quality)
-- Firefox: `audio/webm` (good quality)
-- Safari: Falls back to default codec (basic support)
-
-#### Notes
-
-- Audio files are stored on IPFS via Pinata gateway
-- If audio doesn't play inline, use the "Open in new tab" link
-- The recording button shows elapsed time during recording
-- Console logs help debug audio upload and playback issues
 
 | Shortcut | Action |
 |----------|--------|
@@ -300,106 +352,43 @@ Audio recording now supports:
 | `G` | Switch to groups view |
 | `D` | Switch to DMs view |
 | `/` | Focus search |
-| `Shift + ?` | Show shortcuts help |
-| `Esc` | Close modal/panel |
-
----
-
-## 📖 Component Reference
-
-### New Components (40+ total)
-
-#### **EmojiPicker** (`EmojiPicker.tsx`)
-- 6 categories with 300+ emojis
-- Quick reactions bar
-- Search functionality
-- Keyboard accessible
-
-#### **FileUpload** (`FileUpload.tsx`)
-- Image & document support
-- Progress indicators
-- IPFS upload via Pinata
-- 10MB size limit
-
-#### **MessageReactions** (`MessageReactions.tsx`)
-- Emoji reactions on messages
-- Multi-user reaction tracking
-- Toggle reactions on/off
-- localStorage persistence
-
-#### **DraftManager** (`DraftManager.tsx`)
-- Auto-save unsent messages
-- Drafts modal for viewing
-- Per-conversation drafts
-- Draft indicator badge
-
-#### **KeyboardShortcuts** (`KeyboardShortcuts.tsx`)
-- Customizable shortcuts
-- Visual shortcuts modal
-- Context-aware triggers
-- Power user friendly
-
-####  **LinkPreview** (`LinkPreview.tsx`)
-- Automatic URL detection
-- Open Graph metadata
-- Compact & full preview modes
-- Fallback for missing data
-
-#### **QuickReplies** (`QuickReplies.tsx`)
-- 8 default templates
-- Custom template creation
-- Search templates
-- Category organization
-
-#### **ExportChat** (`ExportChat.tsx`)
-- JSON/TXT/CSV formats
-- Optional timestamps
-- Metadata inclusion
-- Batch export
-
-#### **ConnectionStatus** (`ConnectionStatus.tsx`)
-- Network monitoring
-- Offline/online notifications
-- Auto-reconnect handling
-- Visual indicator
-
-#### **PerformanceDashboard** (`PerformanceDashboard.tsx`)
-- Usage statistics
-- Data metrics
-- Performance tips
-- Beautiful charts
+| `Shift + ?` | Show shortcuts reference |
+| `Esc` | Close modal / panel |
 
 ---
 
 ## 🎨 Design System
 
-### CSS Variables
-```css
-/* Light Mode */
---primary-brand: #FF6B35
---bg-main: #FAFAF9
---text-primary: #1C1917
+Design tokens live in `frontend/src/index.css`. See [docs/HOW_TO_VISUALS.md](docs/HOW_TO_VISUALS.md) for the full guide.
 
-/* Dark Mode */
---primary-brand: #FF6B35
---bg-main: #09090b
---text-primary: #fafafa
+```css
+/* Light mode */
+--primary-brand: #FF6B35;
+--bg-main:       #FAFAF9;
+--text-primary:  #1C1917;
+
+/* Dark mode */
+--primary-brand: #FF6B35;
+--bg-main:       #09090b;
+--text-primary:  #fafafa;
 ```
 
-### Utility Classes
-- **Animations:** `animate-bounce`, `animate-pulse-ring`, `animate-shake`, `animate-scale-in`
-- **Effects:** `.glass`, `.glass-card`, `.btn-gradient`, `.skeleton`
-- **Interactions:** `.hover-lift`, `.active-press`, `.tooltip`
-- **Status:** `.status-dot-online`, `.status-dot-offline`
+**Utility classes:**
+- Animations — `animate-bounce`, `animate-pulse-ring`, `animate-shake`, `animate-scale-in`
+- Effects — `.glass`, `.glass-card`, `.btn-gradient`, `.skeleton`
+- Interactions — `.hover-lift`, `.active-press`, `.tooltip`
+- Status — `.status-dot-online`, `.status-dot-offline`
 
 ---
 
 ## 📊 Performance
 
-- ⚡ **Build Size:** ~890KB gzipped (optimized)
-- 🚀 **Load Time:** <2s on 3G
-- 💾 **Memory:** ~30MB average
-- 🔄 **Real-time:** <500ms message delivery
+| Metric | Value |
+|--------|-------|
+| Gzipped build size | ~890 KB |
+| First load (3G) | < 2 s |
+| Memory footprint | ~30 MB average |
+| Message refresh interval | 15 s (active) / 45 s (idle) |
 
 ---
 
@@ -407,112 +396,152 @@ Audio recording now supports:
 
 | Browser | Support | Notes |
 |---------|---------|-------|
-| Chrome 90+ | ✅ Full | WebM Opus audio |
-| Edge 90+ | ✅ Full | WebM Opus audio |
-| Firefox 88+ | ✅ Full | WebM audio |
-| Safari 14+ | ⚠️ Basic | Default codec fallback |
+| Chrome 90+ | ✅ Full | WebM Opus audio, WebRTC |
+| Edge 90+ | ✅ Full | WebM Opus audio, WebRTC |
+| Firefox 88+ | ✅ Full | WebM audio, WebRTC |
+| Safari 14+ | ⚠️ Partial | Default codec fallback; WebRTC supported |
 
 ---
 
 ## 📚 Documentation
 
-Detailed guides available in `docs/`:
-
-- [How to Run](docs/HOW_TO_RUN.md)
-- [Pinata Setup](docs/PINATA_SETUP.md)
-- [Realtime System](docs/REALTIME_SYSTEM.md)
-- [Troubleshooting](docs/TROUBLESHOOTING.md)
-- [Rate Limit Fix](docs/RATE_LIMIT_FIX.md)
+| Guide | Description |
+|-------|-------------|
+| [HOW_TO_RUN.md](docs/HOW_TO_RUN.md) | Full local setup & smart contract deployment |
+| [PINATA_SETUP.md](docs/PINATA_SETUP.md) | Configure Pinata IPFS credentials |
+| [HOW_TO_VISUALS.md](docs/HOW_TO_VISUALS.md) | Design system, tokens, and component usage |
+| [REALTIME_SYSTEM.md](docs/REALTIME_SYSTEM.md) | Polling architecture & refresh strategy |
+| [RATE_LIMIT_FIX.md](docs/RATE_LIMIT_FIX.md) | How rate limits were resolved |
+| [TROUBLESHOOTING.md](docs/TROUBLESHOOTING.md) | Common errors and fixes |
+| [signaling-server/README.md](signaling-server/README.md) | Deploy the WebRTC signaling relay |
 
 ---
 
 ## 🛠️ Development
 
-### Build for Production
+### Run the Frontend
+
 ```bash
-npm run build
+cd frontend
+pnpm dev          # http://localhost:5173
+pnpm build        # production build → dist/
+pnpm preview      # preview production build
+pnpm test         # run Vitest unit tests
+pnpm lint         # ESLint
 ```
 
-### Run Tests
+### Run the Signaling Server Locally
+
 ```bash
-npm test
+cd signaling-server
+npm install
+npm start         # WebSocket on ws://localhost:8080
 ```
 
-### Deploy Smart Contract
+Set `VITE_SIGNALING_SERVER_URL=ws://localhost:8080` in `frontend/.env` while developing.
+
+### <a name="smart-contract-deployment"></a>Smart Contract Deployment
+
+The contract is already live on Aptos Testnet. Use the steps below only if you want your own deployment.
+
 ```bash
+# Install Aptos CLI
+curl -fsSL "https://aptos.dev/scripts/install_cli.py" | python3
+
+# Initialise a profile (follow the prompts to create/import a key)
 cd smart-contract
-aptos move compile
-aptos move publish
+aptos init --profile default --network testnet
+
+# Fund the account (testnet only)
+aptos account fund-with-faucet --account default --network testnet
+
+# Compile & run tests
+aptos move compile  --named-addresses inbox3=default
+aptos move test     --named-addresses inbox3=default
+
+# Deploy (testnet)
+./deploy.sh testnet
+
+# Deploy (mainnet) — prompts for confirmation
+./deploy.sh mainnet
 ```
 
----
+After deployment, copy the account address into `frontend/.env`:
 
-## 🤝 Contributing
-
-Contributions are welcome! Please:
-
-1. Fork the repository
-2. Create a feature branch (`git checkout -b feature/amazing-feature`)
-3. Commit your changes (`git commit -m 'Add amazing feature'`)
-4. Push to the branch (`git push origin feature/amazing-feature`)
-5. Open a Pull Request
+```bash
+VITE_CONTRACT_ADDRESS=0x<your-deployed-address>
+VITE_NETWORK=testnet   # or mainnet
+```
 
 ---
 
 ## 🚀 Deployment
 
-### Deploy to Vercel (Recommended)
+### Deploy Frontend to Vercel (Recommended)
 
-[![Deploy with Vercel](https://vercel.com/button)](https://vercel.com/new/clone?repository-url=https://github.com/tumansutradhar/inbox3&project-name=inbox3&root-directory=frontend)
+[![Deploy with Vercel](https://vercel.com/button)](https://vercel.com/new/clone?repository-url=https://github.com/tumansutradhar/inbox-3&project-name=inbox3&root-directory=frontend)
 
-**Manual Deployment:**
+**Manual steps:**
 
 ```bash
-# Install Vercel CLI
 npm install -g vercel
-
-# Navigate to frontend
 cd frontend
-
-# Deploy to production
 vercel --prod
 ```
 
-### Deploy to Netlify
+Add the following environment variables in the Vercel project dashboard (or via `vercel env add`):
 
-1. Connect your GitHub repository to Netlify
-2. Set build command: `pnpm build`
-3. Set publish directory: `dist`
-4. Set base directory: `frontend`
+| Variable | Required | Description |
+|----------|----------|-------------|
+| `VITE_CONTRACT_ADDRESS` | ✅ | Deployed Aptos contract address |
+| `VITE_NETWORK` | ✅ | `testnet` or `mainnet` |
+| `VITE_PINATA_API_KEY` | ✅ | Pinata API key |
+| `VITE_PINATA_SECRET_KEY` | ✅ | Pinata secret key |
+| `VITE_PINATA_GATEWAY` | optional | Custom Pinata gateway hostname |
+| `VITE_SIGNALING_SERVER_URL` | optional | `wss://` URL of deployed signaling server |
 
-### Environment Variables
+### Deploy Frontend to Netlify
 
-Copy `frontend/.env.example` to `frontend/.env` and fill in:
+1. Connect this repository to Netlify
+2. **Base directory:** `frontend`
+3. **Build command:** `pnpm build`
+4. **Publish directory:** `dist`
+5. Add the same environment variables listed above in *Site settings → Environment variables*
 
-| Variable | Description | Required |
-|----------|-------------|----------|
-| `VITE_CONTRACT_ADDRESS` | Deployed Aptos contract address | ✅ Yes |
-| `VITE_NETWORK` | `mainnet` \| `testnet` \| `devnet` | ✅ Yes |
-| `VITE_PINATA_API_KEY` | Pinata API key (IPFS storage) | ✅ Yes |
-| `VITE_PINATA_SECRET_KEY` | Pinata secret key | ✅ Yes |
-| `VITE_PINATA_GATEWAY` | Custom Pinata gateway URL | Optional |
-| `VITE_SIGNALING_SERVER_URL` | WebSocket relay for voice/video calls | Optional |
+### Deploy the Signaling Server
+
+See [signaling-server/README.md](signaling-server/README.md) for a free one-click deployment on Render.
+
+---
+
+## 🤝 Contributing
+
+Contributions are welcome!
+
+1. Fork the repository
+2. Create a feature branch: `git checkout -b feature/my-feature`
+3. Commit your changes: `git commit -m 'feat: add my feature'`
+4. Push the branch: `git push origin feature/my-feature`
+5. Open a Pull Request
+
+Please follow the existing code style (TypeScript strict, ESLint, Tailwind utility classes).
 
 ---
 
 ## 📄 License
 
-This project is open source and available under the MIT License.
+This project is open source and available under the [MIT License](LICENSE).
 
 ---
 
 ## 🙏 Acknowledgments
 
-- **Aptos Foundation** - Blockchain infrastructure
-- **Pinata** - IPFS pinning service  
-- **React Team** - Amazing framework
-- **Tailwind CSS** - Utility-first CSS
-- **Vercel** - Deployment platform
+- **Aptos Foundation** — blockchain infrastructure
+- **Pinata** — IPFS pinning service
+- **React Team** — UI framework
+- **Tailwind CSS** — utility-first styling
+- **TweetNaCl** — cryptography primitives
+- **Vercel** — hosting & deployment
 
 ---
 
@@ -520,6 +549,6 @@ This project is open source and available under the MIT License.
 
 **Built with ❤️ for the decentralized future**
 
-[⬆ Back to Top](#inbox3---complete-decentralized-messaging-platform)
+[⬆ Back to Top](#inbox3--decentralized-messaging-platform)
 
 </div>
