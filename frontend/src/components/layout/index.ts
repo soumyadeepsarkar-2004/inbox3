@@ -7,8 +7,11 @@ export {
     CenterPane,
     RightPane,
     PanelCard,
-    useLayout,
 } from './AppShell'
+
+export {
+    useLayout,
+} from './LayoutContext'
 
 // Modal System
 export {

@@ -47,10 +47,10 @@ export function Tooltip({
     }
 
     const arrowStyles = {
-        top: 'bottom-[-4px] left-1/2 -translate-x-1/2 border-l-transparent border-r-transparent border-b-transparent border-t-(--bg-secondary)',
-        bottom: 'top-[-4px] left-1/2 -translate-x-1/2 border-l-transparent border-r-transparent border-t-transparent border-b-(--bg-secondary)',
-        left: 'right-[-4px] top-1/2 -translate-y-1/2 border-t-transparent border-b-transparent border-r-transparent border-l-(--bg-secondary)',
-        right: 'left-[-4px] top-1/2 -translate-y-1/2 border-t-transparent border-b-transparent border-l-transparent border-r-(--bg-secondary)'
+        top: 'bottom-[-4px] left-1/2 -translate-x-1/2 border-l-transparent border-r-transparent border-b-transparent border-t-secondary',
+        bottom: 'top-[-4px] left-1/2 -translate-x-1/2 border-l-transparent border-r-transparent border-t-transparent border-b-secondary',
+        left: 'right-[-4px] top-1/2 -translate-y-1/2 border-t-transparent border-b-transparent border-r-transparent border-l-secondary',
+        right: 'left-[-4px] top-1/2 -translate-y-1/2 border-t-transparent border-b-transparent border-l-transparent border-r-secondary'
     }
 
     return (
@@ -67,7 +67,7 @@ export function Tooltip({
                     className={`
             absolute z-130 ${positionStyles[position]}
             px-3 py-1.5 text-xs font-medium
-            bg-(--text-primary) text-(--bg-card)
+            bg-foreground text-card
             rounded-lg whitespace-nowrap
             animate-fade-in shadow-lg
           `}

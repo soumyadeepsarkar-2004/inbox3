@@ -72,19 +72,19 @@ export function Modal({
             <div
                 className={`
           relative w-full ${sizeStyles[size]}
-          bg-(--bg-card) rounded-2xl shadow-2xl
+          bg-card rounded-2xl shadow-2xl
           animate-scale-in
           max-h-[90vh] overflow-hidden flex flex-col
         `}
             >
                 {/* Header */}
                 {(title || showCloseButton) && (
-                    <div className="flex items-start justify-between p-6 border-b border-(--border-color)">
+                    <div className="flex items-start justify-between p-6 border-b border-border">
                         <div>
                             {title && (
                                 <h2
                                     id="modal-title"
-                                    className="text-xl font-semibold text-(--text-primary)"
+                                    className="text-xl font-semibold text-foreground"
                                 >
                                     {title}
                                 </h2>
@@ -92,7 +92,7 @@ export function Modal({
                             {description && (
                                 <p
                                     id="modal-description"
-                                    className="mt-1 text-sm text-(--text-secondary)"
+                                    className="mt-1 text-sm text-muted-foreground"
                                 >
                                     {description}
                                 </p>
@@ -101,7 +101,7 @@ export function Modal({
                         {showCloseButton && (
                             <button
                                 onClick={onClose}
-                                className="p-2 -m-2 rounded-lg text-(--text-muted) hover:text-(--text-primary) hover:bg-(--bg-secondary) transition-colors"
+                                className="p-2 -m-2 rounded-lg text-muted-foreground hover:text-foreground hover:bg-secondary transition-colors"
                                 aria-label="Close modal"
                             >
                                 <svg

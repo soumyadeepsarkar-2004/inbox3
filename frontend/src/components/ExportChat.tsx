@@ -134,13 +134,13 @@ export default function ExportChat({ messages, chatName, isOpen, onClose }: Expo
 
     return (
         <div className="fixed inset-0 z-100 flex items-center justify-center p-4 bg-black/50 animate-fade-in">
-            <div className="bg-(--bg-card) rounded-3xl shadow-2xl w-full max-w-md overflow-hidden">
+            <div className="bg-card rounded-3xl shadow-2xl w-full max-w-md overflow-hidden">
                 {/* Header */}
-                <div className="flex items-center justify-between p-6 border-b border-(--border-color)">
-                    <h2 className="text-xl font-bold text-(--text-primary)">Export Chat</h2>
+                <div className="flex items-center justify-between p-6 border-b border-border">
+                    <h2 className="text-xl font-bold text-foreground">Export Chat</h2>
                     <button
                         onClick={onClose}
-                        className="p-2 rounded-full hover:bg-(--bg-secondary) transition-colors"
+                        className="p-2 rounded-full hover:bg-secondary transition-colors"
                     >
                         <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
                             <line x1="18" y1="6" x2="6" y2="18" />
@@ -152,21 +152,21 @@ export default function ExportChat({ messages, chatName, isOpen, onClose }: Expo
                 {/* Content */}
                 <div className="p-6 space-y-4">
                     <div>
-                        <p className="text-sm text-(--text-secondary) mb-4">
+                        <p className="text-sm text-muted-foreground mb-4">
                             Export {messages.length} messages from <strong>{chatName}</strong>
                         </p>
 
                         {/* Format Selection */}
                         <div className="space-y-2">
-                            <label className="text-sm font-medium text-(--text-primary)">Format</label>
+                            <label className="text-sm font-medium text-foreground">Format</label>
                             <div className="grid grid-cols-3 gap-2">
                                 {(['json', 'txt', 'csv'] as const).map(format => (
                                     <button
                                         key={format}
                                         onClick={() => setOptions({ ...options, format })}
                                         className={`p-3 rounded-xl font-medium text-sm transition-colors ${options.format === format
-                                            ? 'bg-(--primary-brand) text-white'
-                                            : 'bg-(--bg-secondary) text-(--text-primary) hover:bg-(--bg-card)'
+                                            ? 'bg-primary text-white'
+                                            : 'bg-secondary text-foreground hover:bg-card'
                                             }`}
                                     >
                                         {format.toUpperCase()}
@@ -182,9 +182,9 @@ export default function ExportChat({ messages, chatName, isOpen, onClose }: Expo
                                     type="checkbox"
                                     checked={options.includeTimestamps}
                                     onChange={(e) => setOptions({ ...options, includeTimestamps: e.target.checked })}
-                                    className="w-4 h-4 rounded border-gray-300 text-(--primary-brand) focus:ring-(--primary-brand)"
+                                    className="w-4 h-4 rounded border-gray-300 text-primary focus:ring-primary"
                                 />
-                                <span className="text-sm text-(--text-primary)">Include timestamps</span>
+                                <span className="text-sm text-foreground">Include timestamps</span>
                             </label>
 
                             <label className="flex items-center gap-3 cursor-pointer">
@@ -192,26 +192,26 @@ export default function ExportChat({ messages, chatName, isOpen, onClose }: Expo
                                     type="checkbox"
                                     checked={options.includeMetadata}
                                     onChange={(e) => setOptions({ ...options, includeMetadata: e.target.checked })}
-                                    className="w-4 h-4 rounded border-gray-300 text-(--primary-brand) focus:ring-(--primary-brand)"
+                                    className="w-4 h-4 rounded border-gray-300 text-primary focus:ring-primary"
                                 />
-                                <span className="text-sm text-(--text-primary)">Include metadata (message type, etc.)</span>
+                                <span className="text-sm text-foreground">Include metadata (message type, etc.)</span>
                             </label>
                         </div>
                     </div>
                 </div>
 
                 {/* Footer */}
-                <div className="flex items-center justify-between p-6 border-t border-(--border-color) bg-(--bg-secondary)">
+                <div className="flex items-center justify-between p-6 border-t border-border bg-secondary">
                     <button
                         onClick={onClose}
-                        className="px-4 py-2 text-(--text-secondary) hover:text-(--text-primary) transition-colors"
+                        className="px-4 py-2 text-muted-foreground hover:text-foreground transition-colors"
                     >
                         Cancel
                     </button>
                     <button
                         onClick={handleExport}
                         disabled={exporting || messages.length === 0}
-                        className="px-6 py-2 bg-(--primary-brand) text-white rounded-xl font-medium hover:bg-(--primary-brand-hover) transition-colors disabled:opacity-50 flex items-center gap-2"
+                        className="px-6 py-2 bg-primary text-white rounded-xl font-medium hover:bg-primary/90 transition-colors disabled:opacity-50 flex items-center gap-2"
                     >
                         {exporting ? (
                             <>

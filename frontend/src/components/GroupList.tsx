@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef } from 'react'
+import { useState, useEffect, useRef, useCallback } from 'react'
 import { useWallet } from '@aptos-labs/wallet-adapter-react'
 import { aptos } from '../config'
 import { ListItem } from './ui/ListItem'
@@ -34,13 +34,7 @@ export default function GroupList({ contractAddress, onSelectGroup, onCreateGrou
         return () => window.removeEventListener('keydown', handleKeyDown);
     }, []);
 
-    useEffect(() => {
-        if (account) {
-            fetchGroups()
-        }
-    }, [account, refreshTrigger])
-
-    const fetchGroups = async () => {
+    const fetchGroups = useCallback(async () => {
         if (!account) return
         setLoading(true)
         try {
@@ -89,20 +83,26 @@ export default function GroupList({ contractAddress, onSelectGroup, onCreateGrou
         } finally {
             setLoading(false)
         }
-    }
+    }, [account, contractAddress])
+
+    useEffect(() => {
+        if (account) {
+            fetchGroups()
+        }
+    }, [account, refreshTrigger, fetchGroups])
 
     return (
         <div className="flex flex-col h-full overflow-hidden animate-fade-in">
             {!compact && (
                 <div className="flex items-center justify-between mb-6 px-1">
                     <div>
-                        <h3 className="text-xl font-black text-(--text-primary) tracking-tight uppercase">Squads</h3>
-                        <p className="text-[9px] text-(--text-muted) font-medium tracking-wide uppercase">Your group chats</p>
+                        <h3 className="text-xl font-black text-foreground tracking-tight uppercase">Squads</h3>
+                        <p className="text-[9px] text-muted-foreground font-medium tracking-wide uppercase">Your group chats</p>
                     </div>
                     <div className="flex gap-2">
                         <button
                             onClick={onJoinGroup}
-                            className="px-3 py-1.5 rounded-lg border border-(--border-color) text-[10px] font-black uppercase tracking-widest text-(--text-secondary) hover:border-(--primary-brand) hover:text-(--primary-brand) transition-all"
+                            className="px-3 py-1.5 rounded-lg border border-border text-[10px] font-black uppercase tracking-widest text-muted-foreground hover:border-primary hover:text-primary transition-all"
                         >
                             Join
                         </button>
@@ -130,7 +130,7 @@ export default function GroupList({ contractAddress, onSelectGroup, onCreateGrou
                     <>
                         {/* Premium Search Bar */}
                         <div className="mb-6 relative group px-2">
-                            <div className="absolute left-6 top-1/2 -translate-y-1/2 text-(--text-muted) group-focus-within:text-purple-500 transition-colors z-10">
+                            <div className="absolute left-6 top-1/2 -translate-y-1/2 text-muted-foreground group-focus-within:text-purple-500 transition-colors z-10">
                                 <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3">
                                     <circle cx="11" cy="11" r="8" /><path d="m21 21-4.35-4.35" />
                                 </svg>
@@ -141,12 +141,12 @@ export default function GroupList({ contractAddress, onSelectGroup, onCreateGrou
                                 value={searchQuery}
                                 onChange={(e) => setSearchQuery(e.target.value)}
                                 placeholder="Search groups..."
-                                className="w-full pl-11 pr-11 py-3 bg-gray-50 dark:bg-(--bg-secondary)/40 border border-(--border-color)/40 rounded-2xl text-xs font-bold focus:bg-white dark:focus:bg-(--bg-card) focus:border-purple-500/50 focus:ring-4 focus:ring-purple-500/10 outline-none transition-all placeholder:text-(--text-muted)/50"
+                                className="w-full pl-11 pr-11 py-3 bg-secondary/40 border border-border/40 rounded-2xl text-xs font-bold focus:focus:bg-card focus:border-purple-500/50 focus:ring-4 focus:ring-purple-500/10 outline-none transition-all placeholder:text-muted-foreground/50"
                             />
                             {searchQuery && (
                                 <button
                                     onClick={() => setSearchQuery('')}
-                                    className="absolute right-6 top-1/2 -translate-y-1/2 w-7 h-7 flex items-center justify-center rounded-lg hover:bg-black/5 dark:hover:bg-white/5 text-(--text-muted) hover:text-(--text-primary) transition-all"
+                                    className="absolute right-6 top-1/2 -translate-y-1/2 w-7 h-7 flex items-center justify-center rounded-lg hover:bg-black/5 hover:bg-white/5 text-muted-foreground hover:text-foreground transition-all"
                                 >
                                     <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3">
                                         <line x1="18" y1="6" x2="6" y2="18" /><line x1="6" y1="6" x2="18" y2="18" />
@@ -155,19 +155,19 @@ export default function GroupList({ contractAddress, onSelectGroup, onCreateGrou
                             )}
                             {!searchQuery && (
                                 <div className="absolute right-6 top-1/2 -translate-y-1/2 pointer-events-none opacity-40 group-focus-within:opacity-0 transition-opacity hidden sm:block">
-                                    <span className="text-[9px] font-black text-(--text-muted) border border-(--border-color)/40 px-1.5 py-0.5 rounded-md bg-white/50 dark:bg-black/20">/</span>
+                                    <span className="text-[9px] font-black text-muted-foreground border border-border/40 px-1.5 py-0.5 rounded-md bg-black/20">/</span>
                                 </div>
                             )}
                         </div>
 
                         {filteredGroups.length === 0 ? (
-                            <div className="text-center py-12 px-6 bg-(--bg-secondary)/10 rounded-4xl border-2 border-dashed border-(--border-color)">
-                                <div className="w-12 h-12 rounded-2xl bg-(--bg-secondary) flex items-center justify-center mx-auto mb-4 opacity-50">
-                                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" className="text-(--text-muted)">
+                            <div className="text-center py-12 px-6 bg-secondary/10 rounded-4xl border-2 border-dashed border-border">
+                                <div className="w-12 h-12 rounded-2xl bg-secondary flex items-center justify-center mx-auto mb-4 opacity-50">
+                                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" className="text-muted-foreground">
                                         <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2" /><circle cx="9" cy="7" r="4" />
                                     </svg>
                                 </div>
-                                <p className="text-[10px] font-black uppercase tracking-[0.15em] text-(--text-muted) mb-4">
+                                <p className="text-[10px] font-black uppercase tracking-[0.15em] text-muted-foreground mb-4">
                                     {searchQuery ? 'No groups found' : 'No groups yet'}
                                 </p>
                             </div>

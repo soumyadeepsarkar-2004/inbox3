@@ -56,25 +56,25 @@ export default function GiphyPicker({ onSelect, onClose }: GiphyPickerProps) {
     }, [search])
 
     return (
-        <div className="absolute bottom-full right-0 mb-3 w-[320px] bg-(--bg-card) rounded-2xl shadow-2xl border border-(--border-color) overflow-hidden animate-slide-up z-50">
-            <div className="p-2 border-b border-(--border-color) bg-(--bg-secondary) flex items-center gap-2">
+        <div className="absolute bottom-full right-0 mb-3 w-[320px] bg-card rounded-2xl shadow-2xl border border-border overflow-hidden animate-slide-up z-50">
+            <div className="p-2 border-b border-border bg-secondary flex items-center gap-2">
                 <div className="relative flex-1">
                     <input
                         type="text"
                         value={search}
                         onChange={(e) => setSearch(e.target.value)}
                         placeholder="Search GIFs..."
-                        className="w-full pl-8 pr-3 py-1.5 text-xs bg-(--bg-card) rounded-lg border-none outline-none focus:ring-1 focus:ring-(--primary-brand)"
+                        className="w-full pl-8 pr-3 py-1.5 text-xs bg-card rounded-lg border-none outline-none focus:ring-1 focus:ring-primary"
                         autoFocus
                     />
-                    <svg className="absolute left-2 top-2 text-(--text-muted)" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
+                    <svg className="absolute left-2 top-2 text-muted-foreground" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
                         <circle cx="11" cy="11" r="8"></circle>
                         <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
                     </svg>
                 </div>
                 <button
                     onClick={onClose}
-                    className="p-1 rounded-lg hover:bg-black/5 text-(--text-muted) transition-colors"
+                    className="p-1 rounded-lg hover:bg-black/5 text-muted-foreground transition-colors"
                 >
                     <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3">
                         <line x1="18" y1="6" x2="6" y2="18" />
@@ -92,7 +92,7 @@ export default function GiphyPicker({ onSelect, onClose }: GiphyPickerProps) {
                                 onSelect(gif.images.fixed_height.url)
                                 onClose()
                             }}
-                            className="relative aspect-video rounded-lg overflow-hidden hover:opacity-90 transition-opacity group bg-(--bg-secondary)"
+                            className="relative aspect-video rounded-lg overflow-hidden hover:opacity-90 transition-opacity group bg-secondary"
                         >
                             <img
                                 src={gif.images.fixed_height.url}
@@ -103,8 +103,8 @@ export default function GiphyPicker({ onSelect, onClose }: GiphyPickerProps) {
                         </button>
                     ))}
                 </div>
-                <div className="py-3 text-center border-t border-(--border-color)/30 mt-2">
-                    <p className="text-[9px] font-black uppercase tracking-tighter text-(--text-muted) opacity-50">Powered by GIPHY</p>
+                <div className="py-3 text-center border-t border-border/30 mt-2">
+                    <p className="text-[9px] font-black uppercase tracking-tighter text-muted-foreground opacity-50">Powered by GIPHY</p>
                 </div>
             </div>
         </div>

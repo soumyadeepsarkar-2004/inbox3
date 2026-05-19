@@ -34,7 +34,7 @@ export class SignalingService {
         return Boolean(this.serverUrl);
     }
 
-    connect(localAddress: string): void {
+    connect(localAddress: string, signMessage?: (msg: string) => Promise<{ signature: string; publicKey: string }>): void {
         if (!this.serverUrl) {
             console.warn(
                 '[Signaling] No signaling server configured. ' +
@@ -44,10 +44,10 @@ export class SignalingService {
         }
 
         this.localAddress = localAddress;
-        this._openSocket();
+        this._openSocket(signMessage);
     }
 
-    private _openSocket(): void {
+    private async _openSocket(signMessage?: (msg: string) => Promise<{ signature: string; publicKey: string }>): Promise<void> {
         if (this.ws && (this.ws.readyState === WebSocket.OPEN || this.ws.readyState === WebSocket.CONNECTING)) {
             return;
         }
@@ -56,12 +56,28 @@ export class SignalingService {
         const ws = new WebSocket(this.serverUrl);
         this.ws = ws;
 
-        ws.onopen = () => {
+        ws.onopen = async () => {
             console.log('[Signaling] Connected to relay server');
             this.reconnectAttempts = 0;
             this._setState('connected');
+
             // Register this peer with the relay
-            this._send({ type: 'register', address: this.localAddress });
+            if (signMessage) {
+                try {
+                    const message = `Inbox3:${this.localAddress}`;
+                    const { signature, publicKey } = await signMessage(message);
+                    this._send({
+                        type: 'register',
+                        address: this.localAddress,
+                        signature,
+                        publicKey
+                    });
+                } catch (err) {
+                    console.error('[Signaling] Failed to sign registration message:', err);
+                }
+            } else {
+                this._send({ type: 'register', address: this.localAddress });
+            }
         };
 
         ws.onmessage = (event: MessageEvent) => {

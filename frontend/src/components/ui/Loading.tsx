@@ -16,7 +16,7 @@ export function Spinner({ size = 'md', className = '' }: SpinnerProps) {
             className={`
         ${sizeStyles[size]}
         rounded-full
-        border-(--border-color) border-t-(--primary-brand)
+        border-border border-t-primary
         animate-spin
         ${className}
       `.trim().replace(/\s+/g, ' ')}
@@ -43,7 +43,7 @@ export function Skeleton({
     lines = 1,
     className = ''
 }: SkeletonProps) {
-    const baseStyles = 'animate-pulse bg-(--bg-secondary)'
+    const baseStyles = 'animate-pulse bg-secondary'
 
     const variantStyles = {
         text: 'h-4 rounded',

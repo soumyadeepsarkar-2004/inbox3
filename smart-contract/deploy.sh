@@ -21,6 +21,24 @@ if [ "$TARGET_NETWORK" = "mainnet" ]; then
     echo ""
     read -p "Type 'yes' to confirm mainnet deployment: " CONFIRM
     if [ "$CONFIRM" != "yes" ]; then
+        echo "Deployment cancelled."
+        exit 1
+    fi
+fi
+
+# Determine the profile to use based on target network
+PROFILE=$TARGET_NETWORK
+
+echo "Checking Aptos CLI..."
+aptos info
+
+echo "Deploying Inbox3 to ${TARGET_NETWORK}..."
+aptos move publish --profile $PROFILE --assume-yes
+
+echo "========================================"
+echo "Deployment complete! âœ…"
+echo "Make sure to update your frontend/.env with the module address."
+echo "========================================"
         echo "❌ Deployment cancelled."
         exit 1
     fi

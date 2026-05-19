@@ -160,13 +160,13 @@ export default function GroupChat({ contractAddress, groupAddr, onBack }: GroupC
 
             // Filter out messages that failed to load from IPFS
             const validMessages = processedMessages.filter(
-                m => m.content !== 'Failed to load message' && !m.content.startsWith('⚠️')
+                m => m.content !== 'Failed to load message' && !m.content.startsWith('âš ï¸')
             )
             setMessages(validMessages)
         } catch (error) {
             console.error('Error fetching messages:', error)
         }
-    }, [account, contractAddress, groupAddr, createMessageId])
+    }, [account, contractAddress, groupAddr, createMessageId, addDataUsage])
 
     // Initial fetch and realtime subscription
     useEffect(() => {
@@ -251,10 +251,10 @@ export default function GroupChat({ contractAddress, groupAddr, onBack }: GroupC
     return (
         <Card className="relative flex flex-col h-[550px] md:h-[600px] lg:h-[650px] overflow-hidden">
             {/* Header */}
-            <div className="px-4 py-3 flex items-center gap-3 border-b border-(--border-color) bg-(--bg-card)">
+            <div className="px-4 py-3 flex items-center gap-3 border-b border-border bg-card">
                 <button
                     onClick={onBack}
-                    className="w-9 h-9 rounded-xl flex items-center justify-center text-(--text-muted) hover:bg-(--bg-secondary) transition-colors"
+                    className="w-9 h-9 rounded-xl flex items-center justify-center text-muted-foreground hover:bg-secondary transition-colors"
                     aria-label="Go back"
                 >
                     <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
@@ -262,17 +262,17 @@ export default function GroupChat({ contractAddress, groupAddr, onBack }: GroupC
                     </svg>
                 </button>
                 <div className="flex-1 min-w-0">
-                    <h3 className="font-semibold text-(--text-primary) text-base truncate">
+                    <h3 className="font-semibold text-foreground text-base truncate">
                         {groupName || 'Loading...'}
                     </h3>
                     <div className="flex items-center gap-2">
-                        <span className="w-2 h-2 bg-(--success-green) rounded-full" />
-                        <p className="text-xs text-(--text-muted)">
+                        <span className="w-2 h-2 bg-green-500 rounded-full" />
+                        <p className="text-xs text-muted-foreground">
                             {groupAddr.slice(0, 8)}...{groupAddr.slice(-6)}
                         </p>
                         <button
                             onClick={() => copyToClipboard(groupAddr)}
-                            className="text-(--text-muted) hover:text-(--primary-brand) transition-colors"
+                            className="text-muted-foreground hover:text-primary transition-colors"
                             title="Copy address"
                         >
                             <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
@@ -286,24 +286,24 @@ export default function GroupChat({ contractAddress, groupAddr, onBack }: GroupC
 
             {/* Copy Toast */}
             {copyStatus && (
-                <div className="absolute top-16 right-4 bg-(--bg-secondary) text-(--text-primary) text-xs px-3 py-1.5 rounded-lg shadow-lg border border-(--border-color) z-10 animate-scale-in">
-                    ✓ {copyStatus}
+                <div className="absolute top-16 right-4 bg-secondary text-foreground text-xs px-3 py-1.5 rounded-lg shadow-lg border border-border z-10 animate-scale-in">
+                    âœ“ {copyStatus}
                 </div>
             )}
 
             {/* Messages */}
-            <div className="flex-1 overflow-y-auto p-4 sm:p-6 bg-(--bg-main)">
+            <div className="flex-1 overflow-y-auto p-4 sm:p-6 bg-background">
                 {messages.length === 0 ? (
                     <div className="flex flex-col items-center justify-center h-full gap-4 opacity-60">
-                        <div className="w-16 h-16 rounded-2xl bg-(--bg-secondary) flex items-center justify-center border border-dashed border-(--border-color)">
-                            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" className="text-(--text-muted)">
+                        <div className="w-16 h-16 rounded-2xl bg-secondary flex items-center justify-center border border-dashed border-border">
+                            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" className="text-muted-foreground">
                                 <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2" />
                                 <circle cx="9" cy="7" r="4" />
                                 <path d="M23 21v-2a4 4 0 0 0-3-3.87" />
                                 <path d="M16 3.13a4 4 0 0 1 0 7.75" />
                             </svg>
                         </div>
-                        <p className="text-sm font-medium text-(--text-muted)">No messages in this group yet</p>
+                        <p className="text-sm font-medium text-muted-foreground">No messages in this group yet</p>
                     </div>
                 ) : (
                     <div className="max-w-3xl mx-auto space-y-4">
@@ -334,7 +334,7 @@ export default function GroupChat({ contractAddress, groupAddr, onBack }: GroupC
                             return (
                                 <div
                                     key={msg.id}
-                                    className={`transition-all duration-300 rounded-xl ${isHighlighted ? 'bg-(--primary-brand-light) p-2 -mx-2' : ''
+                                    className={`transition-all duration-300 rounded-xl ${isHighlighted ? 'bg-primary/10 p-2 -mx-2' : ''
                                         }`}
                                 >
                                     <MessageBubble

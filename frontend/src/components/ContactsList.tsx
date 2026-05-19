@@ -82,10 +82,10 @@ export default function ContactsList({ onSelectContact }: ContactsListProps) {
 
     return (
         <div className="contacts-view animate-fade-in">
-            <div className="flex items-center justify-between mb-6 bg-(--bg-secondary) p-4 rounded-lg border border-(--border-color)">
+            <div className="flex items-center justify-between mb-6 bg-secondary p-4 rounded-lg border border-border">
                 <div>
-                    <h2 className="text-xl font-black text-(--text-primary) tracking-tight uppercase">Contacts</h2>
-                    <p className="text-[10px] text-(--text-secondary) font-medium mt-0.5">Add and manage your contacts</p>
+                    <h2 className="text-xl font-black text-foreground tracking-tight uppercase">Contacts</h2>
+                    <p className="text-[10px] text-muted-foreground font-medium mt-0.5">Add and manage your contacts</p>
                 </div>
                 <button
                     onClick={() => setShowAddForm(!showAddForm)}
@@ -98,8 +98,8 @@ export default function ContactsList({ onSelectContact }: ContactsListProps) {
             {message && (
                 <div
                     className={`mb-4 p-3 rounded-lg text-sm ${message.type === 'success'
-                        ? 'bg-(--success-light) text-(--success-green) border border-(--success-green)/20'
-                        : 'bg-(--error-light) text-(--error-red) border border-(--error-red)/20'
+                        ? 'bg-(--success-light) text-green-500 border border-green-500/20'
+                        : 'bg-(--error-light) text-destructive border border-destructive/20'
                         }`}
                 >
                     {message.text}
@@ -108,41 +108,41 @@ export default function ContactsList({ onSelectContact }: ContactsListProps) {
 
             {/* Add Contact Form */}
             {showAddForm && (
-                <div className="mb-6 p-6 bg-white dark:bg-(--bg-card) rounded-[2.5rem] border border-(--primary-brand)/20 shadow-xl shadow-indigo-500/5 animate-scale-in">
-                    <h3 className="text-xs font-black uppercase tracking-widest mb-5 text-(--primary-brand)">New Contact</h3>
+                <div className="mb-6 p-6 bg-card/50 liquid-glass  rounded-[2.5rem] border border-primary/20 shadow-xl shadow-indigo-500/5 animate-scale-in">
+                    <h3 className="text-xs font-black uppercase tracking-widest mb-5 text-primary">New Contact</h3>
 
                     <div className="space-y-4">
                         <div className="space-y-1.5">
-                            <label className="block text-[10px] font-black uppercase tracking-wider text-(--text-muted) ml-1">Wallet Address *</label>
+                            <label className="block text-[10px] font-black uppercase tracking-wider text-muted-foreground ml-1">Wallet Address *</label>
                             <input
                                 type="text"
                                 value={newContact.address}
                                 onChange={(e) => setNewContact({ ...newContact, address: e.target.value })}
                                 placeholder="0x... (Aptos Address)"
-                                className="w-full px-5 py-3.5 bg-gray-50 dark:bg-(--bg-secondary)/50 border border-(--border-color)/50 rounded-2xl focus:border-(--primary-brand) outline-none transition-all text-xs font-mono"
+                                className="w-full px-5 py-3.5 bg-secondary/50 border border-border/50 rounded-2xl focus:border-primary outline-none transition-all text-xs font-mono"
                             />
                         </div>
 
                         <div className="space-y-1.5">
-                            <label className="block text-[10px] font-black uppercase tracking-wider text-(--text-muted) ml-1">Name *</label>
+                            <label className="block text-[10px] font-black uppercase tracking-wider text-muted-foreground ml-1">Name *</label>
                             <input
                                 type="text"
                                 value={newContact.username}
                                 onChange={(e) => setNewContact({ ...newContact, username: e.target.value })}
                                 placeholder="e.g. Satoshi"
                                 maxLength={30}
-                                className="w-full px-5 py-3.5 bg-gray-50 dark:bg-(--bg-secondary)/50 border border-(--border-color)/50 rounded-2xl focus:border-(--primary-brand) outline-none transition-all text-sm"
+                                className="w-full px-5 py-3.5 bg-secondary/50 border border-border/50 rounded-2xl focus:border-primary outline-none transition-all text-sm"
                             />
                         </div>
 
                         <div className="space-y-1.5">
-                            <label className="block text-[10px] font-black uppercase tracking-wider text-(--text-muted) ml-1">Notes (optional)</label>
+                            <label className="block text-[10px] font-black uppercase tracking-wider text-muted-foreground ml-1">Notes (optional)</label>
                             <textarea
                                 value={newContact.notes}
                                 onChange={(e) => setNewContact({ ...newContact, notes: e.target.value })}
                                 placeholder="Security notes, relationship, etc..."
                                 rows={2}
-                                className="w-full px-5 py-3.5 bg-gray-50 dark:bg-(--bg-secondary)/50 border border-(--border-color)/50 rounded-2xl focus:border-(--primary-brand) outline-none transition-all text-sm resize-none"
+                                className="w-full px-5 py-3.5 bg-secondary/50 border border-border/50 rounded-2xl focus:border-primary outline-none transition-all text-sm resize-none"
                             />
                         </div>
 
@@ -158,7 +158,7 @@ export default function ContactsList({ onSelectContact }: ContactsListProps) {
 
             {/* Search Bar */}
             <div className="mb-6 relative group">
-                <div className="absolute left-4 top-1/2 -translate-y-1/2 text-(--text-muted) group-focus-within:text-(--primary-brand) transition-colors z-10">
+                <div className="absolute left-4 top-1/2 -translate-y-1/2 text-muted-foreground group-focus-within:text-primary transition-colors z-10">
                     <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3">
                         <circle cx="11" cy="11" r="8" /><path d="m21 21-4.35-4.35" />
                     </svg>
@@ -169,12 +169,12 @@ export default function ContactsList({ onSelectContact }: ContactsListProps) {
                     value={searchQuery}
                     onChange={(e) => setSearchQuery(e.target.value)}
                     placeholder="Search contacts..."
-                    className="w-full pl-12 pr-12 py-4 bg-gray-50 dark:bg-(--bg-secondary)/50 border border-(--border-color)/50 rounded-2xl focus:bg-white dark:focus:bg-(--bg-card) focus:border-(--primary-brand)/50 focus:ring-4 focus:ring-(--primary-brand)/10 outline-none transition-all text-sm text-(--text-primary) placeholder:text-(--text-muted)/50 font-medium"
+                    className="w-full pl-12 pr-12 py-4 bg-secondary/50 border border-border/50 rounded-2xl focus:focus:bg-card focus:border-primary/50 focus:ring-4 focus:ring-primary/10 outline-none transition-all text-sm text-foreground placeholder:text-muted-foreground/50 font-medium"
                 />
                 {searchQuery && (
                     <button
                         onClick={() => setSearchQuery('')}
-                        className="absolute right-4 top-1/2 -translate-y-1/2 w-8 h-8 flex items-center justify-center rounded-xl hover:bg-black/5 dark:hover:bg-white/5 text-(--text-muted) hover:text-(--text-primary) transition-all"
+                        className="absolute right-4 top-1/2 -translate-y-1/2 w-8 h-8 flex items-center justify-center rounded-xl hover:bg-black/5 hover:bg-white/5 text-muted-foreground hover:text-foreground transition-all"
                     >
                         <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3">
                             <line x1="18" y1="6" x2="6" y2="18" /><line x1="6" y1="6" x2="18" y2="18" />
@@ -183,18 +183,18 @@ export default function ContactsList({ onSelectContact }: ContactsListProps) {
                 )}
                 {!searchQuery && (
                     <div className="absolute right-4 top-1/2 -translate-y-1/2 pointer-events-none opacity-40 group-focus-within:opacity-0 transition-opacity hidden sm:block">
-                        <span className="text-[10px] font-black text-(--text-muted) border border-(--border-color)/50 px-1.5 py-0.5 rounded-md bg-white/50 dark:bg-black/20">/</span>
+                        <span className="text-[10px] font-black text-muted-foreground border border-border/50 px-1.5 py-0.5 rounded-md bg-black/20">/</span>
                     </div>
                 )}
             </div>
 
             {/* Contacts List */}
             {filteredContacts.length === 0 ? (
-                <div className="text-center py-16 bg-(--bg-secondary) rounded-2xl border-2 border-dashed border-(--border-color)">
-                    <div className="w-16 h-16 rounded-full bg-(--bg-tertiary) flex items-center justify-center mx-auto mb-4">
-                        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" className="text-(--text-muted)"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2" /><circle cx="12" cy="7" r="4" /></svg>
+                <div className="text-center py-16 bg-secondary rounded-2xl border-2 border-dashed border-border">
+                    <div className="w-16 h-16 rounded-full bg-muted flex items-center justify-center mx-auto mb-4">
+                        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" className="text-muted-foreground"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2" /><circle cx="12" cy="7" r="4" /></svg>
                     </div>
-                    <p className="text-xs font-bold uppercase tracking-widest text-(--text-secondary)">
+                    <p className="text-xs font-bold uppercase tracking-widest text-muted-foreground">
                         {searchQuery ? 'No contacts found' : 'No contacts yet'}
                     </p>
                 </div>
@@ -203,7 +203,7 @@ export default function ContactsList({ onSelectContact }: ContactsListProps) {
                     {filteredContacts.map((contact) => (
                         <div
                             key={contact.address}
-                            className="p-4 bg-white dark:bg-(--bg-card) rounded-2xl border border-(--border-color)/50 hover:border-indigo-500/30 hover:shadow-xl hover:shadow-indigo-500/5 transition-all group relative"
+                            className="p-4 bg-card/50 liquid-glass  rounded-2xl border border-border/50 hover:border-indigo-500/30 hover:shadow-xl hover:shadow-indigo-500/5 transition-all group relative"
                         >
                             <div className="flex items-center justify-between gap-4">
                                 <div className="flex items-center gap-4 min-w-0">
@@ -212,20 +212,20 @@ export default function ContactsList({ onSelectContact }: ContactsListProps) {
                                             <img
                                                 src={contact.avatar?.startsWith('data:') || contact.avatar?.startsWith('http') ? contact.avatar : `https://gateway.pinata.cloud/ipfs/${contact.avatar}`}
                                                 alt={contact.username}
-                                                className="w-12 h-12 rounded-2xl object-cover border-2 border-(--bg-secondary) shadow-sm"
+                                                className="w-12 h-12 rounded-2xl object-cover border-2 border-secondary shadow-sm"
                                             />
                                         ) : (
-                                            <div className="w-12 h-12 rounded-2xl bg-linear-to-br from-gray-50 to-gray-100 dark:from-white/5 dark:to-white/10 flex items-center justify-center border border-(--border-color)/50">
-                                                <span className="text-sm text-(--text-primary) font-black">
+                                            <div className="w-12 h-12 rounded-2xl bg-linear-to-br from-white/5 to-white/10 flex items-center justify-center border border-border/50">
+                                                <span className="text-sm text-foreground font-black">
                                                     {contact.username.charAt(0).toUpperCase()}
                                                 </span>
                                             </div>
                                         )}
-                                        <div className="absolute -bottom-1 -right-1 w-4 h-4 rounded-full bg-green-500 border-2 border-white dark:border-(--bg-card)"></div>
+                                        <div className="absolute -bottom-1 -right-1 w-4 h-4 rounded-full bg-green-500 border-2 border-card"></div>
                                     </div>
                                     <div className="min-w-0">
-                                        <h3 className="text-sm font-semibold text-(--text-primary) tracking-tight truncate">{contact.username}</h3>
-                                        <p className="text-[10px] font-mono text-(--text-muted) truncate mt-0.5 opacity-60 tracking-wider font-bold">{contact.address}</p>
+                                        <h3 className="text-sm font-semibold text-foreground tracking-tight truncate">{contact.username}</h3>
+                                        <p className="text-[10px] font-mono text-muted-foreground truncate mt-0.5 opacity-60 tracking-wider font-bold">{contact.address}</p>
                                     </div>
                                 </div>
 
@@ -233,7 +233,7 @@ export default function ContactsList({ onSelectContact }: ContactsListProps) {
                                     {onSelectContact && (
                                         <button
                                             onClick={() => onSelectContact(contact.address)}
-                                            className="w-10 h-10 rounded-xl bg-indigo-50 dark:bg-indigo-500/10 text-indigo-500 flex items-center justify-center hover:bg-indigo-500 hover:text-white transition-all active:scale-90"
+                                            className="w-10 h-10 rounded-xl bg-primary/10 text-primary flex items-center justify-center hover:bg-primary hover:text-white transition-all active:scale-90"
                                             title="Send message"
                                         >
                                             <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
@@ -243,7 +243,7 @@ export default function ContactsList({ onSelectContact }: ContactsListProps) {
                                     )}
                                     <button
                                         onClick={() => handleRemoveContact(contact.address)}
-                                        className="w-10 h-10 rounded-xl bg-red-50 dark:bg-red-500/10 text-red-500 flex items-center justify-center hover:bg-red-500 hover:text-white transition-all active:scale-90"
+                                        className="w-10 h-10 rounded-xl bg-destructive/10 text-red-500 flex items-center justify-center hover:bg-destructive hover:text-white transition-all active:scale-90"
                                         title="Remove contact"
                                     >
                                         <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
@@ -254,8 +254,8 @@ export default function ContactsList({ onSelectContact }: ContactsListProps) {
                             </div>
 
                             {contact.notes && (
-                                <div className="mt-3 pt-3 border-t border-(--border-color)/30">
-                                    <p className="text-[11px] text-(--text-muted) italic line-clamp-2 leading-relaxed">
+                                <div className="mt-3 pt-3 border-t border-border/30">
+                                    <p className="text-[11px] text-muted-foreground italic line-clamp-2 leading-relaxed">
                                         <span className="font-black uppercase text-[9px] not-italic mr-2 opacity-40">Notes:</span>
                                         {contact.notes}
                                     </p>
@@ -266,8 +266,8 @@ export default function ContactsList({ onSelectContact }: ContactsListProps) {
                 </div>
             )}
 
-            <div className="mt-8 pt-6 border-t border-(--border-color) text-center">
-                <p className="text-xs font-bold text-(--text-secondary) uppercase tracking-widest">
+            <div className="mt-8 pt-6 border-t border-border text-center">
+                <p className="text-xs font-bold text-muted-foreground uppercase tracking-widest">
                     {filteredContacts.length} {filteredContacts.length === 1 ? 'contact' : 'contacts'}
                 </p>
             </div>

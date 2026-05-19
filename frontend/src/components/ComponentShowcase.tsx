@@ -25,14 +25,14 @@ export default function ComponentShowcase() {
   const [textareaValue, setTextareaValue] = useState('')
 
   return (
-    <div className="min-h-screen bg-(--bg-main) p-8">
+    <div className="min-h-screen bg-background p-8">
       <div className="max-w-6xl mx-auto space-y-12">
         {/* Header */}
         <header className="text-center space-y-4">
-          <h1 className="text-4xl font-bold text-(--text-primary)">
+          <h1 className="text-4xl font-bold text-foreground">
             Inbox3 Component Library
           </h1>
-          <p className="text-(--text-secondary) max-w-2xl mx-auto">
+          <p className="text-muted-foreground max-w-2xl mx-auto">
             Visual QA showcase of all reusable UI components. Use this page to verify
             consistent styling, interactions, and accessibility across the design system.
           </p>
@@ -47,7 +47,7 @@ export default function ComponentShowcase() {
             <a
               key={section}
               href={`#${section.toLowerCase()}`}
-              className="px-3 py-1.5 text-sm rounded-lg bg-(--bg-secondary) text-(--text-secondary) hover:text-(--primary-brand) transition-colors"
+              className="px-3 py-1.5 text-sm rounded-lg bg-secondary text-muted-foreground hover:text-primary transition-colors"
             >
               {section}
             </a>
@@ -146,19 +146,19 @@ export default function ComponentShowcase() {
           <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
             <Card className="p-4">
               <h4 className="font-medium mb-2">Default Card</h4>
-              <p className="text-sm text-(--text-secondary)">Basic card with padding</p>
+              <p className="text-sm text-muted-foreground">Basic card with padding</p>
             </Card>
             <Card variant="outlined" className="p-4">
               <h4 className="font-medium mb-2">Outlined Card</h4>
-              <p className="text-sm text-(--text-secondary)">With visible border</p>
+              <p className="text-sm text-muted-foreground">With visible border</p>
             </Card>
             <Card variant="elevated" className="p-4">
               <h4 className="font-medium mb-2">Elevated Card</h4>
-              <p className="text-sm text-(--text-secondary)">With shadow depth</p>
+              <p className="text-sm text-muted-foreground">With shadow depth</p>
             </Card>
             <Card variant="glass" className="p-4">
               <h4 className="font-medium mb-2">Glass Card</h4>
-              <p className="text-sm text-(--text-secondary)">Frosted glass effect</p>
+              <p className="text-sm text-muted-foreground">Frosted glass effect</p>
             </Card>
           </div>
         </Section>
@@ -228,19 +228,19 @@ export default function ComponentShowcase() {
           <div className="flex items-center gap-6">
             <div className="text-center">
               <Spinner size="xs" />
-              <p className="text-xs mt-2 text-(--text-muted)">XS</p>
+              <p className="text-xs mt-2 text-muted-foreground">XS</p>
             </div>
             <div className="text-center">
               <Spinner size="sm" />
-              <p className="text-xs mt-2 text-(--text-muted)">SM</p>
+              <p className="text-xs mt-2 text-muted-foreground">SM</p>
             </div>
             <div className="text-center">
               <Spinner size="md" />
-              <p className="text-xs mt-2 text-(--text-muted)">MD</p>
+              <p className="text-xs mt-2 text-muted-foreground">MD</p>
             </div>
             <div className="text-center">
               <Spinner size="lg" />
-              <p className="text-xs mt-2 text-(--text-muted)">LG</p>
+              <p className="text-xs mt-2 text-muted-foreground">LG</p>
             </div>
           </div>
         </Section>
@@ -330,7 +330,7 @@ export default function ComponentShowcase() {
             onClose={() => setIsModalOpen(false)}
             title="Example Modal"
           >
-            <p className="text-(--text-secondary) mb-6">
+            <p className="text-muted-foreground mb-6">
               This is an example modal dialog. It supports a title, content area, and actions.
               Click outside or press Escape to close.
             </p>
@@ -344,28 +344,28 @@ export default function ComponentShowcase() {
         {/* Color Palette */}
         <Section id="colors" title="Color Palette" description="Design system color tokens">
           <div className="grid gap-4 grid-cols-2 md:grid-cols-4 lg:grid-cols-6">
-            <ColorSwatch name="Primary" color="var(--primary-brand)" />
-            <ColorSwatch name="Primary Hover" color="var(--primary-brand-hover)" />
-            <ColorSwatch name="Success" color="var(--success-green)" />
+            <ColorSwatch name="Primary" color="varprimary" />
+            <ColorSwatch name="Primary Hover" color="varprimary/90" />
+            <ColorSwatch name="Success" color="vargreen-500" />
             <ColorSwatch name="Warning" color="var(--warning-yellow)" />
-            <ColorSwatch name="Error" color="var(--error-red)" />
-            <ColorSwatch name="Info" color="var(--info-blue)" />
+            <ColorSwatch name="Error" color="vardestructive" />
+            <ColorSwatch name="Info" color="varblue-500" />
           </div>
 
           <Subsection title="Background Colors">
             <div className="grid gap-4 grid-cols-2 md:grid-cols-4">
-              <ColorSwatch name="BG Main" color="var(--bg-main)" bordered />
-              <ColorSwatch name="BG Card" color="var(--bg-card)" bordered />
-              <ColorSwatch name="BG Secondary" color="var(--bg-secondary)" bordered />
-              <ColorSwatch name="Border" color="var(--border-color)" bordered />
+              <ColorSwatch name="BG Main" color="varbackground" bordered />
+              <ColorSwatch name="BG Card" color="varcard" bordered />
+              <ColorSwatch name="BG Secondary" color="varsecondary" bordered />
+              <ColorSwatch name="Border" color="varborder" bordered />
             </div>
           </Subsection>
 
           <Subsection title="Text Colors">
             <div className="grid gap-4 grid-cols-2 md:grid-cols-4">
-              <ColorSwatch name="Text Primary" color="var(--text-primary)" />
-              <ColorSwatch name="Text Secondary" color="var(--text-secondary)" />
-              <ColorSwatch name="Text Muted" color="var(--text-muted)" />
+              <ColorSwatch name="Text Primary" color="varforeground" />
+              <ColorSwatch name="Text Secondary" color="varmuted-foreground" />
+              <ColorSwatch name="Text Muted" color="varmuted-foreground" />
             </div>
           </Subsection>
         </Section>
@@ -380,8 +380,8 @@ export default function ComponentShowcase() {
             <p className="text-xl font-semibold">Heading 5 (20px)</p>
             <p className="text-lg font-medium">Heading 6 (18px)</p>
             <p className="text-base">Body text (16px) - The quick brown fox jumps over the lazy dog.</p>
-            <p className="text-sm text-(--text-secondary)">Small text (14px) - Secondary information and captions.</p>
-            <p className="text-xs text-(--text-muted)">Extra small (12px) - Timestamps, labels, and metadata.</p>
+            <p className="text-sm text-muted-foreground">Small text (14px) - Secondary information and captions.</p>
+            <p className="text-xs text-muted-foreground">Extra small (12px) - Timestamps, labels, and metadata.</p>
           </div>
         </Section>
 
@@ -390,21 +390,21 @@ export default function ComponentShowcase() {
           <div className="space-y-2">
             {[1, 2, 3, 4, 5, 6, 8, 10, 12, 16].map(size => (
               <div key={size} className="flex items-center gap-4">
-                <span className="w-12 text-xs text-(--text-muted)">--space-{size}</span>
+                <span className="w-12 text-xs text-muted-foreground">--space-{size}</span>
                 <div 
-                  className="bg-(--primary-brand) h-4" 
+                  className="bg-primary h-4" 
                   style={{ width: `${size * 4}px` }}
                 />
-                <span className="text-xs text-(--text-secondary)">{size * 4}px</span>
+                <span className="text-xs text-muted-foreground">{size * 4}px</span>
               </div>
             ))}
           </div>
         </Section>
 
         {/* Footer */}
-        <footer className="text-center py-8 border-t border-(--border-color)">
-          <p className="text-(--text-muted) text-sm">
-            Inbox3 Design System • Built with React + Tailwind CSS
+        <footer className="text-center py-8 border-t border-border">
+          <p className="text-muted-foreground text-sm">
+            Inbox3 Design System â€¢ Built with React + Tailwind CSS
           </p>
         </footer>
       </div>
@@ -422,8 +422,8 @@ function Section({ id, title, description, children }: {
   return (
     <section id={id} className="scroll-mt-8">
       <div className="mb-6">
-        <h2 className="text-2xl font-bold text-(--text-primary) mb-2">{title}</h2>
-        <p className="text-(--text-secondary)">{description}</p>
+        <h2 className="text-2xl font-bold text-foreground mb-2">{title}</h2>
+        <p className="text-muted-foreground">{description}</p>
       </div>
       <div className="space-y-6">
         {children}
@@ -435,7 +435,7 @@ function Section({ id, title, description, children }: {
 function Subsection({ title, children }: { title: string; children: React.ReactNode }) {
   return (
     <div className="space-y-3">
-      <h3 className="text-sm font-medium text-(--text-muted) uppercase tracking-wider">{title}</h3>
+      <h3 className="text-sm font-medium text-muted-foreground uppercase tracking-wider">{title}</h3>
       {children}
     </div>
   )
@@ -445,11 +445,11 @@ function ColorSwatch({ name, color, bordered }: { name: string; color: string; b
   return (
     <div className="space-y-2">
       <div 
-        className={`w-full h-16 rounded-lg ${bordered ? 'border border-(--border-color)' : ''}`}
+        className={`w-full h-16 rounded-lg ${bordered ? 'border border-border' : ''}`}
         style={{ backgroundColor: color }}
       />
-      <p className="text-xs font-medium text-(--text-primary)">{name}</p>
-      <p className="text-xs text-(--text-muted) font-mono">{color}</p>
+      <p className="text-xs font-medium text-foreground">{name}</p>
+      <p className="text-xs text-muted-foreground font-mono">{color}</p>
     </div>
   )
 }

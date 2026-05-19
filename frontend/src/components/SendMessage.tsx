@@ -177,12 +177,17 @@ export default function SendMessage({ contractAddress, onMessageSent, onClose, i
         }
       })
 
-      await aptos.waitForTransaction({ transactionHash: response.hash })
-
+      // Background the waiting phase to unblock UI
+      setCurrentStep('Transaction pending...')
       incrementMessagesSent()
-      setCurrentStep('Audio message sent!')
-      setTimeout(() => setCurrentStep(''), 3000)
       onMessageSent()
+
+      aptos.waitForTransaction({ transactionHash: response.hash }).then(() => {
+        console.log('Transaction confirmed:', response.hash);
+      }).catch(err => {
+        console.error('Transaction failed after submission:', err);
+      });
+
     } catch (error) {
       console.error('Error sending audio:', error)
       alert('Failed to send audio message')
@@ -276,13 +281,19 @@ export default function SendMessage({ contractAddress, onMessageSent, onClose, i
         }
       })
 
-      await aptos.waitForTransaction({ transactionHash: response.hash })
-      incrementMessagesSent()
-
+      // Background the waiting phase to unblock UI
       setCurrentStep('Sent!')
+      incrementMessagesSent()
+      onMessageSent()
+
+      aptos.waitForTransaction({ transactionHash: response.hash }).then(() => {
+        console.log('Transaction confirmed:', response.hash);
+      }).catch(err => {
+        console.error('Transaction failed after submission:', err);
+      });
+
       setTimeout(() => setCurrentStep(''), 2000)
 
-      onMessageSent()
     } catch (error) {
       console.error('Error sending message:', error)
       let errorMessage = 'Failed to send message'
@@ -303,7 +314,7 @@ export default function SendMessage({ contractAddress, onMessageSent, onClose, i
 
   if (isCompactMode) {
     return (
-      <div className="flex flex-col border-t border-(--border-color)/30 bg-(--bg-card)/50 backdrop-blur-xl group relative">
+      <div className="flex flex-col border-t border-border/30 bg-card/50 backdrop-blur-xl group relative">
         {loading && currentStep && (
           <div className="absolute top-0 left-0 right-0 -translate-y-full px-5 py-2 flex items-center gap-3 bg-gradient-to-r from-blue-600/90 to-blue-500/90 backdrop-blur-md text-white z-50">
             <Spinner size="xs" />
@@ -316,12 +327,12 @@ export default function SendMessage({ contractAddress, onMessageSent, onClose, i
           disabled={loading}
           placeholder="Type your secure message..."
         />
-        <div className="px-5 py-2 border-t border-(--border-color)/20 flex justify-between items-center opacity-60">
+        <div className="px-5 py-2 border-t border-border/20 flex justify-between items-center opacity-60">
           <div className="flex items-center gap-1.5 px-2 py-0.5 rounded-full bg-green-500/10 border border-green-500/10">
             <div className="w-1 h-1 rounded-full bg-green-500 shadow-[0_0_5px_rgba(34,197,94,0.5)]" />
             <span className="text-[8px] font-black uppercase tracking-widest text-green-600">E2E Secured Connection</span>
           </div>
-          <span className="text-[8px] font-black uppercase tracking-[0.2em] text-(--text-muted)">Aptos Network Layer</span>
+          <span className="text-[8px] font-black uppercase tracking-[0.2em] text-muted-foreground">Aptos Network Layer</span>
         </div>
       </div>
     )
@@ -329,7 +340,7 @@ export default function SendMessage({ contractAddress, onMessageSent, onClose, i
 
   return (
     <div className="h-full flex flex-col items-center justify-center p-4">
-      <div className="w-full max-w-2xl bg-(--bg-card)/20 backdrop-blur-xl rounded-[2.5rem] border border-(--border-color)/30 shadow-2xl overflow-hidden animate-scale-in">
+      <div className="w-full max-w-2xl bg-card/20 backdrop-blur-xl rounded-[2.5rem] border border-border/30 shadow-2xl overflow-hidden animate-scale-in">
         <form onSubmit={handleSubmit} className="p-8 flex flex-col gap-6">
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-4">
@@ -339,12 +350,12 @@ export default function SendMessage({ contractAddress, onMessageSent, onClose, i
                 </svg>
               </div>
               <div>
-                <h2 className="text-xl font-black text-(--text-primary) tracking-tight">New Secure Channel</h2>
+                <h2 className="text-xl font-black text-foreground tracking-tight">New Secure Channel</h2>
                 <p className="text-[10px] font-black uppercase tracking-widest text-orange-500/60">Quantum-Resistant Layer</p>
               </div>
             </div>
             {onClose && (
-              <button type="button" onClick={onClose} className="p-2 rounded-xl hover:bg-black/5 hover:dark:bg-white/5 transition-all text-(--text-muted)">
+              <button type="button" onClick={onClose} className="p-2 rounded-xl hover:bg-black/5 hover:bg-white/5 transition-all text-muted-foreground">
                 <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3"><path d="M18 6L6 18M6 6l12 12" /></svg>
               </button>
             )}
@@ -352,25 +363,25 @@ export default function SendMessage({ contractAddress, onMessageSent, onClose, i
 
           <div className="space-y-4">
             <div className="space-y-1.5 px-1">
-              <label className="text-[10px] font-black uppercase tracking-wider text-(--text-muted) opacity-70">Recipient Address</label>
+              <label className="text-[10px] font-black uppercase tracking-wider text-muted-foreground opacity-70">Recipient Address</label>
               <input
                 type="text"
                 value={recipient}
                 onChange={(e) => setRecipient(e.target.value)}
                 placeholder="0x... (Aptos Address)"
-                className="w-full px-5 py-4 bg-(--bg-secondary)/50 border border-(--border-color)/40 rounded-2xl focus:border-(--primary-brand) outline-none transition-all text-sm font-mono"
+                className="w-full px-5 py-4 bg-secondary/50 border border-border/40 rounded-2xl focus:border-primary outline-none transition-all text-sm font-mono"
                 required
               />
             </div>
 
             <div className="space-y-1.5 px-1">
-              <label className="text-[10px] font-black uppercase tracking-wider text-(--text-muted) opacity-70">Message Content</label>
-              <div className="relative flex flex-col min-h-0 bg-(--bg-secondary)/30 border border-(--border-color)/40 rounded-[1.5rem] focus-within:border-(--primary-brand) transition-all">
+              <label className="text-[10px] font-black uppercase tracking-wider text-muted-foreground opacity-70">Message Content</label>
+              <div className="relative flex flex-col min-h-0 bg-secondary/30 border border-border/40 rounded-[1.5rem] focus-within:border-primary transition-all">
                 <textarea
                   value={message}
                   onChange={(e) => setMessage(e.target.value)}
                   placeholder="Start your conversation privately..."
-                  className="w-full min-h-[160px] px-5 py-4 bg-transparent text-(--text-primary) outline-none text-sm resize-none custom-scrollbar"
+                  className="w-full min-h-[160px] px-5 py-4 bg-transparent text-foreground outline-none text-sm resize-none custom-scrollbar"
                   required={!isRecording && !selectedGif && attachedFiles.length === 0}
                   disabled={isRecording}
                 />
@@ -396,7 +407,7 @@ export default function SendMessage({ contractAddress, onMessageSent, onClose, i
                               <svg width="20" height="20" viewBox="0 0 24 24" fill="white" className="absolute z-10"><path d="M8 5v14l11-7z" /></svg>
                             </div>
                           ) : (
-                            <div className="h-20 w-20 rounded-lg bg-black/10 flex items-center justify-center text-(--text-muted)"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M13 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V9z" /><polyline points="13 2 13 9 20 9" /></svg></div>
+                            <div className="h-20 w-20 rounded-lg bg-black/10 flex items-center justify-center text-muted-foreground"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M13 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V9z" /><polyline points="13 2 13 9 20 9" /></svg></div>
                           )}
                           <button type="button" onClick={() => setAttachedFiles(prev => prev.filter(f => f.id !== file.id))} className="absolute -top-2 -right-2 w-5 h-5 bg-red-500 text-white rounded-full flex items-center justify-center shadow-lg"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3"><path d="M18 6L6 18M6 6l12 12" /></svg></button>
                         </div>
@@ -405,12 +416,12 @@ export default function SendMessage({ contractAddress, onMessageSent, onClose, i
                   </div>
                 )}
 
-                <div className="flex items-center gap-2 p-2 border-t border-(--border-color)/20">
+                <div className="flex items-center gap-2 p-2 border-t border-border/20">
                   <EmojiPicker onSelect={(emoji) => setMessage(prev => prev + emoji)} position="top" />
                   <FileUpload disabled={loading || isRecording} onFileUploaded={async (url, type, fileName) => {
                     setAttachedFiles(prev => [...prev, { url, type, name: fileName, id: Math.random().toString(36).substr(2, 9) }])
                   }} />
-                  <button type="button" onClick={() => setShowGiphy(!showGiphy)} className={`px-4 py-1.5 rounded-lg font-black text-[10px] uppercase transition-all ${showGiphy ? 'bg-orange-500 text-white' : 'hover:bg-black/5 text-(--text-muted) border border-(--border-color)/40'}`}>GIF</button>
+                  <button type="button" onClick={() => setShowGiphy(!showGiphy)} className={`px-4 py-1.5 rounded-lg font-black text-[10px] uppercase transition-all ${showGiphy ? 'bg-orange-500 text-white' : 'hover:bg-black/5 text-muted-foreground border border-border/40'}`}>GIF</button>
                   {showGiphy && (
                     <div className="absolute bottom-full left-0 mb-4 z-50">
                       <GiphyPicker onSelect={(url) => { setSelectedGif(url); setShowGiphy(false); }} onClose={() => setShowGiphy(false)} />
@@ -424,7 +435,7 @@ export default function SendMessage({ contractAddress, onMessageSent, onClose, i
           <div className="flex items-center justify-between pt-2">
             <div className="flex items-center gap-2 px-4 py-2 rounded-full bg-green-500/5 border border-green-500/10">
               <div className="w-1.5 h-1.5 rounded-full bg-green-500 animate-pulse shadow-[0_0_8px_rgba(34,197,94,0.4)]" />
-              <span className="text-[9px] font-black uppercase tracking-widest text-green-600 dark:text-green-400">E2E Secure</span>
+              <span className="text-[9px] font-black uppercase tracking-widest text-emerald-500">E2E Secure</span>
             </div>
 
             <div className="flex gap-4">
@@ -433,7 +444,7 @@ export default function SendMessage({ contractAddress, onMessageSent, onClose, i
                 onClick={isRecording ? stopRecording : startRecording}
                 className={`flex items-center gap-3 px-8 py-4 rounded-[1.5rem] font-black text-[12px] uppercase tracking-widest transition-all active:scale-95 shadow-lg ${isRecording
                   ? 'bg-red-500 text-white animate-pulse shadow-red-500/40 ring-8 ring-red-500/10'
-                  : 'bg-(--bg-secondary) border border-(--border-color)/50 hover:bg-orange-500/10 hover:text-orange-500 hover:border-orange-500/30'}`}
+                  : 'bg-secondary border border-border/50 hover:bg-orange-500/10 hover:text-orange-500 hover:border-orange-500/30'}`}
               >
                 <div className={`w-2.5 h-2.5 rounded-full ${isRecording ? 'bg-white shadow-[0_0_10px_white]' : 'bg-red-500'} animate-pulse`} />
                 {isRecording ? formatTime(recordingTime) : 'Encrypted Audio'}

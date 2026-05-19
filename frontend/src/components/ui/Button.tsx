@@ -28,34 +28,34 @@ export const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
         const baseStyles = `
       inline-flex items-center justify-center gap-2 font-medium
       rounded-xl transition-all duration-200 ease-out
-      focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-(--primary-brand)/50
+      focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary/50
       disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none
       active:scale-[0.98]
     `
 
         const variantStyles = {
             primary: `
-        bg-(--primary-brand) text-white
-        hover:bg-(--primary-brand-hover) hover:-translate-y-0.5
+        bg-primary text-white
+        hover:bg-primary/90 hover:-translate-y-0.5
         shadow-md hover:shadow-lg
       `,
             secondary: `
-        bg-(--bg-secondary) text-(--text-primary)
-        hover:bg-(--border-color)
-        border border-(--border-color)
+        bg-secondary text-foreground
+        hover:bg-border
+        border border-border
       `,
             outline: `
-        bg-transparent text-(--text-primary)
-        border border-(--border-color)
-        hover:border-(--primary-brand) hover:text-(--primary-brand)
-        hover:bg-(--primary-brand-light)
+        bg-transparent text-foreground
+        border border-border
+        hover:border-primary hover:text-primary
+        hover:bg-primary/10
       `,
             ghost: `
-        bg-transparent text-(--text-secondary)
-        hover:bg-(--bg-secondary) hover:text-(--text-primary)
+        bg-transparent text-muted-foreground
+        hover:bg-secondary hover:text-foreground
       `,
             danger: `
-        bg-(--error-red) text-white
+        bg-destructive text-white
         hover:bg-red-600 hover:-translate-y-0.5
         shadow-md hover:shadow-lg
       `

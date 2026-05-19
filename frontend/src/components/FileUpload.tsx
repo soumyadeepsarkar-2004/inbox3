@@ -90,13 +90,13 @@ export default function FileUpload({ onFileUploaded, disabled }: FileUploadProps
                 onClick={() => fileInputRef.current?.click()}
                 disabled={disabled || isUploading}
                 className={`p-2 rounded-lg transition-colors ${isUploading
-                    ? 'bg-(--bg-secondary) text-(--text-muted) cursor-wait'
-                    : 'hover:bg-(--bg-secondary) text-(--text-secondary) hover:text-(--primary-brand)'
+                    ? 'bg-secondary text-muted-foreground cursor-wait'
+                    : 'hover:bg-secondary text-muted-foreground hover:text-primary'
                     }`}
                 title="Attach file or image"
             >
                 {isUploading ? (
-                    <div className="w-5 h-5 border-2 border-(--primary-brand) border-t-transparent rounded-full animate-spin" />
+                    <div className="w-5 h-5 border-2 border-primary border-t-transparent rounded-full animate-spin" />
                 ) : (
                     <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
                         <path d="M21.44 11.05l-9.19 9.19a6 6 0 0 1-8.49-8.49l9.19-9.19a4 4 0 0 1 5.66 5.66l-9.2 9.19a2 2 0 0 1-2.83-2.83l8.49-8.48" />

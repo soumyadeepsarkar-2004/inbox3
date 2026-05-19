@@ -46,7 +46,7 @@ export default function CreateGroupModal({ isOpen, onClose, contractAddress, onG
 
     return (
         <div className="fixed inset-0 z-[100] flex items-center justify-center bg-black/60 backdrop-blur-md p-4 animate-in fade-in duration-300">
-            <div className="bg-(--bg-card) w-full max-w-md p-8 rounded-[2.5rem] border border-(--border-color) shadow-2xl animate-in zoom-in-95 duration-300">
+            <div className="bg-card/50 liquid-glass w-full max-w-md p-8 rounded-[2.5rem] border border-white/10 shadow-2xl animate-in zoom-in-95 duration-300">
                 <div className="flex items-center gap-4 mb-8">
                     <div className="w-12 h-12 rounded-2xl bg-purple-500/10 flex items-center justify-center text-purple-500">
                         <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
@@ -54,21 +54,21 @@ export default function CreateGroupModal({ isOpen, onClose, contractAddress, onG
                         </svg>
                     </div>
                     <div>
-                        <h2 className="text-2xl font-black text-(--text-primary) tracking-tight uppercase">New Group</h2>
-                        <p className="text-[10px] text-(--text-muted) font-bold tracking-widest uppercase">Establish decentralized circle</p>
+                        <h2 className="text-2xl font-black text-foreground tracking-tight uppercase">New Group</h2>
+                        <p className="text-[10px] text-muted-foreground font-bold tracking-widest uppercase">Establish decentralized circle</p>
                     </div>
                 </div>
 
                 <form onSubmit={handleSubmit} className="space-y-6">
                     <div className="space-y-2">
-                        <label className="block text-[10px] font-black uppercase tracking-wider text-(--text-muted) ml-1">
+                        <label className="block text-[10px] font-black uppercase tracking-wider text-muted-foreground ml-1">
                             Identity / Name
                         </label>
                         <input
                             type="text"
                             value={groupName}
                             onChange={(e) => setGroupName(e.target.value)}
-                            className="w-full px-5 py-4 bg-(--bg-secondary) border border-(--border-color) rounded-2xl focus:border-purple-500 focus:ring-4 focus:ring-purple-500/10 outline-none transition-all text-sm text-(--text-primary) placeholder:text-(--text-muted)"
+                            className="w-full px-5 py-4 bg-secondary border border-border rounded-2xl focus:border-purple-500 focus:ring-4 focus:ring-purple-500/10 outline-none transition-all text-sm text-foreground placeholder:text-muted-foreground"
                             placeholder="e.g. Alpha Collective"
                             required
                         />
@@ -85,7 +85,7 @@ export default function CreateGroupModal({ isOpen, onClose, contractAddress, onG
                         <button
                             type="button"
                             onClick={onClose}
-                            className="w-full py-4 bg-(--bg-secondary) text-(--text-secondary) rounded-2xl font-bold text-xs uppercase tracking-widest hover:bg-(--bg-tertiary) transition-all"
+                            className="w-full py-4 bg-secondary text-muted-foreground rounded-2xl font-bold text-xs uppercase tracking-widest hover:bg-muted transition-all"
                             disabled={loading}
                         >
                             Back to Hub

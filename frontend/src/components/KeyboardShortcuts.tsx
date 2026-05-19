@@ -62,13 +62,13 @@ export function ShortcutsModal({ isOpen, onClose, shortcuts }: ShortcutsModalPro
 
     return (
         <div className="fixed inset-0 z-100 flex items-center justify-center p-4 bg-black/50 animate-fade-in">
-            <div className="bg-(--bg-card) rounded-3xl shadow-2xl w-full max-w-2xl overflow-hidden">
+            <div className="bg-card rounded-3xl shadow-2xl w-full max-w-2xl overflow-hidden">
                 {/* Header */}
-                <div className="flex items-center justify-between p-6 border-b border-(--border-color)">
-                    <h2 className="text-xl font-bold text-(--text-primary)">Keyboard Shortcuts</h2>
+                <div className="flex items-center justify-between p-6 border-b border-border">
+                    <h2 className="text-xl font-bold text-foreground">Keyboard Shortcuts</h2>
                     <button
                         onClick={onClose}
-                        className="p-2 rounded-full hover:bg-(--bg-secondary) transition-colors"
+                        className="p-2 rounded-full hover:bg-secondary transition-colors"
                     >
                         <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
                             <line x1="18" y1="6" x2="6" y2="18" />
@@ -83,15 +83,15 @@ export function ShortcutsModal({ isOpen, onClose, shortcuts }: ShortcutsModalPro
                         {shortcuts.map((shortcut, index) => (
                             <div
                                 key={index}
-                                className="flex items-center justify-between p-4 bg-(--bg-secondary) rounded-xl"
+                                className="flex items-center justify-between p-4 bg-secondary rounded-xl"
                             >
-                                <p className="text-sm text-(--text-primary)">{shortcut.description}</p>
+                                <p className="text-sm text-foreground">{shortcut.description}</p>
                                 <div className="flex items-center gap-1">
                                     {formatShortcut(shortcut).map((key, i) => (
                                         <span key={i}>
                                             <span className="kbd">{key}</span>
                                             {i < formatShortcut(shortcut).length - 1 && (
-                                                <span className="mx-1 text-(--text-muted)">+</span>
+                                                <span className="mx-1 text-muted-foreground">+</span>
                                             )}
                                         </span>
                                     ))}
@@ -102,8 +102,8 @@ export function ShortcutsModal({ isOpen, onClose, shortcuts }: ShortcutsModalPro
                 </div>
 
                 {/* Footer */}
-                <div className="p-6 border-t border-(--border-color) bg-(--bg-secondary)">
-                    <p className="text-xs text-(--text-muted) text-center">
+                <div className="p-6 border-t border-border bg-secondary">
+                    <p className="text-xs text-muted-foreground text-center">
                         Press <span className="kbd">?</span> to toggle this help
                     </p>
                 </div>

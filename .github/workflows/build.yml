@@ -1,0 +1,68 @@
+name: Build & Test
+
+on:
+  push:
+    branches: [ main, develop ]
+  pull_request:
+    branches: [ main, develop ]
+
+jobs:
+  frontend:
+    runs-on: ubuntu-latest
+    
+    strategy:
+      matrix:
+        node-version: [18.x, 20.x]
+    
+    steps:
+    - uses: actions/checkout@v4
+    
+    - name: Setup Node.js ${{ matrix.node-version }}
+      uses: actions/setup-node@v4
+      with:
+        node-version: ${{ matrix.node-version }}
+        cache: 'pnpm'
+    
+    - name: Install pnpm
+      run: npm install -g pnpm
+    
+    - name: Install dependencies
+      working-directory: frontend
+      run: pnpm install
+    
+    - name: Lint
+      working-directory: frontend
+      run: pnpm lint
+    
+    - name: Build
+      working-directory: frontend
+      run: pnpm build
+    
+    - name: Run tests
+      working-directory: frontend
+      run: pnpm test --run
+  
+  signaling-server:
+    runs-on: ubuntu-latest
+    
+    strategy:
+      matrix:
+        node-version: [18.x, 20.x]
+    
+    steps:
+    - uses: actions/checkout@v4
+    
+    - name: Setup Node.js ${{ matrix.node-version }}
+      uses: actions/setup-node@v4
+      with:
+        node-version: ${{ matrix.node-version }}
+        cache: 'npm'
+        cache-dependency-path: signaling-server/package-lock.json
+    
+    - name: Install dependencies
+      working-directory: signaling-server
+      run: npm install
+    
+    - name: Verify server
+      working-directory: signaling-server
+      run: npm list

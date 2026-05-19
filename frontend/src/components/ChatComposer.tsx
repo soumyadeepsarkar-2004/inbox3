@@ -182,22 +182,22 @@ export const ChatComposer: React.FC<ChatComposerProps> = ({
     const canSend = (message.trim() || selectedGif || attachedFiles.length > 0) && !disabled && !sending && !isRecording;
 
     return (
-        <div className="bg-white dark:bg-gray-900 border-t border-gray-100 dark:border-gray-800 p-4">
+        <div className="bg-card/50 backdrop-blur-md border-t border-white/5 liquid-glass p-4">
             {/* Reply Context */}
             {replyTarget && (
-                <div className="mb-3 p-3 bg-gray-50 dark:bg-gray-800 rounded-xl border border-gray-200 dark:border-gray-700 flex items-start justify-between gap-3">
+                <div className="mb-3 p-3 bg-secondary rounded-xl border border-border flex items-start justify-between gap-3">
                     <div className="flex-1 min-w-0">
-                        <span className="text-[11px] font-bold text-gray-500 dark:text-gray-400 uppercase tracking-wider">
+                        <span className="text-[11px] font-bold text-muted-foreground uppercase tracking-wider">
                             Replying to {replyTarget.sender.slice(0, 8)}...
                         </span>
-                        <p className="text-sm text-gray-700 dark:text-gray-300 truncate mt-0.5">
+                        <p className="text-sm text-foreground truncate mt-0.5">
                             {replyTarget.snippet}
                         </p>
                     </div>
                     <button
                         type="button"
                         onClick={onCancelReply}
-                        className="text-gray-400 hover:text-gray-600 dark:hover:text-gray-200 transition-colors p-1"
+                        className="text-muted-foreground hover:text-foreground transition-colors p-1"
                     >
                         <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
                             <path d="M18 6L6 18M6 6l12 12" />
@@ -211,7 +211,7 @@ export const ChatComposer: React.FC<ChatComposerProps> = ({
                 <div className="mb-3 flex flex-wrap gap-2">
                     {selectedGif && (
                         <div className="relative group">
-                            <img src={selectedGif} className="h-20 w-auto rounded-lg border border-orange-500/30 shadow-sm" alt="GIF" />
+                            <img src={selectedGif} className="h-20 w-auto rounded-lg border border-primary/30 shadow-sm" alt="GIF" />
                             <button
                                 type="button"
                                 onClick={() => setSelectedGif(null)}
@@ -227,16 +227,16 @@ export const ChatComposer: React.FC<ChatComposerProps> = ({
                         return (
                             <div key={file.id} className="relative group">
                                 {isImg ? (
-                                    <img src={file.url} className="h-20 w-auto rounded-lg border border-orange-500/30 shadow-sm object-cover" alt={file.name} />
+                                    <img src={file.url} className="h-20 w-auto rounded-lg border border-primary/30 shadow-sm object-cover" alt={file.name} />
                                 ) : isVid ? (
-                                    <div className="h-20 aspect-video rounded-lg bg-black/20 border border-orange-500/30 flex items-center justify-center relative overflow-hidden">
+                                    <div className="h-20 aspect-video rounded-lg bg-black/20 border border-primary/30 flex items-center justify-center relative overflow-hidden">
                                         <video src={file.url} className="w-full h-full object-cover" />
                                         <div className="absolute inset-0 flex items-center justify-center bg-black/40">
                                             <svg width="20" height="20" viewBox="0 0 24 24" fill="white"><path d="M8 5v14l11-7z" /></svg>
                                         </div>
                                     </div>
                                 ) : (
-                                    <div className="h-20 w-20 rounded-lg bg-gray-100 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 flex flex-col items-center justify-center p-2">
+                                    <div className="h-20 w-20 rounded-lg bg-muted border border-border flex flex-col items-center justify-center p-2">
                                         <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M13 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V9z" /><polyline points="13 2 13 9 20 9" /></svg>
                                         <span className="text-[8px] font-bold truncate w-full text-center mt-1 text-gray-500">{file.name}</span>
                                     </div>
@@ -270,16 +270,16 @@ export const ChatComposer: React.FC<ChatComposerProps> = ({
             {/* Input Form */}
             <form onSubmit={handleSubmit} className="flex items-end gap-3">
                 {/* Text Input Container */}
-                <div className="flex-1 relative bg-gray-50 dark:bg-gray-800 rounded-2xl border border-gray-200 dark:border-gray-700 focus-within:border-orange-500 focus-within:ring-2 focus-within:ring-orange-500/20 transition-all">
+                <div className="flex-1 relative bg-secondary rounded-2xl border border-border focus-within:border-primary focus-within:ring-2 focus-within:ring-primary/20 transition-all liquid-glass">
                     <textarea
                         ref={inputRef}
                         value={message}
                         onChange={(e) => setMessage(e.target.value)}
                         onKeyDown={handleKeyDown}
-                        placeholder={isRecording ? '🎤 Recording audio...' : placeholder}
+                        placeholder={isRecording ? 'ÃƒÂ°Ã…Â¸Ã…Â½Ã‚Â¤ Recording audio...' : placeholder}
                         disabled={disabled || sending || isRecording}
                         rows={1}
-                        className="w-full px-4 py-3 pr-24 bg-transparent text-gray-900 dark:text-white placeholder-gray-400 dark:placeholder-gray-500 outline-none resize-none text-[15px] leading-relaxed"
+                        className="w-full px-4 py-3 pr-24 bg-transparent text-foreground text-foreground placeholder:text-muted-foreground outline-none resize-none text-[15px] leading-relaxed"
                         style={{ minHeight: '48px', maxHeight: '120px' }}
                     />
 
@@ -304,8 +304,8 @@ export const ChatComposer: React.FC<ChatComposerProps> = ({
                                 type="button"
                                 onClick={() => setShowGiphyPicker(!showGiphyPicker)}
                                 className={`px-2.5 py-1.5 rounded-lg text-[10px] font-bold uppercase tracking-wider transition-all ${showGiphyPicker
-                                        ? 'bg-orange-500 text-white'
-                                        : 'bg-gray-200 dark:bg-gray-700 text-gray-600 dark:text-gray-300 hover:bg-gray-300 dark:hover:bg-gray-600'
+                                        ? 'bg-primary text-white'
+                                        : 'bg-muted text-foreground text-foreground hover:bg-muted-foreground/20'
                                     }`}
                             >
                                 GIF
@@ -321,7 +321,7 @@ export const ChatComposer: React.FC<ChatComposerProps> = ({
                     disabled={disabled || sending}
                     className={`flex items-center justify-center gap-2 px-4 py-3 rounded-2xl font-bold text-[12px] uppercase tracking-wide transition-all min-w-[56px] h-[48px] ${isRecording
                             ? 'bg-red-500 text-white shadow-lg shadow-red-500/30 animate-pulse'
-                            : 'bg-gray-100 dark:bg-gray-800 text-gray-600 dark:text-gray-300 border border-gray-200 dark:border-gray-700 hover:bg-gray-200 dark:hover:bg-gray-700'
+                            : 'bg-muted text-foreground border border-border hover:bg-muted-foreground/20'
                         }`}
                 >
                     {isRecording ? (
@@ -344,8 +344,8 @@ export const ChatComposer: React.FC<ChatComposerProps> = ({
                     type="submit"
                     disabled={!canSend}
                     className={`flex items-center justify-center px-5 py-3 rounded-2xl font-bold text-[12px] uppercase tracking-wide transition-all h-[48px] ${canSend
-                            ? 'bg-gradient-to-r from-orange-500 to-orange-600 text-white shadow-lg shadow-orange-500/30 hover:shadow-orange-500/50 hover:-translate-y-0.5 active:scale-95'
-                            : 'bg-gray-200 dark:bg-gray-700 text-gray-400 dark:text-gray-500 cursor-not-allowed'
+                            ? 'bg-gradient-to-r from-primary to-orange-600 text-white shadow-lg shadow-primary/30 hover:shadow-primary/50 hover:-translate-y-0.5 active:scale-95'
+                            : 'bg-muted text-foreground text-muted-foreground cursor-not-allowed'
                         }`}
                 >
                     {sending ? (

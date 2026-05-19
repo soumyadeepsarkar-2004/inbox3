@@ -23,9 +23,9 @@ export const Card = React.forwardRef<HTMLDivElement, CardProps>(
         const baseStyles = 'rounded-2xl transition-all duration-200'
 
         const variantStyles = {
-            default: 'bg-(--bg-card) border border-(--border-color)',
-            outlined: 'bg-transparent border-2 border-(--border-color)',
-            elevated: 'bg-(--bg-card) shadow-lg border border-(--border-color)/50',
+            default: 'bg-card border border-border',
+            outlined: 'bg-transparent border-2 border-border',
+            elevated: 'bg-card shadow-lg border border-border/50',
             glass: 'bg-(--glass-bg) backdrop-blur-xl border border-(--glass-border)'
         }
 

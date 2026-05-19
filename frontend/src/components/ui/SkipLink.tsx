@@ -19,9 +19,9 @@ export function SkipLink({
                 sr-only focus:not-sr-only
                 fixed top-0 left-0 z-9999
                 px-4 py-2 m-2
-                bg-(--primary-brand) text-white
+                bg-primary text-white
                 rounded-lg font-medium text-sm
-                focus:outline-none focus:ring-2 focus:ring-(--primary-brand)/50
+                focus:outline-none focus:ring-2 focus:ring-primary/50
                 transition-transform
                 -translate-y-full focus:translate-y-0
             "

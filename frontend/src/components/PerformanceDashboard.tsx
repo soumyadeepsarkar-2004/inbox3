@@ -177,12 +177,12 @@ export default function PerformanceDashboard({ isOpen, onClose, standalone = fal
     ]
 
     const colorClasses = {
-        blue: 'bg-blue-100 dark:bg-blue-900/30 text-blue-600 dark:text-blue-400',
-        green: 'bg-green-100 dark:bg-green-900/30 text-green-600 dark:text-green-400',
-        purple: 'bg-purple-100 dark:bg-purple-900/30 text-purple-600 dark:text-purple-400',
-        orange: 'bg-orange-100 dark:bg-orange-900/30 text-orange-600 dark:text-orange-400',
-        pink: 'bg-pink-100 dark:bg-pink-900/30 text-pink-600 dark:text-pink-400',
-        cyan: 'bg-cyan-100 dark:bg-cyan-900/30 text-cyan-600 dark:text-cyan-400'
+        blue: 'bg-blue-100 bg-opacity-20 text-blue-600 ',
+        green: 'bg-green-100 bg-opacity-20 text-green-600 ',
+        purple: 'bg-purple-100 bg-opacity-20 text-purple-600 ',
+        orange: 'bg-orange-100 bg-opacity-20 text-orange-600 ',
+        pink: 'bg-pink-100 bg-opacity-20 text-pink-600 ',
+        cyan: 'bg-cyan-100 bg-opacity-20 text-cyan-600 '
     }
 
     if (standalone) {
@@ -191,29 +191,29 @@ export default function PerformanceDashboard({ isOpen, onClose, standalone = fal
                 <div className="grid grid-cols-2 gap-x-10 gap-y-8">
                     {stats.slice(0, 4).map((stat, index) => (
                         <div key={index} className="group cursor-default relative">
-                            <p className="text-[10px] font-black uppercase tracking-[0.2em] text-(--text-muted) mb-2.5 group-hover:text-(--primary-brand) transition-colors whitespace-nowrap">
+                            <p className="text-[10px] font-black uppercase tracking-[0.2em] text-muted-foreground mb-2.5 group-hover:text-primary transition-colors whitespace-nowrap">
                                 {stat.label.split(' ').length > 1 ? stat.label.split(' ')[1] : stat.label}
                             </p>
                             <div className="flex items-end gap-1.5">
-                                <span className="text-2xl font-black text-(--text-primary) tracking-tight leading-none">
+                                <span className="text-2xl font-black text-foreground tracking-tight leading-none">
                                     {stat.value}
                                 </span>
-                                <span className="text-[8px] font-black text-(--text-muted) uppercase tracking-tighter opacity-30 mb-0.5">Units</span>
+                                <span className="text-[8px] font-black text-muted-foreground uppercase tracking-tighter opacity-30 mb-0.5">Units</span>
                             </div>
                         </div>
                     ))}
                 </div>
 
-                <div className="pt-6 border-t border-(--border-color)/40 flex items-center justify-between mt-2">
+                <div className="pt-6 border-t border-border/40 flex items-center justify-between mt-2">
                     <div className="flex items-center gap-2.5">
                         <div className="relative flex items-center justify-center">
                             <div className="w-2 h-2 rounded-full bg-green-500 animate-pulse" />
                             <div className="absolute inset-0 w-2 h-2 rounded-full bg-green-500 blur-[3px] opacity-40" />
                         </div>
-                        <span className="text-[9px] font-black text-(--text-secondary) uppercase tracking-[0.15em]">System Active</span>
+                        <span className="text-[9px] font-black text-muted-foreground uppercase tracking-[0.15em]">System Active</span>
                     </div>
-                    <div className="px-2.5 py-1 rounded-lg bg-(--bg-secondary) border border-(--border-color) shadow-inner flex items-center">
-                        <span className="text-[9px] font-bold font-mono text-(--primary-brand) uppercase tracking-wider">{NETWORK}</span>
+                    <div className="px-2.5 py-1 rounded-lg bg-secondary border border-border shadow-inner flex items-center">
+                        <span className="text-[9px] font-bold font-mono text-primary uppercase tracking-wider">{NETWORK}</span>
                     </div>
                 </div>
             </div>
@@ -222,7 +222,7 @@ export default function PerformanceDashboard({ isOpen, onClose, standalone = fal
 
     return (
         <div className="fixed inset-0 z-100 flex items-center justify-center p-4 bg-black/50 animate-fade-in backdrop-blur-sm">
-            <div className="bg-(--bg-card) rounded-3xl shadow-2xl w-full max-w-4xl max-h-[90vh] overflow-hidden border border-(--border-color)/50">
+            <div className="bg-card rounded-3xl shadow-2xl w-full max-w-4xl max-h-[90vh] overflow-hidden border border-border/50">
                 {/* Header */}
                 <div className="flex items-center justify-between p-8 border-b border-white/10 bg-gradient-to-br from-[#8B5CF6] via-[#7C3AED] to-[#6D28D9] text-white relative overflow-hidden">
                     <div className="absolute inset-0 bg-[url('https://www.transparenttextures.com/patterns/cubes.png')] opacity-10 pointer-events-none"></div>
@@ -252,18 +252,18 @@ export default function PerformanceDashboard({ isOpen, onClose, standalone = fal
                         {stats.map((stat, index) => (
                             <div
                                 key={index}
-                                className="p-6 bg-white dark:bg-(--bg-card) rounded-[2rem] hover:shadow-2xl hover:shadow-indigo-500/10 transition-all group border border-(--border-color)/50 relative overflow-hidden"
+                                className="p-6 bg-card/50 liquid-glass  rounded-[2rem] hover:shadow-2xl hover:shadow-indigo-500/10 transition-all group border border-border/50 relative overflow-hidden"
                             >
                                 <div className={`absolute top-0 right-0 w-24 h-24 -mr-8 -mt-8 rounded-full opacity-5 group-hover:scale-150 transition-transform duration-700 ${colorClasses[stat.color as keyof typeof colorClasses].split(' ')[0]}`}></div>
                                 <div className="flex items-center gap-4 mb-4">
                                     <div className={`p-3.5 rounded-2xl ${colorClasses[stat.color as keyof typeof colorClasses]} shadow-lg shadow-current/10`}>
                                         {stat.icon}
                                     </div>
-                                    <p className="text-xs font-black uppercase tracking-widest text-(--text-muted)">{stat.label}</p>
+                                    <p className="text-xs font-black uppercase tracking-widest text-muted-foreground">{stat.label}</p>
                                 </div>
                                 <div className="flex items-baseline gap-2">
-                                    <p className="text-3xl font-black text-(--text-primary) tracking-tighter">{stat.value}</p>
-                                    <span className="text-[10px] font-bold text-(--text-muted) uppercase tracking-tighter opacity-40">Live</span>
+                                    <p className="text-3xl font-black text-foreground tracking-tighter">{stat.value}</p>
+                                    <span className="text-[10px] font-bold text-muted-foreground uppercase tracking-tighter opacity-40">Live</span>
                                 </div>
                             </div>
                         ))}
@@ -272,8 +272,8 @@ export default function PerformanceDashboard({ isOpen, onClose, standalone = fal
                     {/* Additional Info */}
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                         {/* Protocol Analytics (Activity Chart) */}
-                        <div className="p-8 bg-white dark:bg-(--bg-card) rounded-[2.5rem] border border-(--border-color)/50 shadow-sm relative overflow-hidden group">
-                            <h3 className="font-black text-xs uppercase tracking-[0.2em] text-(--text-muted) mb-8 flex items-center gap-2">
+                        <div className="p-8 bg-card/50 liquid-glass  rounded-[2.5rem] border border-border/50 shadow-sm relative overflow-hidden group">
+                            <h3 className="font-black text-xs uppercase tracking-[0.2em] text-muted-foreground mb-8 flex items-center gap-2">
                                 <span className="w-2 h-2 rounded-full bg-indigo-500 animate-pulse"></span>
                                 Protocol Activity Flow
                             </h3>
@@ -295,7 +295,7 @@ export default function PerformanceDashboard({ isOpen, onClose, standalone = fal
                                                     </div>
                                                 </div>
                                             </div>
-                                            <span className="text-[10px] font-bold text-(--text-muted) uppercase">{day}</span>
+                                            <span className="text-[10px] font-bold text-muted-foreground uppercase">{day}</span>
                                         </div>
                                     )
                                 })}
@@ -303,36 +303,36 @@ export default function PerformanceDashboard({ isOpen, onClose, standalone = fal
                         </div>
 
                         {/* Quick Insights */}
-                        <div className="p-8 bg-white dark:bg-(--bg-card) rounded-[2.5rem] border border-(--border-color)/50 shadow-sm">
-                            <h3 className="font-black text-xs uppercase tracking-[0.2em] text-(--text-muted) mb-6 flex items-center gap-2">
+                        <div className="p-8 bg-card/50 liquid-glass  rounded-[2.5rem] border border-border/50 shadow-sm">
+                            <h3 className="font-black text-xs uppercase tracking-[0.2em] text-muted-foreground mb-6 flex items-center gap-2">
                                 <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" className="text-purple-500">
                                     <path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5" />
                                 </svg>
                                 Network Insights
                             </h3>
                             <div className="space-y-5">
-                                <div className="flex items-center justify-between p-4 bg-(--bg-secondary)/40 rounded-2xl">
+                                <div className="flex items-center justify-between p-4 bg-secondary/40 rounded-2xl">
                                     <div className="flex flex-col">
-                                        <span className="text-[10px] font-black uppercase text-(--text-muted) tracking-widest">Most Active Day</span>
-                                        <span className="text-lg font-black text-(--text-primary) tracking-tight">{metrics.mostActiveDay}</span>
+                                        <span className="text-[10px] font-black uppercase text-muted-foreground tracking-widest">Most Active Day</span>
+                                        <span className="text-lg font-black text-foreground tracking-tight">{metrics.mostActiveDay}</span>
                                     </div>
                                     <div className="w-10 h-10 rounded-xl bg-indigo-500/10 flex items-center justify-center text-indigo-500 font-black text-xs">
                                         {metrics.mostActiveDay.slice(0, 1)}
                                     </div>
                                 </div>
-                                <div className="flex items-center justify-between p-4 bg-(--bg-secondary)/40 rounded-2xl">
+                                <div className="flex items-center justify-between p-4 bg-secondary/40 rounded-2xl">
                                     <div className="flex flex-col">
-                                        <span className="text-[10px] font-black uppercase text-(--text-muted) tracking-widest">Protocol Uptime</span>
-                                        <span className="text-lg font-black text-(--text-primary) tracking-tight">{formatUptime(metrics.uptime)}</span>
+                                        <span className="text-[10px] font-black uppercase text-muted-foreground tracking-widest">Protocol Uptime</span>
+                                        <span className="text-lg font-black text-foreground tracking-tight">{formatUptime(metrics.uptime)}</span>
                                     </div>
                                     <div className="w-10 h-10 rounded-xl bg-green-500/10 flex items-center justify-center text-green-500">
                                         <div className="w-2 h-2 rounded-full bg-green-500 animate-pulse"></div>
                                     </div>
                                 </div>
-                                <div className="flex items-center justify-between p-4 bg-(--bg-secondary)/40 rounded-2xl">
+                                <div className="flex items-center justify-between p-4 bg-secondary/40 rounded-2xl">
                                     <div className="flex flex-col">
-                                        <span className="text-[10px] font-black uppercase text-(--text-muted) tracking-widest">Efficiency Ratio</span>
-                                        <span className="text-lg font-black text-(--text-primary) tracking-tight">
+                                        <span className="text-[10px] font-black uppercase text-muted-foreground tracking-widest">Efficiency Ratio</span>
+                                        <span className="text-lg font-black text-foreground tracking-tight">
                                             {metrics.messagesReceived > 0
                                                 ? (metrics.messagesSent / metrics.messagesReceived).toFixed(2)
                                                 : '1.00'}
@@ -347,13 +347,13 @@ export default function PerformanceDashboard({ isOpen, onClose, standalone = fal
 
                 {/* Footer */}
                 {onClose && (
-                    <div className="p-6 border-t border-(--border-color) bg-(--bg-secondary) flex items-center justify-between">
-                        <p className="text-xs text-(--text-muted)">
+                    <div className="p-6 border-t border-border bg-secondary flex items-center justify-between">
+                        <p className="text-xs text-muted-foreground">
                             Last updated: {new Date().toLocaleString()}
                         </p>
                         <button
                             onClick={onClose}
-                            className="px-6 py-2 bg-(--primary-brand) text-white rounded-xl font-medium hover:bg-(--primary-brand-hover) transition-colors"
+                            className="px-6 py-2 bg-primary text-white rounded-xl font-medium hover:bg-primary/90 transition-colors"
                         >
                             Close
                         </button>

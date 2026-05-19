@@ -43,7 +43,7 @@ export const MessageBubble: React.FC<MessageBubbleProps> = ({
 
     const truncateSnippet = (text: string, maxLength = 60) => {
         if (!text) return '';
-        return text.length > maxLength ? `${text.slice(0, maxLength)}…` : text;
+        return text.length > maxLength ? `${text.slice(0, maxLength)}â€¦` : text;
     };
 
     const formatTimestamp = (ts: number) => {
@@ -52,9 +52,9 @@ export const MessageBubble: React.FC<MessageBubbleProps> = ({
     };
 
     const getReplySnippet = () => {
-        if (message.type === 'audio') return '🎤 Voice Message';
-        if (message.content.includes('![')) return '📷 Photo';
-        if (message.content.includes('[Video:')) return '🎬 Video';
+        if (message.type === 'audio') return 'ðŸŽ¤ Voice Message';
+        if (message.content.includes('![')) return 'ðŸ“· Photo';
+        if (message.content.includes('[Video:')) return 'ðŸŽ¬ Video';
         return message.content;
     };
 
@@ -93,7 +93,7 @@ export const MessageBubble: React.FC<MessageBubbleProps> = ({
                 <button
                     type="button"
                     onClick={togglePlay}
-                    className="w-10 h-10 rounded-full flex items-center justify-center transition-all bg-(--primary-brand) text-white shadow-md hover:opacity-90"
+                    className="w-10 h-10 rounded-full flex items-center justify-center transition-all bg-primary text-white shadow-md hover:opacity-90"
                 >
                     {audioPlaying ? (
                         <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
@@ -112,14 +112,14 @@ export const MessageBubble: React.FC<MessageBubbleProps> = ({
                     {waveformBars.map((height, i) => (
                         <div
                             key={i}
-                            className={`w-[3px] rounded-full ${message.isMe ? 'bg-white/60' : 'bg-(--primary-brand)/40'}`}
+                            className={`w-[3px] rounded-full ${message.isMe ? 'bg-white/60' : 'bg-primary/40'}`}
                             style={{ height: `${height}px` }}
                         />
                     ))}
                 </div>
 
                 {/* Duration */}
-                <span className={`text-[11px] font-medium ${message.isMe ? 'text-white/70' : 'text-(--text-muted)'}`}>
+                <span className={`text-[11px] font-medium ${message.isMe ? 'text-white/70' : 'text-muted-foreground'}`}>
                     0:00
                 </span>
 
@@ -282,19 +282,19 @@ export const MessageBubble: React.FC<MessageBubbleProps> = ({
             rel="noopener noreferrer"
             className={`flex items-center gap-3 mt-2 p-3 rounded-xl transition-colors ${message.isMe
                 ? 'bg-white/10 hover:bg-white/20'
-                : 'bg-(--bg-secondary) hover:bg-(--bg-tertiary)'
+                : 'bg-secondary hover:bg-muted'
                 }`}
         >
-            <div className={`w-10 h-10 rounded-lg flex items-center justify-center ${message.isMe ? 'bg-white/20' : 'bg-(--primary-brand)/10'
+            <div className={`w-10 h-10 rounded-lg flex items-center justify-center ${message.isMe ? 'bg-white/20' : 'bg-primary/10'
                 }`}>
-                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" className={message.isMe ? 'text-white' : 'text-(--primary-brand)'}>
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" className={message.isMe ? 'text-white' : 'text-primary'}>
                     <path d="M13 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V9z" />
                     <polyline points="13 2 13 9 20 9" />
                 </svg>
             </div>
             <div className="flex-1 min-w-0">
                 <p className="text-sm font-medium truncate">{label || 'Document'}</p>
-                <p className={`text-xs ${message.isMe ? 'text-white/60' : 'text-(--text-muted)'}`}>Tap to download</p>
+                <p className={`text-xs ${message.isMe ? 'text-white/60' : 'text-muted-foreground'}`}>Tap to download</p>
             </div>
         </a>
     );
@@ -307,11 +307,11 @@ export const MessageBubble: React.FC<MessageBubbleProps> = ({
         >
             {/* Reply Context */}
             {parentMessage && (
-                <div className={`mb-2 max-w-[80%] px-3 py-2 rounded-xl border-l-2 bg-(--bg-secondary) border-(--primary-brand)/40`}>
-                    <p className="text-xs font-medium text-(--text-muted)">
-                        ↩ {parentMessage.sender.slice(0, 6)}...
+                <div className={`mb-2 max-w-[80%] px-3 py-2 rounded-xl border-l-2 bg-secondary border-primary/40`}>
+                    <p className="text-xs font-medium text-muted-foreground">
+                        â†© {parentMessage.sender.slice(0, 6)}...
                     </p>
-                    <p className="text-sm text-(--text-secondary) truncate mt-0.5">
+                    <p className="text-sm text-muted-foreground truncate mt-0.5">
                         {truncateSnippet(parentMessage.content)}
                     </p>
                 </div>
@@ -337,7 +337,7 @@ export const MessageBubble: React.FC<MessageBubbleProps> = ({
                                     sender: message.sender,
                                     snippet: getReplySnippet()
                                 })}
-                                className="w-7 h-7 rounded-full bg-(--bg-card) shadow-sm border border-(--border-color) flex items-center justify-center text-(--text-muted) hover:text-(--primary-brand) transition-colors"
+                                className="w-7 h-7 rounded-full bg-card shadow-sm border border-border flex items-center justify-center text-muted-foreground hover:text-primary transition-colors"
                                 title="Reply"
                             >
                                 <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
@@ -351,8 +351,8 @@ export const MessageBubble: React.FC<MessageBubbleProps> = ({
                     {/* Message Bubble */}
                     <div
                         className={`px-4 py-2.5 transition-all ${message.isMe
-                            ? 'bg-gradient-to-br from-(--primary-brand) to-(--primary-brand-dark) text-white rounded-2xl rounded-br-md shadow-md'
-                            : 'bg-(--bg-secondary) text-(--text-primary) rounded-2xl rounded-bl-md'
+                            ? 'bg-gradient-to-br from-primary to-primary/90 text-white rounded-2xl rounded-br-md shadow-md'
+                            : 'bg-secondary text-foreground rounded-2xl rounded-bl-md'
                             }`}
                         style={{
                             minWidth: message.type === 'audio' ? '260px' : '48px',
@@ -363,16 +363,16 @@ export const MessageBubble: React.FC<MessageBubbleProps> = ({
 
                     {/* Metadata Row */}
                     <div className={`flex items-center gap-1.5 mt-1 px-1 ${message.isMe ? 'justify-end' : 'justify-start'}`}>
-                        <span className="text-xs text-(--text-muted)">
+                        <span className="text-xs text-muted-foreground">
                             {formatTimestamp(message.timestamp)}
                         </span>
                         {message.isMe && (
                             <div className="flex items-center">
-                                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" className={message.onChainRead ? 'text-(--primary-brand)' : 'text-(--text-muted)'}>
+                                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" className={message.onChainRead ? 'text-primary' : 'text-muted-foreground'}>
                                     <polyline points="20 6 9 17 4 12" />
                                 </svg>
                                 {message.onChainRead && (
-                                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" className="text-(--primary-brand) -ml-2">
+                                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" className="text-primary -ml-2">
                                         <polyline points="20 6 9 17 4 12" />
                                     </svg>
                                 )}

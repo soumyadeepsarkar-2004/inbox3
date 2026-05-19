@@ -1,19 +1,11 @@
-﻿import { useState, useEffect, useRef, useCallback } from 'react';
+import { useState, useEffect, useRef, useCallback } from 'react';
 import { useWallet } from '@aptos-labs/wallet-adapter-react';
 import { profileManager, type UserProfile } from '../lib/profileManager';
 import { encryptionManager } from '../lib/encryptionManager';
 import { uploadFile } from '../lib/ipfs';
+import { resolveAvatarUrl } from '../lib/avatar';
 
 // ── Helpers ──────────────────────────────────────────────────────────────────
-
-/** Returns a display URL for an avatar value (IPFS CID or data URL). */
-export function resolveAvatarUrl(avatar: string | undefined): string | undefined {
-    if (!avatar) return undefined;
-    if (avatar.startsWith('data:') || avatar.startsWith('blob:') || avatar.startsWith('http')) {
-        return avatar;
-    }
-    return `https://gateway.pinata.cloud/ipfs/${avatar}`;
-}
 
 /** Convert a File to a base64 data URL. */
 function fileToDataUrl(file: File): Promise<string> {
@@ -166,7 +158,7 @@ export default function ProfileEditor() {
 
     if (!account) {
         return (
-            <div className="py-12 text-center text-(--text-muted)">
+            <div className="py-12 text-center text-muted-foreground">
                 Connect your wallet to manage your profile
             </div>
         );
@@ -192,18 +184,18 @@ export default function ProfileEditor() {
                 {/* Avatar */}
                 <div className="flex flex-col items-center gap-2">
                     <div
-                        className={`relative group cursor-pointer rounded-full select-none transition-all ${dragOver ? 'ring-4 ring-(--primary-brand) ring-offset-2' : ''}`}
+                        className={`relative group cursor-pointer rounded-full select-none transition-all ${dragOver ? 'ring-4 ring-primary ring-offset-2' : ''}`}
                         onClick={() => !uploading && fileInputRef.current?.click()}
                         onDragOver={(e) => { e.preventDefault(); setDragOver(true); }}
                         onDragLeave={() => setDragOver(false)}
                         onDrop={handleDrop}
                         title="Click or drag & drop to change photo"
                     >
-                        <div className="w-24 h-24 rounded-full overflow-hidden bg-(--bg-secondary) border-2 border-(--border-color) flex items-center justify-center">
+                        <div className="w-24 h-24 rounded-full overflow-hidden bg-secondary border-2 border-border flex items-center justify-center">
                             {previewUrl ? (
                                 <img src={previewUrl} alt="Avatar" className="w-full h-full object-cover" />
                             ) : (
-                                <span className="text-3xl font-bold text-(--text-muted)">{initials}</span>
+                                <span className="text-3xl font-bold text-muted-foreground">{initials}</span>
                             )}
                         </div>
                         {!uploading && (
@@ -217,54 +209,54 @@ export default function ProfileEditor() {
                             </div>
                         )}
                     </div>
-                    <button type="button" onClick={() => !uploading && fileInputRef.current?.click()} disabled={uploading} className="text-sm font-medium text-(--primary-brand) hover:underline disabled:opacity-50 disabled:cursor-not-allowed">
+                    <button type="button" onClick={() => !uploading && fileInputRef.current?.click()} disabled={uploading} className="text-sm font-medium text-primary hover:underline disabled:opacity-50 disabled:cursor-not-allowed">
                         {uploading ? 'Uploading…' : previewUrl ? 'Change photo' : 'Upload photo'}
                     </button>
-                    <p className="text-xs text-(--text-muted)">JPG, PNG or GIF · max 5 MB</p>
+                    <p className="text-xs text-muted-foreground">JPG, PNG or GIF · max 5 MB</p>
                     <input ref={fileInputRef} type="file" accept="image/*" onChange={handleFileInput} className="hidden" />
                 </div>
 
                 {/* Username */}
                 <div>
-                    <label className="block text-sm font-medium text-(--text-primary) mb-1.5">Username <span className="text-red-400">*</span></label>
+                    <label className="block text-sm font-medium text-foreground mb-1.5">Username <span className="text-red-400">*</span></label>
                     <input
                         type="text"
                         value={username}
                         onChange={(e) => { setUsername(e.target.value); setUsernameError(''); }}
                         placeholder="e.g. satoshi"
                         maxLength={30}
-                        className={`w-full px-4 py-2.5 bg-(--bg-secondary) border rounded-xl text-(--text-primary) placeholder:text-(--text-muted) text-sm focus:outline-none focus:ring-2 focus:ring-(--primary-brand)/40 transition-all ${usernameError ? 'border-red-400' : 'border-(--border-color)'}`}
+                        className={`w-full px-4 py-2.5 bg-secondary border rounded-xl text-foreground placeholder:text-muted-foreground text-sm focus:outline-none focus:ring-2 focus:ring-primary/40 transition-all ${usernameError ? 'border-red-400' : 'border-border'}`}
                     />
-                    {usernameError ? <p className="text-xs text-red-400 mt-1">{usernameError}</p> : <p className="text-xs text-(--text-muted) mt-1">{username.length}/30 characters</p>}
+                    {usernameError ? <p className="text-xs text-red-400 mt-1">{usernameError}</p> : <p className="text-xs text-muted-foreground mt-1">{username.length}/30 characters</p>}
                 </div>
 
                 {/* Bio */}
                 <div>
-                    <label className="block text-sm font-medium text-(--text-primary) mb-1.5">Bio</label>
+                    <label className="block text-sm font-medium text-foreground mb-1.5">Bio</label>
                     <textarea
                         value={bio}
                         onChange={(e) => setBio(e.target.value)}
                         placeholder="A short bio about yourself…"
                         maxLength={200}
                         rows={3}
-                        className="w-full px-4 py-2.5 bg-(--bg-secondary) border border-(--border-color) rounded-xl text-(--text-primary) placeholder:text-(--text-muted) text-sm focus:outline-none focus:ring-2 focus:ring-(--primary-brand)/40 transition-all resize-none"
+                        className="w-full px-4 py-2.5 bg-secondary border border-border rounded-xl text-foreground placeholder:text-muted-foreground text-sm focus:outline-none focus:ring-2 focus:ring-primary/40 transition-all resize-none"
                     />
-                    <p className="text-xs text-(--text-muted) mt-1">{bio.length}/200 characters</p>
+                    <p className="text-xs text-muted-foreground mt-1">{bio.length}/200 characters</p>
                 </div>
 
                 {/* Wallet Address */}
                 <div>
-                    <label className="block text-sm font-medium text-(--text-primary) mb-1.5">Wallet Address</label>
+                    <label className="block text-sm font-medium text-foreground mb-1.5">Wallet Address</label>
                     <div className="flex items-center gap-2">
-                        <input type="text" value={addr} readOnly className="flex-1 px-4 py-2.5 bg-(--bg-secondary) border border-(--border-color) rounded-xl text-(--text-muted) font-mono text-xs truncate" />
-                        <button type="button" onClick={() => navigator.clipboard.writeText(addr).then(() => showToast('success', 'Address copied'))} className="p-2.5 rounded-xl border border-(--border-color) text-(--text-muted) hover:text-(--text-primary) hover:border-(--primary-brand) transition-all shrink-0" title="Copy address">
+                        <input type="text" value={addr} readOnly className="flex-1 px-4 py-2.5 bg-secondary border border-border rounded-xl text-muted-foreground font-mono text-xs truncate" />
+                        <button type="button" onClick={() => navigator.clipboard.writeText(addr).then(() => showToast('success', 'Address copied'))} className="p-2.5 rounded-xl border border-border text-muted-foreground hover:text-foreground hover:border-primary transition-all shrink-0" title="Copy address">
                             <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><rect x="9" y="9" width="13" height="13" rx="2" ry="2" /><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1" /></svg>
                         </button>
                     </div>
                 </div>
 
                 {/* Save Button */}
-                <button type="button" onClick={handleSave} disabled={saving || uploading} className="w-full py-3 bg-(--primary-brand) text-white rounded-xl font-semibold text-sm hover:opacity-90 transition-all active:scale-[0.98] disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2">
+                <button type="button" onClick={handleSave} disabled={saving || uploading} className="w-full py-3 bg-primary text-white rounded-xl font-semibold text-sm hover:opacity-90 transition-all active:scale-[0.98] disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2">
                     {saving ? (
                         <><div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />Saving…</>
                     ) : (
@@ -273,7 +265,7 @@ export default function ProfileEditor() {
                 </button>
 
                 {profile && (
-                    <p className="text-xs text-(--text-muted) text-center">Last updated {new Date(profile.updatedAt).toLocaleDateString(undefined, { month: 'short', day: 'numeric', year: 'numeric' })}</p>
+                    <p className="text-xs text-muted-foreground text-center">Last updated {new Date(profile.updatedAt).toLocaleDateString(undefined, { month: 'short', day: 'numeric', year: 'numeric' })}</p>
                 )}
             </div>
         </div>

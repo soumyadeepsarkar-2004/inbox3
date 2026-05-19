@@ -23,7 +23,8 @@ import ExportChat from './components/ExportChat'
 import { useDrafts, DraftsModal } from './components/DraftManager'
 import ComponentShowcase from './components/ComponentShowcase'
 import PerformanceDashboard from './components/PerformanceDashboard'
-import ProfileEditor, { resolveAvatarUrl } from './components/ProfileEditor'
+import ProfileEditor from './components/ProfileEditor'
+import { resolveAvatarUrl } from './lib/avatar'
 import { CallInterface, IncomingCallModal } from './components/CallInterface'
 import { profileManager, type UserProfile } from './lib/profileManager'
 import { getRealtimeService, type RealtimeMessage } from './lib/realtime'
@@ -238,9 +239,22 @@ function App() {
 
     // Connect signaling service when wallet connects
     useEffect(() => {
-        if (connected && account) {
+        if (connected && account && (window as any).aptos) {
             const signaling = getSignalingService()
-            signaling.connect(account.address.toString())
+
+            // Function to sign signaling registration message
+            const signMessage = async (message: string) => {
+                const response = await (window as any).aptos.signMessage({
+                    message,
+                    nonce: 'inbox3-registration'
+                });
+                return {
+                    signature: response.signature,
+                    publicKey: response.fullPublicKey
+                };
+            }
+
+            signaling.connect(account.address.toString(), signMessage)
             // Wire incoming signals to WebRTC handler
             const webrtc = getWebRTCService()
             webrtc.setLocalAddress(account.address.toString())
@@ -365,19 +379,19 @@ function App() {
 
     // ===== NAVIGATION & CONTEXT (SIDEBAR - 25%) =====
     const sidebarContent = (
-        <div className="flex flex-col h-full overflow-hidden bg-(--bg-card)">
+        <div className="flex flex-col h-full overflow-hidden bg-card">
             {/* Dashboard Stats (Live) */}
-            <div className="px-4 py-4 grid grid-cols-2 gap-3 border-b border-(--border-color)/50">
-                <div className="bg-(--bg-secondary)/50 p-3 rounded-2xl border border-(--border-color)/30 group hover:border-(--primary-brand)/30 transition-all cursor-default relative overflow-hidden">
+            <div className="px-4 py-4 grid grid-cols-2 gap-3 border-b border-border/50">
+                <div className="bg-secondary/50 p-3 rounded-2xl border border-border/30 group hover:border-primary/30 transition-all cursor-default relative overflow-hidden">
                     <div className="absolute top-0 right-0 w-8 h-8 -mr-2 -mt-2 bg-indigo-500/5 rounded-full group-hover:scale-150 transition-transform duration-500"></div>
-                    <span className="text-[9px] font-black uppercase text-(--text-muted) tracking-widest block mb-1">Messages</span>
-                    <span className="text-xl font-black text-(--text-primary) tracking-tighter">
+                    <span className="text-[9px] font-black uppercase text-muted-foreground tracking-widest block mb-1">Messages</span>
+                    <span className="text-xl font-black text-foreground tracking-tighter">
                         {loadedMessages.length}
                     </span>
                 </div>
-                <div className="bg-(--bg-secondary)/50 p-3 rounded-2xl border border-(--border-color)/30 group hover:border-green-500/30 transition-all cursor-default relative overflow-hidden">
+                <div className="bg-secondary/50 p-3 rounded-2xl border border-border/30 group hover:border-green-500/30 transition-all cursor-default relative overflow-hidden">
                     <div className="absolute top-0 right-0 w-8 h-8 -mr-2 -mt-2 bg-green-500/5 rounded-full group-hover:scale-150 transition-transform duration-500"></div>
-                    <span className="text-[9px] font-black uppercase text-(--text-muted) tracking-widest block mb-1">Network</span>
+                    <span className="text-[9px] font-black uppercase text-muted-foreground tracking-widest block mb-1">Network</span>
                     <div className="flex items-center gap-1.5">
                         <span className="w-1.5 h-1.5 rounded-full bg-green-500 animate-pulse"></span>
                         <span className="text-[10px] font-black text-green-600 uppercase">Active</span>
@@ -387,12 +401,12 @@ function App() {
 
             {/* Tab Switcher */}
             <div className="p-4">
-                <div className="flex p-1.5 bg-(--bg-secondary) rounded-2xl border border-(--border-color)/40">
+                <div className="flex p-1.5 bg-secondary/50 liquid-glass rounded-2xl border border-border/40">
                     <button
                         onClick={() => setCurrentView('dm')}
                         className={`flex-1 flex items-center justify-center gap-2.5 py-3 rounded-xl text-xs font-black uppercase tracking-widest transition-all ${currentView === 'dm'
-                            ? 'bg-white dark:bg-(--bg-card) text-(--primary-brand) shadow-xl shadow-indigo-500/5 border border-indigo-500/10'
-                            : 'text-(--text-muted) hover:text-(--text-primary)'}`}
+                            ? 'bg-card text-primary shadow-xl border border-primary/20 liquid-glass'
+                            : 'text-muted-foreground hover:text-foreground hover:bg-secondary/50'}`}
                     >
                         <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3">
                             <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z" />
@@ -402,8 +416,8 @@ function App() {
                     <button
                         onClick={() => setCurrentView('groups')}
                         className={`flex-1 flex items-center justify-center gap-2.5 py-3 rounded-xl text-xs font-black uppercase tracking-widest transition-all ${currentView === 'groups'
-                            ? 'bg-white dark:bg-(--bg-card) text-(--primary-brand) shadow-xl shadow-indigo-500/5 border border-indigo-500/10'
-                            : 'text-(--text-muted) hover:text-(--text-primary)'}`}
+                            ? 'bg-card text-primary shadow-xl border border-primary/20 liquid-glass'
+                            : 'text-muted-foreground hover:text-foreground hover:bg-secondary/50'}`}
                     >
                         <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3">
                             <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2" /><circle cx="9" cy="7" r="4" />
@@ -434,10 +448,10 @@ function App() {
             </div>
 
             {/* Footer */}
-            <div className="p-3 border-t border-(--border-color) flex flex-col gap-2">
+            <div className="p-3 border-t border-border flex flex-col gap-2">
                 <button
                     onClick={() => setIsPerformanceOpen(true)}
-                    className="w-full py-2.5 rounded-xl bg-(--bg-secondary) text-(--text-secondary) hover:text-(--primary-brand) hover:bg-(--primary-brand-light) transition-all flex items-center justify-center gap-2 text-[10px] font-black uppercase tracking-widest"
+                    className="w-full py-2.5 rounded-xl bg-secondary text-muted-foreground hover:text-primary hover:bg-primary/10 transition-all flex items-center justify-center gap-2 text-[10px] font-black uppercase tracking-widest"
                 >
                     <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
                         <line x1="12" y1="20" x2="12" y2="10" /><line x1="18" y1="20" x2="18" y2="4" /><line x1="6" y1="20" x2="6" y2="16" />
@@ -452,20 +466,20 @@ function App() {
 
     // ===== PROFILE & UTILITIES (RIGHT PANE - 25%) =====
     const rightPaneContent = (
-        <div className="flex flex-col h-full bg-[#FBF8F3] dark:bg-(--bg-main) p-6 gap-8 overflow-y-auto custom-scrollbar">
+        <div className="flex flex-col h-full bg-background border-l border-border/40 p-6 gap-8 overflow-y-auto custom-scrollbar">
             {/* Profile Header */}
             <div className="flex items-center justify-between">
-                <h2 className="text-xl font-bold text-(--text-primary)">Profile</h2>
+                <h2 className="text-xl font-bold text-foreground">Profile</h2>
                 <div className="relative group">
-                    <button className="w-8 h-8 rounded-lg flex items-center justify-center text-(--text-muted) hover:text-(--text-primary) hover:bg-black/5 dark:hover:bg-white/5 transition-all">
+                    <button className="w-8 h-8 rounded-lg flex items-center justify-center text-muted-foreground hover:text-foreground hover:bg-white/5 transition-all">
                         <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
                             <circle cx="12" cy="12" r="1" /><circle cx="19" cy="12" r="1" /><circle cx="5" cy="12" r="1" />
                         </svg>
                     </button>
-                    <div className="absolute right-0 mt-2 w-48 bg-(--bg-card) border border-(--border-color) rounded-xl shadow-xl opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all z-20 overflow-hidden">
+                    <div className="absolute right-0 mt-2 w-48 bg-card border border-border rounded-xl shadow-xl opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all z-20 overflow-hidden liquid-glass">
                         <button
                             onClick={() => setIsProfileEditorOpen(true)}
-                            className="w-full px-4 py-3 text-left text-sm font-medium text-(--text-primary) hover:bg-(--bg-secondary) flex items-center gap-3"
+                            className="w-full px-4 py-3 text-left text-sm font-medium text-foreground hover:bg-secondary flex items-center gap-3"
                         >
                             <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
                                 <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7" />
@@ -475,7 +489,7 @@ function App() {
                         </button>
                         <button
                             onClick={disconnect}
-                            className="w-full px-4 py-3 text-left text-sm font-medium text-red-500 hover:bg-red-50 dark:hover:bg-red-500/10 flex items-center gap-3"
+                            className="w-full px-4 py-3 text-left text-sm font-medium text-destructive hover:bg-destructive/10 flex items-center gap-3"
                         >
                             <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
                                 <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4" /><polyline points="16 17 21 12 16 7" /><line x1="21" y1="12" x2="9" y2="12" />
@@ -487,8 +501,8 @@ function App() {
             </div>
 
             {/* Profile Card */}
-            <div className="bg-white dark:bg-(--bg-card) rounded-3xl p-6 text-center shadow-sm border border-(--border-color)/50">
-                <div className="flex justify-center mb-6">
+            <div className="bg-card/50 liquid-glass rounded-3xl p-6 text-center shadow-xl border border-white/5 relative overflow-hidden">
+                <div className="flex justify-center mb-6 relative z-10">
                     <Avatar
                         address={account?.address?.toString() || ''}
                         src={resolveAvatarUrl(userProfile?.avatar)}
@@ -497,20 +511,20 @@ function App() {
                         showStatus={true}
                     />
                 </div>
-                <h3 className="text-xl font-bold text-(--text-primary) tracking-tight">
+                <h3 className="text-xl font-bold text-foreground tracking-tight relative z-10">
                     {account?.address?.toString().slice(0, 8)}...{account?.address?.toString().slice(-6)}
                 </h3>
-                <p className="text-md font-medium text-[#A78BFA] mt-1">
+                <p className="text-md font-medium text-primary mt-1 relative z-10">
                     @{userProfile?.username || 'inbox3user'}
                 </p>
 
                 {/* Profile Action Buttons */}
-                <div className="flex justify-center gap-4 mt-8">
+                <div className="flex justify-center gap-4 mt-8 relative z-10">
                     <button
                         onClick={() => startVoiceCall(selectedRecipient || '')}
                         className={`w-12 h-12 rounded-full flex items-center justify-center transition-all border ${selectedRecipient && selectedRecipient.trim().length > 5
-                            ? 'bg-green-50 dark:bg-green-500/10 text-green-600 hover:bg-green-500 hover:text-white border-green-200 dark:border-green-500/30 shadow-lg shadow-green-500/10'
-                            : 'bg-gray-50 dark:bg-(--bg-secondary) text-(--text-muted) border-transparent hover:bg-indigo-50 dark:hover:bg-indigo-500/10 hover:text-indigo-600 hover:border-indigo-100'
+                            ? 'bg-green-500/10 text-green-500 hover:bg-green-500 hover:text-white border-green-500/30 shadow-lg shadow-green-500/10 liquid-glass'
+                            : 'bg-secondary text-muted-foreground border-transparent hover:bg-primary/10 hover:text-primary hover:border-primary/20 liquid-glass'
                             }`}
                         title={selectedRecipient ? 'Start Voice Call' : 'Select a contact first'}
                     >
@@ -521,8 +535,8 @@ function App() {
                     <button
                         onClick={() => startVideoCall(selectedRecipient || '')}
                         className={`w-12 h-12 rounded-full flex items-center justify-center transition-all border ${selectedRecipient && selectedRecipient.trim().length > 5
-                            ? 'bg-indigo-50 dark:bg-indigo-500/10 text-indigo-600 hover:bg-indigo-500 hover:text-white border-indigo-200 dark:border-indigo-500/30 shadow-lg shadow-indigo-500/10'
-                            : 'bg-gray-50 dark:bg-(--bg-secondary) text-(--text-muted) border-transparent hover:bg-indigo-50 dark:hover:bg-indigo-500/10 hover:text-indigo-600 hover:border-indigo-100'
+                            ? 'bg-primary/10 text-primary hover:bg-primary hover:text-white border-primary/30 shadow-lg shadow-primary/10 liquid-glass'
+                            : 'bg-secondary text-muted-foreground border-transparent hover:bg-primary/10 hover:text-primary hover:border-primary/20 liquid-glass'
                             }`}
                         title={selectedRecipient ? 'Start Video Call' : 'Select a contact first'}
                     >
@@ -532,7 +546,7 @@ function App() {
                     </button>
                     <button
                         onClick={() => setSelectedRecipient(' ')}
-                        className="w-12 h-12 rounded-full bg-gray-50 dark:bg-(--bg-secondary) text-(--text-muted) flex items-center justify-center hover:bg-indigo-50 dark:hover:bg-indigo-500/10 hover:text-indigo-600 transition-all border border-transparent hover:border-indigo-100"
+                        className="w-12 h-12 rounded-full bg-secondary liquid-glass text-muted-foreground flex items-center justify-center hover:bg-primary/10 hover:text-primary transition-all border border-transparent hover:border-primary/20"
                     >
                         <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
                             <path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z" /><polyline points="22,6 12,13 2,6" />
@@ -540,7 +554,7 @@ function App() {
                     </button>
                     <button
                         onClick={() => setIsExportOpen(true)}
-                        className="w-12 h-12 rounded-full bg-gray-50 dark:bg-(--bg-secondary) text-(--text-muted) flex items-center justify-center hover:bg-indigo-50 dark:hover:bg-indigo-500/10 hover:text-indigo-600 transition-all border border-transparent hover:border-indigo-100"
+                        className="w-12 h-12 rounded-full bg-secondary liquid-glass text-muted-foreground flex items-center justify-center hover:bg-primary/10 hover:text-primary transition-all border border-transparent hover:border-primary/20"
                     >
                         <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
                             <path d="M4 12v8a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-8" /><polyline points="16 6 12 2 8 6" /><line x1="12" y1="2" x2="12" y2="15" />
@@ -551,26 +565,26 @@ function App() {
 
             {/* Quick Actions */}
             <div className="space-y-4">
-                <h3 className="text-[11px] font-black text-(--text-muted) uppercase tracking-[0.2em] px-1">Quick Actions</h3>
+                <h3 className="text-[11px] font-black text-muted-foreground uppercase tracking-[0.2em] px-1">Quick Actions</h3>
                 <div className="grid grid-cols-2 gap-4">
                     <button
                         onClick={() => setIsContactsOpen(true)}
-                        className="p-5 bg-white dark:bg-(--bg-card) border border-(--border-color)/50 rounded-2xl flex flex-col items-center justify-center gap-3 group hover:border-indigo-500/50 hover:shadow-lg hover:shadow-indigo-500/5 transition-all w-full"
+                        className="p-5 bg-card/50 liquid-glass border border-white/5 rounded-2xl flex flex-col items-center justify-center gap-3 group hover:border-primary/50 hover:shadow-lg hover:shadow-primary/20 transition-all w-full"
                     >
-                        <div className="w-11 h-11 rounded-xl bg-gray-50 dark:bg-(--bg-secondary) text-indigo-500 flex items-center justify-center group-hover:bg-indigo-500 group-hover:text-white transition-all">
+                        <div className="w-11 h-11 rounded-full bg-secondary text-primary flex items-center justify-center group-hover:bg-primary group-hover:text-white transition-all">
                             <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5"><path d="M16 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2" /><circle cx="9" cy="7" r="4" /></svg>
                         </div>
-                        <span className="text-xs font-bold text-(--text-primary)">Contacts</span>
+                        <span className="text-xs font-bold text-foreground">Contacts</span>
                     </button>
 
                     <button
                         onClick={() => setIsQRModalOpen(true)}
-                        className="p-5 bg-white dark:bg-(--bg-card) border border-(--border-color)/50 rounded-2xl flex flex-col items-center justify-center gap-3 group hover:border-indigo-500/50 hover:shadow-lg hover:shadow-indigo-500/5 transition-all w-full"
+                        className="p-5 bg-card/50 liquid-glass border border-white/5 rounded-2xl flex flex-col items-center justify-center gap-3 group hover:border-primary/50 hover:shadow-lg hover:shadow-primary/20 transition-all w-full"
                     >
-                        <div className="w-11 h-11 rounded-xl bg-gray-50 dark:bg-(--bg-secondary) text-(--text-muted) flex items-center justify-center group-hover:bg-indigo-500 group-hover:text-white transition-all">
+                        <div className="w-11 h-11 rounded-full bg-secondary text-muted-foreground flex items-center justify-center group-hover:bg-primary group-hover:text-white transition-all">
                             <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5"><rect x="3" y="3" width="7" height="7" /><rect x="14" y="3" width="7" height="7" /><rect x="3" y="14" width="7" height="7" /><rect x="14" y="14" width="3" height="3" /></svg>
                         </div>
-                        <span className="text-xs font-bold text-(--text-primary)">QR Code</span>
+                        <span className="text-xs font-bold text-foreground">QR Code</span>
                     </button>
                 </div>
             </div>
@@ -579,7 +593,7 @@ function App() {
             <div className="mt-auto pt-4">
                 <button
                     onClick={() => setIsSettingsOpen(true)}
-                    className="w-full py-3 bg-white dark:bg-(--bg-card) border border-(--border-color)/50 rounded-xl text-sm font-semibold text-(--text-primary) hover:border-indigo-500/50 hover:text-indigo-600 transition-all flex items-center justify-center gap-2.5 shadow-sm"
+                    className="w-full py-3 bg-card/50 liquid-glass border border-white/5 rounded-xl text-sm font-semibold text-foreground hover:border-primary/50 hover:text-primary transition-all flex items-center justify-center gap-2.5 shadow-sm"
                 >
                     <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
                         <circle cx="12" cy="12" r="3" /><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z" />
@@ -589,42 +603,42 @@ function App() {
             </div>
 
             {/* Network Vitals */}
-            <div className="bg-linear-to-br from-indigo-600 to-purple-700 rounded-3xl p-6 text-white relative overflow-hidden shadow-lg shadow-indigo-500/20">
-                <div className="absolute top-0 right-0 w-32 h-32 -mr-16 -mt-16 bg-white/10 rounded-full blur-3xl animate-pulse"></div>
+            <div className="bg-linear-to-br from-card to-background liquid-glass rounded-3xl p-6 text-foreground relative overflow-hidden shadow-2xl border border-white/5">
+                <div className="absolute top-0 right-0 w-32 h-32 -mr-16 -mt-16 bg-primary/20 rounded-full blur-3xl animate-pulse"></div>
                 <div className="relative z-10">
                     <div className="flex items-center gap-3 mb-6">
-                        <div className="w-10 h-10 rounded-2xl bg-white/20 backdrop-blur-md flex items-center justify-center border border-white/20">
-                            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
+                        <div className="w-10 h-10 rounded-2xl bg-secondary/50 backdrop-blur-md flex items-center justify-center border border-white/10">
+                            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" className="text-primary">
                                 <path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5" />
                             </svg>
                         </div>
                         <div>
-                            <h4 className="text-[10px] font-black uppercase tracking-[0.2em] opacity-80">Protocol Status</h4>
-                            <p className="text-sm font-bold tracking-tight uppercase">{NETWORK.charAt(0).toUpperCase() + NETWORK.slice(1)}</p>
+                            <h4 className="text-[10px] font-black uppercase tracking-[0.2em] text-muted-foreground">Protocol Status</h4>
+                            <p className="text-sm font-bold tracking-tight uppercase text-foreground">{NETWORK.charAt(0).toUpperCase() + NETWORK.slice(1)}</p>
                         </div>
                     </div>
 
                     <div className="space-y-4">
                         <div className="flex items-center justify-between">
-                            <span className="text-[10px] font-bold uppercase opacity-60">Latency</span>
-                            <span className={`text-xs font-black ${latencyStatus === 'good' ? 'text-green-300' :
-                                latencyStatus === 'ok' ? 'text-yellow-300' :
-                                    latencyStatus === 'slow' ? 'text-red-300' : 'text-white/60'
+                            <span className="text-[10px] font-bold uppercase text-muted-foreground">Latency</span>
+                            <span className={`text-xs font-black ${latencyStatus === 'good' ? 'text-green-400' :
+                                latencyStatus === 'ok' ? 'text-yellow-400' :
+                                    latencyStatus === 'slow' ? 'text-destructive' : 'text-muted-foreground'
                                 }`}>
-                                {networkLatencyMs !== null ? `${networkLatencyMs} ms` : '—'}
+                                {networkLatencyMs !== null ? `${networkLatencyMs} ms` : 'â€”'}
                             </span>
                         </div>
-                        <div className="h-1 bg-white/10 rounded-full overflow-hidden">
+                        <div className="h-1 bg-secondary rounded-full overflow-hidden">
                             <div
-                                className={`h-full transition-all duration-700 ${latencyStatus === 'good' ? 'bg-green-400 w-[90%]' :
-                                    latencyStatus === 'ok' ? 'bg-yellow-400 w-[60%]' :
-                                        latencyStatus === 'slow' ? 'bg-red-400 w-[30%]' : 'bg-white/20 w-[10%] animate-pulse'
+                                className={`h-full transition-all duration-700 ${latencyStatus === 'good' ? 'bg-green-500 w-[90%]' :
+                                    latencyStatus === 'ok' ? 'bg-yellow-500 w-[60%]' :
+                                        latencyStatus === 'slow' ? 'bg-destructive w-[30%]' : 'bg-muted w-[10%] animate-pulse'
                                     }`}
                             />
                         </div>
                         <div className="flex items-center justify-between">
-                            <span className="text-[10px] font-bold uppercase opacity-60">Status</span>
-                            <span className="text-xs font-black italic uppercase">
+                            <span className="text-[10px] font-bold uppercase text-muted-foreground">Status</span>
+                            <span className="text-xs font-black italic uppercase text-foreground">
                                 {latencyStatus === 'measuring' ? 'Pinging...' :
                                     latencyStatus === 'good' ? 'Optimal' :
                                         latencyStatus === 'ok' ? 'Moderate' : 'High Latency'}
@@ -642,11 +656,11 @@ function App() {
             logo={
                 <div className="flex items-center gap-2.5 group cursor-pointer">
                     <div className="relative">
-                        <div className="absolute inset-0 bg-(--primary-brand)/20 blur-lg rounded-full group-hover:bg-(--primary-brand)/30 transition-all" />
+                        <div className="absolute inset-0 bg-primary/20 blur-lg rounded-full group-hover:bg-primary/30 transition-all" />
                         <img src="/favicon.png" alt="Inbox3" className="w-9 h-9 rounded-xl shadow-md relative z-10 border border-white/10" />
                     </div>
-                    <span className="text-xl font-bold tracking-tight text-(--text-primary)">
-                        Inbox<span className="text-(--primary-brand)">3</span>
+                    <span className="text-xl font-bold tracking-tight text-foreground">
+                        Inbox<span className="text-primary">3</span>
                     </span>
                 </div>
             }
@@ -655,7 +669,7 @@ function App() {
                 <div className="flex items-center gap-4">
                     <button
                         onClick={() => setIsShortcutsOpen(true)}
-                        className="p-2.5 rounded-xl text-(--text-muted) hover:bg-(--bg-secondary) hover:text-(--primary-brand) transition-all group"
+                        className="p-2.5 rounded-xl text-muted-foreground hover:bg-secondary hover:text-primary transition-all group"
                         title="Keyboard Shortcuts (Ctrl+K)">
                         <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" className="group-hover:rotate-12 transition-transform">
                             <path d="M18 3a3 3 0 0 0-3 3v12a3 3 0 0 0 3 3 3 3 0 0 0 3-3V6a3 3 0 0 0-3-3z" />
@@ -665,7 +679,7 @@ function App() {
 
                     <button
                         onClick={toggleDarkMode}
-                        className="p-2.5 rounded-xl bg-(--bg-card) border border-(--border-color) text-(--text-primary) hover:border-(--primary-brand) transition-all shadow-sm group active:scale-95"
+                        className="p-2.5 rounded-xl bg-card border border-border text-foreground hover:border-primary transition-all shadow-sm group active:scale-95"
                     >
                         {darkMode ? (
                             <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" className="group-hover:rotate-45 transition-transform"><circle cx="12" cy="12" r="5" /><path d="M12 1V3M12 21V23M4.22 4.22L5.64 5.64M18.36 18.36L19.78 19.78M1 12H3M21 12H23M4.22 19.78L5.64 18.36M18.36 5.64L19.78 4.22" /></svg>
@@ -697,7 +711,7 @@ function App() {
         })
 
         return (
-            <div className="hero-container bg-(--bg-main)">
+            <div className="hero-container bg-background">
                 <WalletModal
                     isOpen={isWalletModalOpen}
                     onClose={() => setIsWalletModalOpen(false)}
@@ -707,7 +721,7 @@ function App() {
                 />
 
                 <div className="absolute top-6 right-6 z-60">
-                    <button onClick={toggleDarkMode} className="p-3 rounded-full bento-card text-(--text-primary)">
+                    <button onClick={toggleDarkMode} className="p-3 rounded-full bento-card text-foreground">
                         {darkMode ? (
                             <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><circle cx="12" cy="12" r="5" /><line x1="12" y1="1" x2="12" y2="3" /><line x1="12" y1="21" x2="12" y2="23" /><path d="M4.22 4.22L5.64 5.64M18.36 18.36L19.78 19.78M1 12H3M21 12H23M4.22 19.78L5.64 18.36M18.36 5.64L19.78 4.22" /></svg>
                         ) : (
@@ -720,8 +734,8 @@ function App() {
                     <div className="w-full max-w-sm text-center">
                         <div className="mb-12">
                             <img src="/logo.png" alt="Inbox3" className="w-24 mx-auto mb-8 shadow-sm rounded-2xl" />
-                            <h1 className="text-4xl font-extrabold text-(--text-primary) tracking-tight mb-3">Inbox3</h1>
-                            <p className="text-(--text-muted) text-sm font-medium leading-relaxed max-w-[280px] mx-auto">
+                            <h1 className="text-4xl font-extrabold text-foreground tracking-tight mb-3">Inbox3</h1>
+                            <p className="text-muted-foreground text-sm font-medium leading-relaxed max-w-[280px] mx-auto">
                                 Your decentralized home for secure communication.
                             </p>
                         </div>
@@ -736,7 +750,7 @@ function App() {
                             <Button
                                 onClick={() => { setWalletModalMode('social'); setIsWalletModalOpen(true); }}
                                 variant="outline"
-                                className="w-full py-4! rounded-2xl! font-bold border-gray-200! dark:border-white/10! text-(--text-primary)! hover:bg-gray-50! dark:hover:bg-white/5! transition-all"
+                                className="w-full py-4! rounded-2xl! font-bold border-gray-200! dark:border-white/10! text-foreground! hover:bg-gray-50! dark:hover:bg-white/5! transition-all"
                             >
                                 Social Sign-in
                             </Button>
@@ -744,22 +758,22 @@ function App() {
                     </div>
                 </div>
 
-                <div className="hero-right bg-(--bg-secondary)/30 backdrop-blur-xl border-l border-(--border-color)/50 flex items-center justify-center p-12">
+                <div className="hero-right bg-secondary/30 backdrop-blur-xl border-l border-border/50 flex items-center justify-center p-12">
                     <div className="max-w-lg text-center">
-                        <h2 className="text-5xl font-black text-(--text-primary) tracking-tighter mb-6 leading-tight">
+                        <h2 className="text-5xl font-black text-foreground tracking-tighter mb-6 leading-tight">
                             Private. Secure.<br />
-                            <span className="bg-linear-to-r from-(--primary-brand) to-purple-500 bg-clip-text text-transparent font-black">Decentralized.</span>
+                            <span className="bg-linear-to-r from-primary to-purple-500 bg-clip-text text-transparent font-black">Decentralized.</span>
                         </h2>
                         <div className="grid grid-cols-2 gap-4">
                             <div className="p-6 bento-card text-left space-y-3">
                                 <div className="w-10 h-10 rounded-xl bg-blue-100 text-blue-600 flex items-center justify-center"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z" /></svg></div>
-                                <h3 className="font-bold text-(--text-primary)">E2E Encrypted</h3>
-                                <p className="text-xs text-(--text-secondary) leading-relaxed">Your data belongs to you. Only the recipient can decrypt messages.</p>
+                                <h3 className="font-bold text-foreground">E2E Encrypted</h3>
+                                <p className="text-xs text-muted-foreground leading-relaxed">Your data belongs to you. Only the recipient can decrypt messages.</p>
                             </div>
                             <div className="p-6 bento-card text-left space-y-3">
                                 <div className="w-10 h-10 rounded-xl bg-purple-100 text-purple-600 flex items-center justify-center"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5"><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z" /></svg></div>
-                                <h3 className="font-bold text-(--text-primary)">Blockchain Powered</h3>
-                                <p className="text-xs text-(--text-secondary) leading-relaxed">Built on Aptos for high speed and decentralized verification.</p>
+                                <h3 className="font-bold text-foreground">Blockchain Powered</h3>
+                                <p className="text-xs text-muted-foreground leading-relaxed">Built on Aptos for high speed and decentralized verification.</p>
                             </div>
                         </div>
                     </div>
@@ -770,9 +784,9 @@ function App() {
 
     if (loading) {
         return (
-            <div className="flex flex-col items-center justify-center min-h-screen bg-(--bg-main)">
-                <div className="w-20 h-20 border-4 border-(--primary-brand) border-t-transparent rounded-full animate-spin mb-6" />
-                <h2 className="text-2xl font-black text-(--text-primary) animate-pulse">Initializing Workspace...</h2>
+            <div className="flex flex-col items-center justify-center min-h-screen bg-background">
+                <div className="w-20 h-20 border-4 border-primary border-t-transparent rounded-full animate-spin mb-6" />
+                <h2 className="text-2xl font-black text-foreground animate-pulse">Initializing Workspace...</h2>
             </div>
         )
     }
@@ -781,10 +795,10 @@ function App() {
         return (
             <div className="container max-w-2xl mx-auto px-4 py-24">
                 <Card className="p-12 text-center bento-card space-y-8">
-                    <div className="w-24 h-24 bg-(--primary-brand-light) rounded-3xl flex items-center justify-center mx-auto text-(--primary-brand)"><svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z" /><polyline points="22,6 12,13 2,6" /></svg></div>
+                    <div className="w-24 h-24 bg-primary/10 rounded-3xl flex items-center justify-center mx-auto text-primary"><svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z" /><polyline points="22,6 12,13 2,6" /></svg></div>
                     <h1 className="text-4xl font-black tracking-tighter">Setup Required</h1>
-                    <p className="text-lg text-(--text-secondary)">Your account does not have a decentralized inbox yet. Initializing one will allow you to participate in private messaging.</p>
-                    <Button onClick={createInbox} loading={loading} className="w-full py-5! text-xl font-bold rounded-2xl! shadow-xl shadow-(--primary-brand)/20">Initialize My Inbox</Button>
+                    <p className="text-lg text-muted-foreground">Your account does not have a decentralized inbox yet. Initializing one will allow you to participate in private messaging.</p>
+                    <Button onClick={createInbox} loading={loading} className="w-full py-5! text-xl font-bold rounded-2xl! shadow-xl shadow-primary/20">Initialize My Inbox</Button>
                 </Card>
             </div>
         )
@@ -811,19 +825,19 @@ function App() {
                         {currentView === 'dm' && (
                             <div className="h-full flex flex-col overflow-hidden">
                                 {selectedRecipient && selectedRecipient.trim().length > 5 ? (
-                                    <div className="flex-1 flex flex-col min-h-0 bg-(--bg-main)/30">
-                                        <div className="px-5 py-3 border-b border-(--border-color)/30 bg-(--bg-card)/40 backdrop-blur-md flex justify-between items-center transition-all shrink-0">
+                                    <div className="flex-1 flex flex-col min-h-0 bg-background/30">
+                                        <div className="px-5 py-3 border-b border-border/30 bg-card/40 backdrop-blur-md flex justify-between items-center transition-all shrink-0">
                                             <div className="flex items-center gap-3">
                                                 <Avatar address={selectedRecipient} size="sm" status="online" />
                                                 <div className="min-w-0">
-                                                    <h3 className="text-xs font-black text-(--text-primary) uppercase tracking-wide">
+                                                    <h3 className="text-xs font-black text-foreground uppercase tracking-wide">
                                                         {selectedRecipient.slice(0, 10)}...{selectedRecipient.slice(-8)}
                                                     </h3>
                                                 </div>
                                             </div>
                                             <button
                                                 onClick={() => setSelectedRecipient('')}
-                                                className="p-1.5 rounded-lg hover:bg-black/5 hover:dark:bg-white/5 text-(--text-muted) hover:text-orange-500 transition-all active:scale-90"
+                                                className="p-1.5 rounded-lg hover:bg-black/5 hover:dark:bg-white/5 text-muted-foreground hover:text-orange-500 transition-all active:scale-90"
                                             >
                                                 <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3">
                                                     <path d="M18 6L6 18M6 6l12 12" />
@@ -840,7 +854,7 @@ function App() {
                                             />
                                         </div>
 
-                                        <div className="bg-(--bg-card)/30 backdrop-blur-md">
+                                        <div className="bg-card/30 backdrop-blur-md">
                                             <SendMessage
                                                 contractAddress={CONTRACT_ADDRESS}
                                                 onMessageSent={handleMessageSentAndReset}
@@ -850,7 +864,7 @@ function App() {
                                         </div>
                                     </div>
                                 ) : selectedRecipient === ' ' ? (
-                                    <div className="flex-1 flex flex-col items-center justify-center p-4 bg-(--bg-main)/50">
+                                    <div className="flex-1 flex flex-col items-center justify-center p-4 bg-background/50">
                                         <div className="w-full max-w-2xl">
                                             <SendMessage
                                                 contractAddress={CONTRACT_ADDRESS}
@@ -868,11 +882,11 @@ function App() {
                                                     <path d="M22 2L11 13M22 2L15 22L11 13L2 9L22 2Z" />
                                                 </svg>
                                             </div>
-                                            <h2 className="text-2xl font-bold text-(--text-primary) mb-2 tracking-tight">No conversation selected</h2>
-                                            <p className="text-sm text-(--text-muted) mb-6">Choose a contact from the sidebar or start a new message</p>
+                                            <h2 className="text-2xl font-bold text-foreground mb-2 tracking-tight">No conversation selected</h2>
+                                            <p className="text-sm text-muted-foreground mb-6">Choose a contact from the sidebar or start a new message</p>
                                             <Button
                                                 onClick={() => setSelectedRecipient(' ')}
-                                                className="rounded-xl! px-6! py-2.5! bg-(--primary-brand)! text-white! font-semibold text-sm!"
+                                                className="rounded-xl! px-6! py-2.5! bg-primary! text-white! font-semibold text-sm!"
                                             >
                                                 New Message
                                             </Button>
@@ -887,7 +901,7 @@ function App() {
                                 {selectedGroup ? (
                                     <GroupChat groupAddr={selectedGroup} contractAddress={CONTRACT_ADDRESS} onBack={() => setSelectedGroup(null)} />
                                 ) : (
-                                    <div className="h-full flex items-center justify-center p-8 bg-(--bg-main)">
+                                    <div className="h-full flex items-center justify-center p-8 bg-background">
                                         <div className="text-center max-w-lg w-full">
                                             {/* Modern Icon Container */}
                                             <div className="relative inline-block mb-8">
@@ -902,17 +916,17 @@ function App() {
                                                 </div>
                                             </div>
 
-                                            <h2 className="text-3xl font-bold text-(--text-primary) mb-3 tracking-tight">
+                                            <h2 className="text-3xl font-bold text-foreground mb-3 tracking-tight">
                                                 Decentralized Groups
                                             </h2>
-                                            <p className="text-(--text-secondary) mb-8 text-base font-normal max-w-sm mx-auto leading-relaxed">
+                                            <p className="text-muted-foreground mb-8 text-base font-normal max-w-sm mx-auto leading-relaxed">
                                                 Secure, community-owned communication spaces powered by blockchain technology.
                                             </p>
 
                                             <div className="flex flex-col sm:flex-row gap-6 items-center justify-center">
                                                 <button
                                                     onClick={() => setIsJoinGroupModalOpen(true)}
-                                                    className="w-full sm:w-auto px-10 py-4 rounded-2xl bg-(--bg-secondary) border border-(--border-color) text-(--text-primary) font-black text-[10px] uppercase tracking-[0.2em] hover:border-(--primary-brand) hover:bg-(--bg-card) transition-all shadow-sm"
+                                                    className="w-full sm:w-auto px-10 py-4 rounded-2xl bg-secondary border border-border text-foreground font-black text-[10px] uppercase tracking-[0.2em] hover:border-primary hover:bg-card transition-all shadow-sm"
                                                 >
                                                     Join Group
                                                 </button>
@@ -924,9 +938,9 @@ function App() {
                                                 </button>
                                             </div>
 
-                                            <div className="mt-16 pt-8 border-t border-(--border-color)/50">
+                                            <div className="mt-16 pt-8 border-t border-border/50">
                                                 <div className="flex items-center justify-center gap-6 opacity-60">
-                                                    <span className="text-[9px] font-black uppercase tracking-[0.4em] text-(--text-muted) animate-pulse">Aptos Protocol Secured</span>
+                                                    <span className="text-[9px] font-black uppercase tracking-[0.4em] text-muted-foreground animate-pulse">Aptos Protocol Secured</span>
                                                 </div>
                                             </div>
                                         </div>

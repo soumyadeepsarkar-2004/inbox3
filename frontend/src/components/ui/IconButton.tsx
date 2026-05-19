@@ -26,15 +26,15 @@ export const IconButton = forwardRef<HTMLButtonElement, IconButtonProps>(
         const baseStyles = `
       relative inline-flex items-center justify-center
       rounded-xl transition-all duration-200
-      focus:outline-none focus:ring-2 focus:ring-(--primary-brand)/50
+      focus:outline-none focus:ring-2 focus:ring-primary/50
       disabled:opacity-50 disabled:cursor-not-allowed
     `
 
         const variantStyles = {
-            default: 'bg-(--bg-secondary) text-(--text-primary) hover:bg-(--border-color)',
-            ghost: 'text-(--text-secondary) hover:bg-(--bg-secondary) hover:text-(--text-primary)',
+            default: 'bg-secondary text-foreground hover:bg-border',
+            ghost: 'text-muted-foreground hover:bg-secondary hover:text-foreground',
             outline:
-                'border border-(--border-color) text-(--text-secondary) hover:border-(--primary-brand) hover:text-(--primary-brand)'
+                'border border-border text-muted-foreground hover:border-primary hover:text-primary'
         }
 
         const sizeStyles = {
@@ -74,7 +74,7 @@ export const IconButton = forwardRef<HTMLButtonElement, IconButtonProps>(
               min-w-[18px] h-[18px] px-1
               flex items-center justify-center
               text-[10px] font-bold text-white
-              bg-(--primary-brand) rounded-full
+              bg-primary rounded-full
             "
                     >
                         {typeof badge === 'number' && badge > 99 ? '99+' : badge}

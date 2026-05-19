@@ -14,8 +14,8 @@ export function Badge({
     className = ''
 }: BadgeProps) {
     const variantStyles = {
-        default: 'bg-(--bg-secondary) text-(--text-secondary)',
-        primary: 'bg-(--primary-brand-light) text-(--primary-brand)',
+        default: 'bg-secondary text-muted-foreground',
+        primary: 'bg-primary/10 text-primary',
         success: 'bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400',
         warning: 'bg-amber-100 text-amber-700 dark:bg-amber-900/30 dark:text-amber-400',
         danger: 'bg-red-100 text-red-700 dark:bg-red-900/30 dark:text-red-400',
@@ -45,8 +45,8 @@ export function Badge({
             ${variant === 'warning' ? 'bg-amber-500' : ''}
             ${variant === 'danger' ? 'bg-red-500' : ''}
             ${variant === 'info' ? 'bg-blue-500' : ''}
-            ${variant === 'primary' ? 'bg-(--primary-brand)' : ''}
-            ${variant === 'default' ? 'bg-(--text-muted)' : ''}
+            ${variant === 'primary' ? 'bg-primary' : ''}
+            ${variant === 'default' ? 'bg-muted-foreground' : ''}
           `}
                 />
             )}

@@ -20,12 +20,12 @@ const sizeMap = {
 
 const colorMap = {
     current: 'currentColor',
-    primary: 'var(--text-primary)',
-    secondary: 'var(--text-secondary)',
-    muted: 'var(--text-muted)',
-    success: 'var(--success-green)',
+    primary: 'varforeground',
+    secondary: 'varmuted-foreground',
+    muted: 'varmuted-foreground',
+    success: 'vargreen-500',
     warning: 'var(--warning-yellow)',
-    error: 'var(--error-red)',
+    error: 'vardestructive',
 }
 
 const IconBase = forwardRef<SVGSVGElement, IconProps & { children: React.ReactNode }>(

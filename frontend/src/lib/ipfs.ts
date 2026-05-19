@@ -1,90 +1,36 @@
-const PINATA_API_KEY = import.meta.env.VITE_PINATA_API_KEY as string | undefined;
-const PINATA_SECRET_KEY = import.meta.env.VITE_PINATA_SECRET_KEY as string | undefined;
+const IPFS_PROXY_URL = (import.meta.env.VITE_IPFS_PROXY_URL as string | undefined) || 'http://localhost:3001';
 const PINATA_GATEWAY = (import.meta.env.VITE_PINATA_GATEWAY as string | undefined) || 'gateway.pinata.cloud';
 
-const IS_PROD = import.meta.env.PROD; // true when built with `vite build`
-
-// ─── Validate IPFS config in production ─────────────────────────────────────
-if (IS_PROD && (!PINATA_API_KEY || !PINATA_SECRET_KEY)) {
-  console.error(
-    '[Inbox3 IPFS] Pinata credentials are not set.\n' +
-    '  Messages stored on-chain reference IPFS CIDs. Without Pinata,\n' +
-    '  message content will NOT persist between sessions.\n' +
-    '  Set VITE_PINATA_API_KEY and VITE_PINATA_SECRET_KEY in your .env file.'
-  );
-}
+const IS_PROD = import.meta.env.PROD;
 
 // ─── Upload ──────────────────────────────────────────────────────────────────
 export const upload = async (data: string): Promise<string> => {
-  if (!PINATA_API_KEY || !PINATA_SECRET_KEY) {
-    if (IS_PROD) {
-      throw new Error(
-        'Pinata IPFS credentials are required in production. ' +
-        'Set VITE_PINATA_API_KEY and VITE_PINATA_SECRET_KEY in your .env file.'
-      );
-    }
-    // Development-only fallback: store in localStorage
-    console.warn('[IPFS] Pinata not configured — using localStorage fallback (dev only).');
-    const mockCid = 'mock-cid-' + Date.now();
-    try {
-      localStorage.setItem(`ipfs-${mockCid}`, data);
-    } catch (e) {
-      console.warn('Failed to store mock data locally:', e);
-    }
-    return mockCid;
-  }
-
   try {
-    const blob = new Blob([data], { type: 'application/json' });
-    const formData = new FormData();
-    formData.append('file', blob, 'message.json');
-
-    const metadata = {
-      name: `inbox3-message-${Date.now()}`,
-      keyvalues: {
-        app: 'inbox3',
-        timestamp: Date.now().toString()
-      }
-    };
-    formData.append('pinataMetadata', JSON.stringify(metadata));
-
-    const response = await fetch('https://api.pinata.cloud/pinning/pinFileToIPFS', {
+    const response = await fetch(`${IPFS_PROXY_URL}/api/pin-json`, {
       method: 'POST',
-      headers: {
-        'pinata_api_key': PINATA_API_KEY,
-        'pinata_secret_api_key': PINATA_SECRET_KEY,
-      },
-      body: formData
+      headers: { 'Content-Type': 'application/json' },
+      body: data
     });
 
     if (!response.ok) {
-      throw new Error(`Pinata upload failed: ${response.status} ${response.statusText}`);
+      throw new Error(`Proxy upload failed: ${response.status} ${response.statusText}`);
     }
 
     const result = await response.json();
 
-    // Proactively cache for immediate retrieval
+    // Cache content to avoid immediate re-fetch
     try {
       localStorage.setItem(`ipfs-${result.IpfsHash}`, data);
-    } catch {
-      // Cache failure is non-critical
-    }
+    } catch { }
 
     return result.IpfsHash;
   } catch (error) {
-    // In production, propagate the error — don't silently fall back
-    if (IS_PROD) {
-      throw error;
-    }
-    // Dev fallback only
-    console.error('[IPFS] Pinata upload failed, using local fallback:', error);
-    const fallbackCid = 'fallback-cid-' + Date.now();
-    try {
-      localStorage.setItem(`ipfs-${fallbackCid}`, data);
-    } catch (e) {
-      console.warn('Failed to store fallback data locally:', e);
-    }
-    return fallbackCid;
+    if (IS_PROD) throw error;
+
+    console.warn('[IPFS] Proxy not reachable, using localStorage fallback (dev only).');
+    const mockCid = 'mock-cid-' + Date.now();
+    localStorage.setItem(`ipfs-${mockCid}`, data);
+    return mockCid;
   }
 };
 
@@ -174,42 +120,26 @@ export const download = async (rawCid: string): Promise<string> => {
 
 // ─── Upload File ─────────────────────────────────────────────────────────────
 export const uploadFile = async (file: Blob): Promise<string> => {
-  if (!PINATA_API_KEY || !PINATA_SECRET_KEY) {
-    if (IS_PROD) {
-      throw new Error('Pinata credentials required for file uploads. Set VITE_PINATA_API_KEY and VITE_PINATA_SECRET_KEY.');
+  try {
+    const formData = new FormData();
+    formData.append('file', file);
+
+    const response = await fetch(`${IPFS_PROXY_URL}/api/pin-file`, {
+      method: 'POST',
+      body: formData
+    });
+
+    if (!response.ok) {
+      throw new Error(`Proxy file upload failed: ${response.status} ${response.statusText}`);
     }
-    console.warn('[IPFS] Using mock CID for file upload (dev only).');
+
+    const result = await response.json();
+    return result.IpfsHash;
+  } catch (error) {
+    if (IS_PROD) throw error;
+    console.warn('[IPFS] Proxy not reachable, using mock CID for file upload (dev only).');
     return 'mock-file-cid-' + Date.now();
   }
-
-  const formData = new FormData();
-  formData.append('file', file);
-
-  const metadata = {
-    name: `inbox3-file-${Date.now()}`,
-    keyvalues: {
-      app: 'inbox3',
-      timestamp: Date.now().toString(),
-      type: file.type
-    }
-  };
-  formData.append('pinataMetadata', JSON.stringify(metadata));
-
-  const response = await fetch('https://api.pinata.cloud/pinning/pinFileToIPFS', {
-    method: 'POST',
-    headers: {
-      'pinata_api_key': PINATA_API_KEY,
-      'pinata_secret_api_key': PINATA_SECRET_KEY,
-    },
-    body: formData
-  });
-
-  if (!response.ok) {
-    throw new Error(`Pinata file upload failed: ${response.status} ${response.statusText}`);
-  }
-
-  const result = await response.json();
-  return result.IpfsHash;
 };
 
 // ─── High-level helpers ──────────────────────────────────────────────────────

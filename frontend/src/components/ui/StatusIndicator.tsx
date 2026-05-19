@@ -17,14 +17,14 @@ export function StatusIndicator({
 }: StatusIndicatorProps) {
     const statusConfig = {
         online: {
-            color: 'bg-(--success-green)',
+            color: 'bg-green-500',
             label: label || 'Connected',
-            textColor: 'text-(--success-green)'
+            textColor: 'text-green-500'
         },
         offline: {
-            color: 'bg-(--text-muted)',
+            color: 'bg-muted-foreground',
             label: label || 'Offline',
-            textColor: 'text-(--text-muted)'
+            textColor: 'text-muted-foreground'
         },
         connecting: {
             color: 'bg-(--warning-yellow)',
@@ -32,9 +32,9 @@ export function StatusIndicator({
             textColor: 'text-(--warning-yellow)'
         },
         error: {
-            color: 'bg-(--error-red)',
+            color: 'bg-destructive',
             label: label || 'Error',
-            textColor: 'text-(--error-red)'
+            textColor: 'text-destructive'
         }
     }
 

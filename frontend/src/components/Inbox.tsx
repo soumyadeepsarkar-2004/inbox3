@@ -75,8 +75,20 @@ export default function Inbox({ refreshKey, onMessages, onSelectContact, filterB
       const processed = await Promise.all(
         combined.map(async (m) => {
           try {
-            const data = await getFromPinata(m.cid);
-            addDataUsage(new Blob([JSON.stringify(data)]).size);
+            // Priority 1: Check localStorage Cache
+            let data: any = null;
+            const cached = localStorage.getItem(`ipfs-${m.cid}`);
+            if (cached) {
+              try {
+                data = JSON.parse(cached);
+              } catch {
+                data = { content: cached };
+              }
+            } else {
+              // Priority 2: Fetch from Pinata with background caching
+              data = await getFromPinata(m.cid);
+              addDataUsage(new Blob([JSON.stringify(data)]).size);
+            }
 
             // For sent messages, we can check if they were read by the recipient
             let onChainRead = m.read;
@@ -232,7 +244,7 @@ export default function Inbox({ refreshKey, onMessages, onSelectContact, filterB
     return (
       <div className="space-y-2 px-1">
         {[1, 2, 3, 4, 5].map((i) => (
-          <div key={i} className="h-14 bg-(--bg-secondary)/20 rounded-xl animate-pulse border border-(--border-color)/10" />
+          <div key={i} className="h-14 bg-secondary/20 rounded-xl animate-pulse border border-border/10" />
         ))}
       </div>
     );
@@ -244,7 +256,7 @@ export default function Inbox({ refreshKey, onMessages, onSelectContact, filterB
       <div className="px-3 mb-6 space-y-4">
         {/* Search Bar */}
         <div className="relative group">
-          <div className="absolute left-4 top-1/2 -translate-y-1/2 text-(--text-muted) group-focus-within:text-(--primary-brand) transition-colors z-10">
+          <div className="absolute left-4 top-1/2 -translate-y-1/2 text-muted-foreground group-focus-within:text-primary transition-colors z-10">
             <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3">
               <circle cx="11" cy="11" r="8" /><path d="m21 21-4.35-4.35" />
             </svg>
@@ -255,12 +267,12 @@ export default function Inbox({ refreshKey, onMessages, onSelectContact, filterB
             placeholder="Search messages..."
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
-            className="w-full pl-11 pr-11 py-3 bg-gray-50 dark:bg-(--bg-secondary)/50 border border-(--border-color)/40 rounded-xl text-xs font-bold focus:bg-white dark:focus:bg-(--bg-card) focus:border-(--primary-brand)/50 focus:ring-4 focus:ring-(--primary-brand)/10 outline-none transition-all placeholder:text-(--text-muted)/50"
+            className="w-full pl-11 pr-11 py-3 bg-secondary/50 border border-border/40 rounded-xl text-xs font-bold focus:focus:bg-card focus:border-primary/50 focus:ring-4 focus:ring-primary/10 outline-none transition-all placeholder:text-muted-foreground/50"
           />
           {searchQuery && (
             <button
               onClick={() => setSearchQuery('')}
-              className="absolute right-3 top-1/2 -translate-y-1/2 w-7 h-7 flex items-center justify-center rounded-lg hover:bg-black/5 dark:hover:bg-white/5 text-(--text-muted) hover:text-(--text-primary) transition-all"
+              className="absolute right-3 top-1/2 -translate-y-1/2 w-7 h-7 flex items-center justify-center rounded-lg hover:bg-black/5 hover:bg-white/5 text-muted-foreground hover:text-foreground transition-all"
             >
               <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3">
                 <line x1="18" y1="6" x2="6" y2="18" /><line x1="6" y1="6" x2="18" y2="18" />
@@ -269,7 +281,7 @@ export default function Inbox({ refreshKey, onMessages, onSelectContact, filterB
           )}
           {!searchQuery && (
             <div className="absolute right-4 top-1/2 -translate-y-1/2 pointer-events-none opacity-40 group-focus-within:opacity-0 transition-opacity hidden sm:block">
-              <span className="text-[9px] font-black text-(--text-muted) border border-(--border-color)/40 px-1.5 py-0.5 rounded-md bg-white/50 dark:bg-black/20">/</span>
+              <span className="text-[9px] font-black text-muted-foreground border border-border/40 px-1.5 py-0.5 rounded-md bg-black/20">/</span>
             </div>
           )}
         </div>
@@ -286,8 +298,8 @@ export default function Inbox({ refreshKey, onMessages, onSelectContact, filterB
               key={filter.id}
               onClick={() => setActiveFilter(filter.id as typeof activeFilter)}
               className={`px-3 py-1.5 rounded-lg text-[10px] font-black uppercase tracking-widest whitespace-nowrap transition-all ${activeFilter === filter.id
-                ? 'bg-(--primary-brand) text-white shadow-md shadow-indigo-500/20'
-                : 'bg-(--bg-secondary)/50 text-(--text-muted) hover:text-(--text-primary)'
+                ? 'bg-primary text-white shadow-md shadow-indigo-500/20'
+                : 'bg-secondary/50 text-muted-foreground hover:text-foreground'
                 }`}
             >
               {filter.label}
@@ -301,7 +313,7 @@ export default function Inbox({ refreshKey, onMessages, onSelectContact, filterB
         <div className="px-2 mb-3">
           <button
             onClick={markAllAsRead}
-            className="text-xs font-medium text-(--primary-brand) hover:underline"
+            className="text-xs font-medium text-primary hover:underline"
           >
             Mark all as read
           </button>
@@ -311,11 +323,11 @@ export default function Inbox({ refreshKey, onMessages, onSelectContact, filterB
       <div className="flex-1 overflow-y-auto custom-scrollbar px-1 pb-4">
         {groupedMsgs.length === 0 ? (
           <div className="py-12 text-center px-4">
-            <div className="w-14 h-14 rounded-2xl bg-(--bg-secondary) flex items-center justify-center text-(--text-muted) mx-auto mb-4">
+            <div className="w-14 h-14 rounded-2xl bg-secondary flex items-center justify-center text-muted-foreground mx-auto mb-4">
               <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z" /></svg>
             </div>
-            <p className="text-sm text-(--text-muted)">No messages yet</p>
-            <p className="text-xs text-(--text-muted) mt-1">Start a conversation</p>
+            <p className="text-sm text-muted-foreground">No messages yet</p>
+            <p className="text-xs text-muted-foreground mt-1">Start a conversation</p>
           </div>
         ) : (
           <div className="flex flex-col gap-1">

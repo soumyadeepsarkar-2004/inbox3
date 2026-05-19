@@ -79,10 +79,10 @@ export function Avatar({
     }
 
     const statusColorStyles = {
-        online: 'bg-(--success-green)',
-        offline: 'bg-(--text-muted)',
+        online: 'bg-green-500',
+        offline: 'bg-muted-foreground',
         away: 'bg-(--warning-yellow)',
-        busy: 'bg-(--error-red)'
+        busy: 'bg-destructive'
     }
 
     const colorClass = getAvatarColor(address || name || 'default')
@@ -94,7 +94,7 @@ export function Avatar({
                 <img
                     src={src}
                     alt={name || address || 'Avatar'}
-                    className={`${sizeStyles[size]} rounded-full object-cover ring-2 ring-(--border-color)`}
+                    className={`${sizeStyles[size]} rounded-full object-cover ring-2 ring-border`}
                 />
             ) : (
                 <div
@@ -102,7 +102,7 @@ export function Avatar({
             ${sizeStyles[size]} ${colorClass}
             rounded-full flex items-center justify-center
             font-semibold text-white
-            ring-2 ring-(--border-color)
+            ring-2 ring-border
           `}
                     title={address || name}
                 >
@@ -115,7 +115,7 @@ export function Avatar({
             absolute bottom-0 right-0
             ${statusSizeStyles[size]}
             ${statusColorStyles[status]}
-            rounded-full ring-2 ring-(--bg-card)
+            rounded-full ring-2 ring-card
           `}
                     aria-label={`Status: ${status}`}
                 />

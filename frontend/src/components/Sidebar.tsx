@@ -71,20 +71,20 @@ export function Sidebar({
     return (
         <aside
             className={`
-        flex flex-col h-full
-        bg-(--bg-card) border-r border-(--border-color)
-        transition-all duration-300 ease-out
+        flex flex-col h-full relative
+        bg-card/50 backdrop-blur-md border-r border-border/40
+        transition-all duration-300 ease-out z-20 liquid-glass
         ${isExpanded ? 'w-64' : 'w-16'}
       `}
             onMouseEnter={() => setIsHovered(true)}
             onMouseLeave={() => setIsHovered(false)}
         >
             {/* Header */}
-            <div className="flex items-center justify-between p-4 border-b border-(--border-color)">
+            <div className="flex items-center justify-between p-4 border-b border-border/40">
                 {isExpanded ? (
                     <div className="flex items-center gap-3">
                         <img src="/logo.png" alt="Inbox3" className="w-8 h-8" />
-                        <span className="font-bold text-(--text-primary)">Inbox3</span>
+                        <span className="font-bold text-foreground">Inbox3</span>
                     </div>
                 ) : (
                     <img src="/logo.png" alt="Inbox3" className="w-8 h-8 mx-auto" />
@@ -104,15 +104,15 @@ export function Sidebar({
             </div>
 
             {/* Quick Actions */}
-            <div className={`p-3 border-b border-(--border-color) ${isExpanded ? '' : 'flex justify-center'}`}>
+            <div className={`p-3 border-b border-border/40 ${isExpanded ? '' : 'flex justify-center'}`}>
                 {isExpanded ? (
                     <button
                         onClick={onNewMessage}
                         className="
               w-full flex items-center justify-center gap-2
-              px-4 py-2.5 rounded-xl
-              bg-(--primary-brand) text-white font-medium
-              hover:bg-(--primary-brand-hover) hover:-translate-y-0.5
+              px-4 py-2.5 rounded-full
+              bg-primary text-primary-foreground font-medium
+              hover:bg-primary/90 hover:-translate-y-0.5
               transition-all duration-200 shadow-md
             "
                     >
@@ -123,22 +123,20 @@ export function Sidebar({
                     </button>
                 ) : (
                     <Tooltip content="New Message" position="right">
-                        <IconButton
-                            icon={
-                                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                                    <path d="M12 5v14M5 12h14" />
-                                </svg>
-                            }
-                            label="New Message"
-                            variant="default"
+                        <button
+                            className="bg-primary text-primary-foreground rounded-full p-2 hover:bg-primary/90 shadow-md"
                             onClick={onNewMessage}
-                        />
+                        >
+                            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                                <path d="M12 5v14M5 12h14" />
+                            </svg>
+                        </button>
                     </Tooltip>
                 )}
             </div>
 
             {/* Navigation */}
-            <nav className="flex-1 p-3 space-y-1 overflow-y-auto">
+            <nav className="flex-1 p-3 space-y-1 overflow-y-auto custom-scrollbar">
                 {navItems.map((item) => (
                     <Tooltip key={item.id} content={item.label} position="right" delay={collapsed ? 100 : 1000}>
                         <button
@@ -147,8 +145,8 @@ export function Sidebar({
                 w-full flex items-center gap-3 px-3 py-2.5 rounded-xl
                 transition-all duration-200
                 ${item.active
-                                    ? 'bg-(--primary-brand-light) text-(--primary-brand)'
-                                    : 'text-(--text-secondary) hover:bg-(--bg-secondary) hover:text-(--text-primary)'
+                                    ? 'bg-primary/10 text-primary liquid-glass'
+                                    : 'text-muted-foreground hover:bg-secondary/50 hover:text-foreground'
                                 }
                 ${!isExpanded ? 'justify-center' : ''}
               `}
@@ -165,19 +163,19 @@ export function Sidebar({
                                 </>
                             )}
                             {!isExpanded && item.badge !== undefined && item.badge > 0 && (
-                                <span className="absolute top-0.5 right-0.5 w-2 h-2 bg-(--primary-brand) rounded-full" />
+                                <span className="absolute top-0.5 right-0.5 w-2 h-2 bg-primary rounded-full" />
                             )}
                         </button>
                     </Tooltip>
                 ))}
 
                 {/* Divider */}
-                <div className="my-4 border-t border-(--border-color)" />
+                <div className="my-4 border-t border-border/40" />
 
                 {/* Folders / Tags section */}
                 {isExpanded && (
                     <div className="space-y-1">
-                        <h3 className="px-3 py-2 text-xs font-semibold text-(--text-muted) uppercase tracking-wider">
+                        <h3 className="px-3 py-2 text-xs font-semibold text-muted-foreground uppercase tracking-wider">
                             Labels
                         </h3>
                         {['Important', 'Work', 'Personal', 'Archive'].map((label) => (
@@ -185,19 +183,19 @@ export function Sidebar({
                                 key={label}
                                 className="
                   w-full flex items-center gap-3 px-3 py-2 rounded-lg
-                  text-sm text-(--text-secondary)
-                  hover:bg-(--bg-secondary) hover:text-(--text-primary)
+                  text-sm text-secondary-foreground
+                  hover:bg-secondary/50 hover:text-foreground
                   transition-colors
                 "
                             >
                                 <span
                                     className={`w-2.5 h-2.5 rounded-full ${label === 'Important'
-                                        ? 'bg-(--error-red)'
+                                        ? 'bg-destructive'
                                         : label === 'Work'
-                                            ? 'bg-(--info-blue)'
+                                            ? 'bg-primary'
                                             : label === 'Personal'
-                                                ? 'bg-(--success-green)'
-                                                : 'bg-(--text-muted)'
+                                                ? 'bg-green-500'
+                                                : 'bg-muted'
                                         }`}
                                 />
                                 {label}
@@ -208,13 +206,13 @@ export function Sidebar({
             </nav>
 
             {/* Footer Actions */}
-            <div className={`p-3 border-t border-(--border-color) space-y-1 ${!isExpanded ? 'flex flex-col items-center' : ''}`}>
+            <div className={`p-3 border-t border-border space-y-1 ${!isExpanded ? 'flex flex-col items-center' : ''}`}>
                 <Tooltip content="Search" position="right">
                     <button
                         onClick={onSearch}
                         className={`
               flex items-center gap-3 px-3 py-2.5 rounded-xl w-full
-              text-(--text-secondary) hover:bg-(--bg-secondary) hover:text-(--text-primary)
+              text-muted-foreground hover:bg-secondary hover:text-foreground
               transition-colors
               ${!isExpanded ? 'justify-center' : ''}
             `}
@@ -232,7 +230,7 @@ export function Sidebar({
                         onClick={onSettings}
                         className={`
               flex items-center gap-3 px-3 py-2.5 rounded-xl w-full
-              text-(--text-secondary) hover:bg-(--bg-secondary) hover:text-(--text-primary)
+              text-muted-foreground hover:bg-secondary hover:text-foreground
               transition-colors
               ${!isExpanded ? 'justify-center' : ''}
             `}
@@ -250,7 +248,7 @@ export function Sidebar({
                         onClick={onPerformance}
                         className={`
               flex items-center gap-3 px-3 py-2.5 rounded-xl w-full
-              text-(--text-secondary) hover:bg-(--bg-secondary) hover:text-(--text-primary)
+              text-muted-foreground hover:bg-secondary hover:text-foreground
               transition-colors
               ${!isExpanded ? 'justify-center' : ''}
             `}

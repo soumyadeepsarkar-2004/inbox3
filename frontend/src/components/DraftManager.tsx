@@ -22,6 +22,15 @@ export function useDrafts() {
         }
     }, [])
 
+    const removeDraft = useCallback((id: string) => {
+        setDrafts(prev => {
+            const updated = { ...prev }
+            delete updated[id]
+            localStorage.setItem('inbox3_drafts', JSON.stringify(updated))
+            return updated
+        })
+    }, [])
+
     const saveDraft = useCallback((
         id: string,
         content: string,
@@ -49,20 +58,11 @@ export function useDrafts() {
             localStorage.setItem('inbox3_drafts', JSON.stringify(updated))
             return updated
         })
-    }, [])
+    }, [removeDraft])
 
     const getDraft = useCallback((id: string): Draft | null => {
         return drafts[id] || null
     }, [drafts])
-
-    const removeDraft = useCallback((id: string) => {
-        setDrafts(prev => {
-            const updated = { ...prev }
-            delete updated[id]
-            localStorage.setItem('inbox3_drafts', JSON.stringify(updated))
-            return updated
-        })
-    }, [])
 
     const getAllDrafts = useCallback((): Draft[] => {
         return Object.values(drafts).sort((a, b) => b.timestamp - a.timestamp)
@@ -95,7 +95,7 @@ export function DraftIndicator({ draftCount, onClick }: DraftIndicatorProps) {
     return (
         <button
             onClick={onClick}
-            className="flex items-center gap-2 px-3 py-2 bg-blue-50 dark:bg-blue-900/20 text-blue-700 dark:text-blue-400 rounded-lg hover:bg-blue-100 dark:hover:bg-blue-900/30 transition-colors text-sm"
+            className="flex items-center gap-2 px-3 py-2 bg-primary/20 text-primary rounded-lg hover:bg-primary/30 transition-colors text-sm"
         >
             <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
                 <path d="M21.44 11.05l-9.19 9.19a6 6 0 0 1-8.49-8.49l9.19-9.19a4 4 0 0 1 5.66 5.66l-9.2 9.19a2 2 0 0 1-2.83-2.83l8.49-8.48" />
@@ -121,13 +121,13 @@ export function DraftsModal({ isOpen, onClose, drafts, onSelectDraft, onDeleteDr
 
     return (
         <div className="fixed inset-0 z-100 flex items-center justify-center p-4 bg-black/50 animate-fade-in">
-            <div className="bg-(--bg-card) rounded-3xl shadow-2xl w-full max-w-2xl max-h-[80vh] overflow-hidden">
+            <div className="bg-card rounded-3xl shadow-2xl w-full max-w-2xl max-h-[80vh] overflow-hidden">
                 {/* Header */}
-                <div className="flex items-center justify-between p-6 border-b border-(--border-color)">
-                    <h2 className="text-xl font-bold text-(--text-primary)">Drafts</h2>
+                <div className="flex items-center justify-between p-6 border-b border-border">
+                    <h2 className="text-xl font-bold text-foreground">Drafts</h2>
                     <button
                         onClick={onClose}
-                        className="p-2 rounded-full hover:bg-(--bg-secondary) transition-colors"
+                        className="p-2 rounded-full hover:bg-secondary transition-colors"
                     >
                         <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
                             <line x1="18" y1="6" x2="6" y2="18" />
@@ -145,14 +145,14 @@ export function DraftsModal({ isOpen, onClose, drafts, onSelectDraft, onDeleteDr
                                     <path d="M21.44 11.05l-9.19 9.19a6 6 0 0 1-8.49-8.49l9.19-9.19a4 4 0 0 1 5.66 5.66l-9.2 9.19a2 2 0 0 1-2.83-2.83l8.49-8.48" />
                                 </svg>
                             </div>
-                            <p className="text-(--text-muted)">No drafts saved</p>
+                            <p className="text-muted-foreground">No drafts saved</p>
                         </div>
                     ) : (
                         <div className="p-4 space-y-2">
                             {drafts.map(draft => (
                                 <div
                                     key={draft.id}
-                                    className="p-4 bg-(--bg-secondary) rounded-xl hover:bg-(--bg-card) transition-colors cursor-pointer"
+                                    className="p-4 bg-secondary rounded-xl hover:bg-card transition-colors cursor-pointer"
                                     onClick={() => {
                                         onSelectDraft(draft)
                                         onClose()
@@ -160,11 +160,11 @@ export function DraftsModal({ isOpen, onClose, drafts, onSelectDraft, onDeleteDr
                                 >
                                     <div className="flex items-start justify-between mb-2">
                                         <div className="flex items-center gap-2">
-                                            <span className="px-2 py-1 rounded-md text-xs font-medium bg-(--bg-card) text-(--text-secondary)">
+                                            <span className="px-2 py-1 rounded-md text-xs font-medium bg-card text-muted-foreground">
                                                 {draft.type === 'dm' ? 'DM' : 'Group'}
                                             </span>
                                             {draft.recipient && (
-                                                <span className="text-xs text-(--text-muted) font-mono">
+                                                <span className="text-xs text-muted-foreground font-mono">
                                                     {draft.recipient.slice(0, 8)}...
                                                 </span>
                                             )}
@@ -174,7 +174,7 @@ export function DraftsModal({ isOpen, onClose, drafts, onSelectDraft, onDeleteDr
                                                 e.stopPropagation()
                                                 onDeleteDraft(draft.id)
                                             }}
-                                            className="p-1 rounded-lg hover:bg-red-100 dark:hover:bg-red-900/30 text-red-500"
+                                            className="p-1 rounded-lg hover:bg-red-900/30 text-red-500"
                                         >
                                             <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
                                                 <polyline points="3 6 5 6 21 6" />
@@ -182,10 +182,10 @@ export function DraftsModal({ isOpen, onClose, drafts, onSelectDraft, onDeleteDr
                                             </svg>
                                         </button>
                                     </div>
-                                    <p className="text-sm text-(--text-primary) line-clamp-2">
+                                    <p className="text-sm text-foreground line-clamp-2">
                                         {draft.content}
                                     </p>
-                                    <p className="text-xs text-(--text-muted) mt-2">
+                                    <p className="text-xs text-muted-foreground mt-2">
                                         {new Date(draft.timestamp).toLocaleString()}
                                     </p>
                                 </div>

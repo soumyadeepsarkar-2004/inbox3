@@ -25,13 +25,13 @@ export default function QRCodeModal({ isOpen, onClose, address, title = 'Your Wa
 
     return (
         <div className="fixed inset-0 z-100 flex items-center justify-center p-4 bg-black/50 animate-fade-in">
-            <div className="bg-(--bg-card) rounded-3xl shadow-2xl w-full max-w-sm overflow-hidden">
+            <div className="bg-card rounded-3xl shadow-2xl w-full max-w-sm overflow-hidden">
                 {/* Header */}
-                <div className="flex items-center justify-between p-6 border-b border-(--border-color)">
-                    <h2 className="text-lg font-bold text-(--text-primary)">{title}</h2>
+                <div className="flex items-center justify-between p-6 border-b border-border">
+                    <h2 className="text-lg font-bold text-foreground">{title}</h2>
                     <button
                         onClick={onClose}
-                        className="p-2 rounded-full hover:bg-(--bg-secondary) transition-colors"
+                        className="p-2 rounded-full hover:bg-secondary transition-colors"
                     >
                         <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
                             <line x1="18" y1="6" x2="6" y2="18" />
@@ -53,14 +53,14 @@ export default function QRCodeModal({ isOpen, onClose, address, title = 'Your Wa
 
                     {/* Address */}
                     <div className="w-full">
-                        <p className="text-xs text-(--text-muted) text-center mb-2">Scan or share this address</p>
-                        <div className="flex items-center gap-2 p-3 bg-(--bg-secondary) rounded-xl">
-                            <code className="flex-1 text-xs text-(--text-primary) font-mono break-all">
+                        <p className="text-xs text-muted-foreground text-center mb-2">Scan or share this address</p>
+                        <div className="flex items-center gap-2 p-3 bg-secondary rounded-xl">
+                            <code className="flex-1 text-xs text-foreground font-mono break-all">
                                 {address}
                             </code>
                             <button
                                 onClick={copyToClipboard}
-                                className="p-2 rounded-lg hover:bg-(--bg-card) transition-colors text-(--text-secondary) hover:text-(--primary-brand)"
+                                className="p-2 rounded-lg hover:bg-card transition-colors text-muted-foreground hover:text-primary"
                                 title="Copy address"
                             >
                                 <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
@@ -73,10 +73,10 @@ export default function QRCodeModal({ isOpen, onClose, address, title = 'Your Wa
                 </div>
 
                 {/* Footer */}
-                <div className="p-6 border-t border-(--border-color) bg-(--bg-secondary)">
+                <div className="p-6 border-t border-border bg-secondary">
                     <button
                         onClick={onClose}
-                        className="w-full py-3 bg-(--primary-brand) text-white rounded-xl font-medium hover:bg-(--primary-brand-hover) transition-colors"
+                        className="w-full py-3 bg-primary text-white rounded-xl font-medium hover:bg-primary/90 transition-colors"
                     >
                         Done
                     </button>

@@ -62,13 +62,13 @@ export default function SettingsPanel({ isOpen, onClose, onSettingsChange }: Set
 
     return (
         <div className="fixed inset-0 z-100 flex items-center justify-center p-4 bg-black/50 animate-fade-in">
-            <div className="bg-(--bg-card) rounded-3xl shadow-2xl w-full max-w-md overflow-hidden">
+            <div className="bg-card rounded-3xl shadow-2xl w-full max-w-md overflow-hidden">
                 {/* Header */}
-                <div className="flex items-center justify-between p-6 border-b border-(--border-color)">
-                    <h2 className="text-xl font-bold text-(--text-primary)">Settings</h2>
+                <div className="flex items-center justify-between p-6 border-b border-border">
+                    <h2 className="text-xl font-bold text-foreground">Settings</h2>
                     <button
                         onClick={onClose}
-                        className="p-2 rounded-full hover:bg-(--bg-secondary) transition-colors"
+                        className="p-2 rounded-full hover:bg-secondary transition-colors"
                     >
                         <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
                             <line x1="18" y1="6" x2="6" y2="18" />
@@ -81,7 +81,7 @@ export default function SettingsPanel({ isOpen, onClose, onSettingsChange }: Set
                 <div className="p-6 space-y-6 max-h-[60vh] overflow-y-auto">
                     {/* Notifications Section */}
                     <section>
-                        <h3 className="text-sm font-semibold text-(--text-primary) mb-3 flex items-center gap-2">
+                        <h3 className="text-sm font-semibold text-foreground mb-3 flex items-center gap-2">
                             <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
                                 <path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9" />
                                 <path d="M13.73 21a2 2 0 0 1-3.46 0" />
@@ -106,7 +106,7 @@ export default function SettingsPanel({ isOpen, onClose, onSettingsChange }: Set
 
                     {/* Do Not Disturb Section */}
                     <section>
-                        <h3 className="text-sm font-semibold text-(--text-primary) mb-3 flex items-center gap-2">
+                        <h3 className="text-sm font-semibold text-foreground mb-3 flex items-center gap-2">
                             <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
                                 <circle cx="12" cy="12" r="10" />
                                 <path d="M4.93 4.93l14.14 14.14" />
@@ -130,26 +130,26 @@ export default function SettingsPanel({ isOpen, onClose, onSettingsChange }: Set
                                 <>
                                     <div className="flex items-center gap-3">
                                         <div className="flex-1">
-                                            <label className="text-xs text-(--text-muted) block mb-1">Start</label>
+                                            <label className="text-xs text-muted-foreground block mb-1">Start</label>
                                             <input
                                                 type="time"
                                                 value={settings.dndStartTime}
                                                 onChange={(e) => updateSetting('dndStartTime', e.target.value)}
-                                                className="w-full px-3 py-2 rounded-lg bg-(--bg-secondary) text-(--text-primary) text-sm border border-(--border-color) focus:outline-none focus:ring-2 focus:ring-(--primary-brand)"
+                                                className="w-full px-3 py-2 rounded-lg bg-secondary text-foreground text-sm border border-border focus:outline-none focus:ring-2 focus:ring-primary"
                                             />
                                         </div>
                                         <div className="flex-1">
-                                            <label className="text-xs text-(--text-muted) block mb-1">End</label>
+                                            <label className="text-xs text-muted-foreground block mb-1">End</label>
                                             <input
                                                 type="time"
                                                 value={settings.dndEndTime}
                                                 onChange={(e) => updateSetting('dndEndTime', e.target.value)}
-                                                className="w-full px-3 py-2 rounded-lg bg-(--bg-secondary) text-(--text-primary) text-sm border border-(--border-color) focus:outline-none focus:ring-2 focus:ring-(--primary-brand)"
+                                                className="w-full px-3 py-2 rounded-lg bg-secondary text-foreground text-sm border border-border focus:outline-none focus:ring-2 focus:ring-primary"
                                             />
                                         </div>
                                     </div>
                                     <div>
-                                        <label className="text-xs text-(--text-muted) block mb-2">Active Days</label>
+                                        <label className="text-xs text-muted-foreground block mb-2">Active Days</label>
                                         <div className="flex gap-1">
                                             {['S', 'M', 'T', 'W', 'T', 'F', 'S'].map((day, index) => (
                                                 <button
@@ -161,8 +161,8 @@ export default function SettingsPanel({ isOpen, onClose, onSettingsChange }: Set
                                                         updateSetting('dndDays', newDays)
                                                     }}
                                                     className={`w-8 h-8 rounded-full text-xs font-medium transition-colors ${settings.dndDays.includes(index)
-                                                        ? 'bg-(--primary-brand) text-white'
-                                                        : 'bg-(--bg-secondary) text-(--text-muted) hover:bg-(--bg-tertiary)'
+                                                        ? 'bg-primary text-white'
+                                                        : 'bg-secondary text-muted-foreground hover:bg-muted'
                                                         }`}
                                                 >
                                                     {day}
@@ -177,7 +177,7 @@ export default function SettingsPanel({ isOpen, onClose, onSettingsChange }: Set
 
                     {/* Appearance Section */}
                     <section>
-                        <h3 className="text-sm font-semibold text-(--text-primary) mb-3 flex items-center gap-2">
+                        <h3 className="text-sm font-semibold text-foreground mb-3 flex items-center gap-2">
                             <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
                                 <circle cx="12" cy="12" r="3" />
                                 <path d="M12 1v2M12 21v2M4.22 4.22l1.42 1.42M18.36 18.36l1.42 1.42M1 12h2M21 12h2M4.22 19.78l1.42-1.42M18.36 5.64l1.42-1.42" />
@@ -187,13 +187,13 @@ export default function SettingsPanel({ isOpen, onClose, onSettingsChange }: Set
                         <div className="space-y-3">
                             <div className="flex items-center justify-between">
                                 <div>
-                                    <p className="text-sm font-medium text-(--text-primary)">Theme</p>
-                                    <p className="text-xs text-(--text-muted)">Choose your preferred theme</p>
+                                    <p className="text-sm font-medium text-foreground">Theme</p>
+                                    <p className="text-xs text-muted-foreground">Choose your preferred theme</p>
                                 </div>
                                 <select
                                     value={settings.theme}
                                     onChange={(e) => updateSetting('theme', e.target.value as Settings['theme'])}
-                                    className="px-3 py-2 rounded-lg bg-(--bg-secondary) text-(--text-primary) text-sm border border-(--border-color) focus:outline-none focus:ring-2 focus:ring-(--primary-brand)"
+                                    className="px-3 py-2 rounded-lg bg-secondary text-foreground text-sm border border-border focus:outline-none focus:ring-2 focus:ring-primary"
                                 >
                                     <option value="light">Light</option>
                                     <option value="dark">Dark</option>
@@ -217,7 +217,7 @@ export default function SettingsPanel({ isOpen, onClose, onSettingsChange }: Set
 
                     {/* Data Section */}
                     <section>
-                        <h3 className="text-sm font-semibold text-(--text-primary) mb-3 flex items-center gap-2">
+                        <h3 className="text-sm font-semibold text-foreground mb-3 flex items-center gap-2">
                             <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
                                 <path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z" />
                                 <polyline points="22,6 12,13 2,6" />
@@ -233,14 +233,14 @@ export default function SettingsPanel({ isOpen, onClose, onSettingsChange }: Set
                             />
                             <div className="flex items-center justify-between">
                                 <div>
-                                    <p className="text-sm font-medium text-(--text-primary)">Refresh Interval</p>
-                                    <p className="text-xs text-(--text-muted)">How often to check for new messages</p>
+                                    <p className="text-sm font-medium text-foreground">Refresh Interval</p>
+                                    <p className="text-xs text-muted-foreground">How often to check for new messages</p>
                                 </div>
                                 <select
                                     value={settings.refreshInterval}
                                     onChange={(e) => updateSetting('refreshInterval', Number(e.target.value))}
                                     disabled={!settings.autoRefresh}
-                                    className="px-3 py-2 rounded-lg bg-(--bg-secondary) text-(--text-primary) text-sm border border-(--border-color) focus:outline-none focus:ring-2 focus:ring-(--primary-brand) disabled:opacity-50"
+                                    className="px-3 py-2 rounded-lg bg-secondary text-foreground text-sm border border-border focus:outline-none focus:ring-2 focus:ring-primary disabled:opacity-50"
                                 >
                                     <option value={15}>15 seconds</option>
                                     <option value={30}>30 seconds</option>
@@ -249,7 +249,7 @@ export default function SettingsPanel({ isOpen, onClose, onSettingsChange }: Set
                                 </select>
                             </div>
                         </div>
-                        <div className="pt-4 mt-4 border-t border-(--border-color)">
+                        <div className="pt-4 mt-4 border-t border-border">
                             <button
                                 onClick={() => {
                                     if (window.confirm('Are you sure you want to clear the local cache? This will clear stored messages and reload the page.')) {
@@ -261,7 +261,7 @@ export default function SettingsPanel({ isOpen, onClose, onSettingsChange }: Set
                             >
                                 Clear Local Cache
                             </button>
-                            <p className="mt-2 text-xs text-center text-(--text-muted)">
+                            <p className="mt-2 text-xs text-center text-muted-foreground">
                                 Useful if messages are out of sync
                             </p>
                         </div>
@@ -269,16 +269,16 @@ export default function SettingsPanel({ isOpen, onClose, onSettingsChange }: Set
                 </div>
 
                 {/* Footer */}
-                <div className="flex items-center justify-between p-6 border-t border-(--border-color) bg-(--bg-secondary)">
+                <div className="flex items-center justify-between p-6 border-t border-border bg-secondary">
                     <button
                         onClick={resetSettings}
-                        className="text-sm text-(--text-muted) hover:text-(--text-primary) transition-colors"
+                        className="text-sm text-muted-foreground hover:text-foreground transition-colors"
                     >
                         Reset to defaults
                     </button>
                     <button
                         onClick={onClose}
-                        className="px-5 py-2 bg-(--primary-brand) text-white rounded-xl font-medium hover:bg-(--primary-brand-hover) transition-colors"
+                        className="px-5 py-2 bg-primary text-white rounded-xl font-medium hover:bg-primary/90 transition-colors"
                     >
                         Done
                     </button>
@@ -299,12 +299,12 @@ function ToggleSetting({ label, description, checked, onChange }: ToggleSettingP
     return (
         <div className="flex items-center justify-between">
             <div>
-                <p className="text-sm font-medium text-(--text-primary)">{label}</p>
-                <p className="text-xs text-(--text-muted)">{description}</p>
+                <p className="text-sm font-medium text-foreground">{label}</p>
+                <p className="text-xs text-muted-foreground">{description}</p>
             </div>
             <button
                 onClick={() => onChange(!checked)}
-                className={`relative w-12 h-6 rounded-full transition-colors ${checked ? 'bg-(--primary-brand)' : 'bg-(--bg-secondary) border border-(--border-color)'
+                className={`relative w-12 h-6 rounded-full transition-colors ${checked ? 'bg-primary' : 'bg-secondary border border-border'
                     }`}
             >
                 <span

@@ -102,9 +102,9 @@ export const ChatConversation: React.FC<ChatConversationProps> = ({
     // Loading State
     if (loading && messages.length === 0) {
         return (
-            <div className="flex flex-col items-center justify-center h-full gap-4 bg-(--bg-card)">
+            <div className="flex flex-col items-center justify-center h-full gap-4 bg-card">
                 <Spinner size="md" />
-                <p className="text-sm text-(--text-muted)">Loading messages...</p>
+                <p className="text-sm text-muted-foreground">Loading messages...</p>
             </div>
         );
     }
@@ -112,15 +112,15 @@ export const ChatConversation: React.FC<ChatConversationProps> = ({
     // Empty State
     if (messages.length === 0) {
         return (
-            <div className="flex flex-col items-center justify-center h-full gap-4 px-8 bg-(--bg-card)">
-                <div className="w-16 h-16 rounded-2xl bg-(--bg-secondary) flex items-center justify-center border border-(--border-color)">
-                    <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" className="text-(--text-muted)">
+            <div className="flex flex-col items-center justify-center h-full gap-4 px-8 bg-card">
+                <div className="w-16 h-16 rounded-2xl bg-secondary flex items-center justify-center border border-border">
+                    <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" className="text-muted-foreground">
                         <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z" />
                     </svg>
                 </div>
                 <div className="text-center">
-                    <p className="text-base font-medium text-(--text-primary)">No messages yet</p>
-                    <p className="text-sm text-(--text-muted) mt-1">Send a message to start the conversation</p>
+                    <p className="text-base font-medium text-foreground">No messages yet</p>
+                    <p className="text-sm text-muted-foreground mt-1">Send a message to start the conversation</p>
                 </div>
             </div>
         );
@@ -130,25 +130,25 @@ export const ChatConversation: React.FC<ChatConversationProps> = ({
     const otherAddress = contactAddress || messages.find(m => m.direction === 'received')?.sender || messages[0]?.sender;
 
     return (
-        <div className="flex flex-col h-full bg-(--bg-card)">
+        <div className="flex flex-col h-full bg-card">
             {/* Chat Header */}
-            <div className="flex items-center justify-between px-4 py-3 border-b border-(--border-color)">
+            <div className="flex items-center justify-between px-4 py-3 border-b border-border">
                 <div className="flex items-center gap-3">
                     <Avatar address={otherAddress || ''} size="sm" status="online" />
                     <div>
-                        <h3 className="text-sm font-semibold text-(--text-primary)">
+                        <h3 className="text-sm font-semibold text-foreground">
                             {otherAddress ? `${otherAddress.slice(0, 8)}...${otherAddress.slice(-6)}` : 'Chat'}
                         </h3>
-                        <p className="text-xs text-(--text-muted)">@ Online</p>
+                        <p className="text-xs text-muted-foreground">@ Online</p>
                     </div>
                 </div>
                 <div className="flex items-center gap-2">
-                    <button className="w-8 h-8 rounded-lg flex items-center justify-center text-(--text-muted) hover:text-(--text-primary) hover:bg-(--bg-secondary) transition-all">
+                    <button className="w-8 h-8 rounded-lg flex items-center justify-center text-muted-foreground hover:text-foreground hover:bg-secondary transition-all">
                         <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
                             <circle cx="11" cy="11" r="8" /><path d="m21 21-4.35-4.35" />
                         </svg>
                     </button>
-                    <button className="w-8 h-8 rounded-lg flex items-center justify-center text-(--text-muted) hover:text-(--text-primary) hover:bg-(--bg-secondary) transition-all">
+                    <button className="w-8 h-8 rounded-lg flex items-center justify-center text-muted-foreground hover:text-foreground hover:bg-secondary transition-all">
                         <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
                             <circle cx="12" cy="12" r="1" /><circle cx="19" cy="12" r="1" /><circle cx="5" cy="12" r="1" />
                         </svg>
@@ -184,7 +184,7 @@ export const ChatConversation: React.FC<ChatConversationProps> = ({
                             <div
                                 key={m.id}
                                 className={`w-full flex flex-col transition-all duration-300 rounded-xl ${isHighlighted
-                                    ? 'bg-(--primary-brand-light) -mx-2 px-2 py-2'
+                                    ? 'bg-primary/10 -mx-2 px-2 py-2'
                                     : ''
                                     }`}
                             >
