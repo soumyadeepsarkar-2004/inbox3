@@ -21,7 +21,9 @@ export const upload = async (data: string): Promise<string> => {
     // Cache content to avoid immediate re-fetch
     try {
       localStorage.setItem(`ipfs-${result.IpfsHash}`, data);
-    } catch { }
+    } catch {
+      // localStorage may be full or unavailable (private mode)
+    }
 
     return result.IpfsHash;
   } catch (error) {
@@ -143,13 +145,16 @@ export const uploadFile = async (file: Blob): Promise<string> => {
 };
 
 // ─── High-level helpers ──────────────────────────────────────────────────────
-interface IpfsMessagePayload {
+export interface IpfsMessagePayload {
   content: string;
   sender: string;
   timestamp: number;
   type?: 'text' | 'audio';
   parentId?: string | null;
 }
+
+/** Parsed IPFS payload or a plain-text localStorage fallback */
+export type ResolvedMessageData = IpfsMessagePayload | { content: string };
 
 export const uploadToPinata = async (
   content: string,

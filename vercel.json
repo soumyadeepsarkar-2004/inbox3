@@ -1,5 +1,15 @@
 {
-  "installCommand": "npm --prefix landing ci",
-  "buildCommand": "npm --prefix landing run build",
-  "outputDirectory": "landing/dist"
+  "version": 2,
+  "buildCommand": "bash build.sh",
+  "outputDirectory": "public",
+  "rewrites": [
+    {
+      "source": "/app/(.*)",
+      "destination": "/app/index.html"
+    },
+    {
+      "source": "/(.*)",
+      "destination": "/index.html"
+    }
+  ]
 }

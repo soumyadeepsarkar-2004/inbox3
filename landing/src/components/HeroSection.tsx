@@ -27,9 +27,7 @@ export function HeroSection() {
 
         <div className="mt-8 mb-[66px]">
           <a
-            href="https://inbox3-aptos.vercel.app"
-            target="_blank"
-            rel="noopener noreferrer"
+            href="/app"
           >
             <Button
               variant="heroSecondary"

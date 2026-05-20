@@ -2,7 +2,7 @@ import { useState, useEffect, useCallback, useMemo, useRef } from 'react';
 import { useWallet } from '@aptos-labs/wallet-adapter-react';
 import { aptos, CONTRACT_ADDRESS } from '../config';
 import { ListItem } from './ui/ListItem';
-import { getFromPinata } from '../lib/ipfs';
+import { getFromPinata, type ResolvedMessageData } from '../lib/ipfs';
 import { useMetrics } from './PerformanceDashboard';
 import { ChatConversation } from './ChatConversation';
 
@@ -76,7 +76,7 @@ export default function Inbox({ refreshKey, onMessages, onSelectContact, filterB
         combined.map(async (m) => {
           try {
             // Priority 1: Check localStorage Cache
-            let data: any = null;
+            let data: ResolvedMessageData;
             const cached = localStorage.getItem(`ipfs-${m.cid}`);
             if (cached) {
               try {
@@ -111,7 +111,7 @@ export default function Inbox({ refreshKey, onMessages, onSelectContact, filterB
               id: m.cid, // Stable ID for react unique keys
               onChainId: m.id, // The actual ID from Move
               content: data.content,
-              type: data.type || 'text',
+              type: ('type' in data && data.type) || 'text',
               plain: data.content,
               direction: m.direction,
               onChainRead: onChainRead,

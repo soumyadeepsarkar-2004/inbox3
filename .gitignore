@@ -7,6 +7,7 @@ pnpm-debug.log*
 
 # Production builds
 dist/
+public/
 build/
 .next/
 out/
@@ -110,3 +111,5 @@ private-key.json
 # If you populate it with real keys, protect it with:
 #   echo "smart-contract/.aptos/config.yaml" >> .git/info/exclude
 smart-contract/.aptos/config.yaml
+.vercel
+.env*.local

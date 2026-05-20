@@ -1,5 +1,6 @@
 import { useState, useEffect, type ReactNode } from 'react'
 import { LayoutContext, useLayout } from './LayoutContext'
+import { motion, AnimatePresence } from 'framer-motion'
 
 // ============================================
 // BREAKPOINT HOOK
@@ -71,39 +72,105 @@ export function AppShell({ topNav, sidebar, children, rightPane }: AppShellProps
                 isDesktop,
             }}
         >
-            <div className="app-shell">
+            <div className="app-shell relative">
+                {/* Dynamic Background Glows */}
+                <div className="absolute inset-0 overflow-hidden pointer-events-none z-0">
+                    <motion.div
+                        animate={{
+                            x: [0, 60, -30, 0],
+                            y: [0, -80, 50, 0],
+                            scale: [1, 1.25, 0.85, 1],
+                            rotate: [0, 90, 180, 360]
+                        }}
+                        transition={{
+                            duration: 25,
+                            repeat: Infinity,
+                            ease: "easeInOut"
+                        }}
+                        className="absolute top-[-10%] left-[10%] w-[50vw] h-[50vw] max-w-[600px] rounded-full bg-purple-600/10 blur-[130px]"
+                    />
+                    <motion.div
+                        animate={{
+                            x: [0, -50, 70, 0],
+                            y: [0, 60, -70, 0],
+                            scale: [1, 0.9, 1.2, 1],
+                            rotate: [360, 270, 90, 0]
+                        }}
+                        transition={{
+                            duration: 30,
+                            repeat: Infinity,
+                            ease: "easeInOut",
+                            delay: 2
+                        }}
+                        className="absolute bottom-[-10%] right-[10%] w-[55vw] h-[55vw] max-w-[700px] rounded-full bg-[#FF6B35]/8 blur-[150px]"
+                    />
+                    <motion.div
+                        animate={{
+                            x: [0, 40, -50, 0],
+                            y: [0, 50, -60, 0],
+                            scale: [1, 1.15, 0.8, 1]
+                        }}
+                        transition={{
+                            duration: 22,
+                            repeat: Infinity,
+                            ease: "easeInOut",
+                            delay: 4
+                        }}
+                        className="absolute top-[30%] right-[25%] w-[40vw] h-[40vw] max-w-[500px] rounded-full bg-indigo-500/10 blur-[120px]"
+                    />
+                </div>
+
                 {/* Fixed Top Navigation */}
-                <header className="app-shell__topnav">
+                <header className="app-shell__topnav z-10 relative">
                     {topNav}
                 </header>
-
+ 
                 {/* Main Layout Container - CSS Grid Implementation */}
-                <div className="app-shell__grid">
+                <div className="app-shell__grid z-10 relative">
                     {/* Left Pane - Navigation & Inbox (3 cols) */}
-                    <aside
+                    <motion.aside
+                        initial={isDesktop ? { x: -20, opacity: 0 } : false}
+                        animate={{ x: 0, opacity: 1 }}
+                        transition={{ duration: 0.5, ease: "easeOut" }}
                         className={`app-shell__left-pane ${isMobile && !sidebarOpen ? 'hidden' : ''} ${isMobile ? 'app-shell__left-pane--mobile-overlay' : ''}`}
                     >
                         {sidebar}
-                    </aside>
+                    </motion.aside>
 
                     {/* Center Pane - Main Content (6 cols) */}
                     <main className="app-shell__center-pane" id="main-content">
-                        <div className="app-shell__content-scroller">
-                            {children}
-                        </div>
+                        <AnimatePresence mode="wait">
+                            <motion.div
+                                className="app-shell__content-scroller"
+                                initial={{ opacity: 0, y: 10 }}
+                                animate={{ opacity: 1, y: 0 }}
+                                exit={{ opacity: 0, y: -10 }}
+                                transition={{ duration: 0.4 }}
+                            >
+                                {children}
+                            </motion.div>
+                        </AnimatePresence>
                     </main>
 
                     {/* Right Pane - Utilities (3 cols) */}
-                    <aside
+                    <motion.aside
+                        initial={isDesktop ? { x: 20, opacity: 0 } : false}
+                        animate={{ x: 0, opacity: 1 }}
+                        transition={{ duration: 0.5, ease: "easeOut", delay: 0.1 }}
                         className={`app-shell__right-pane ${!rightPaneOpen && !isDesktop ? 'hidden' : ''}`}
                     >
                         {rightPane}
-                    </aside>
+                    </motion.aside>
                 </div>
 
                 {/* Mobile Tablet Navigation Bar (Optional/Custom) */}
                 {isMobile && sidebarOpen && (
-                    <div className="app-shell__mobile-overlay" onClick={() => setSidebarOpen(false)} />
+                    <motion.div
+                        initial={{ opacity: 0 }}
+                        animate={{ opacity: 1 }}
+                        className="app-shell__mobile-overlay"
+                        onClick={() => setSidebarOpen(false)}
+                    />
                 )}
             </div>
         </LayoutContext.Provider>

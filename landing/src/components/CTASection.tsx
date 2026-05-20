@@ -25,7 +25,7 @@ export function CTASection() {
         </p>
 
         <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
-          <a href="https://inbox3-aptos.vercel.app" target="_blank" rel="noopener noreferrer">
+          <a href="/app">
             <Button variant="hero" className="px-10 py-7 text-lg gap-2 group">
               Launch Inbox3
               <ArrowRight className="w-5 h-5 transition-transform group-hover:translate-x-1" />

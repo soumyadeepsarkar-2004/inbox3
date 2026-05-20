@@ -1,5 +1,6 @@
 import { useState, useEffect, useCallback, useMemo } from 'react'
 import { useWallet } from '@aptos-labs/wallet-adapter-react'
+import { motion, AnimatePresence } from 'framer-motion'
 
 // Layout Components
 import { AppShell, TopNav } from './components/layout'
@@ -8,6 +9,7 @@ import { AppShell, TopNav } from './components/layout'
 import SendMessage from './components/SendMessage'
 import Inbox, { type ProcessedMessage } from './components/Inbox'
 import ContactsList from './components/ContactsList'
+import EmptyChatView from './components/EmptyChatView'
 import NotificationSystem from './components/NotificationSystem'
 import GroupList from './components/GroupList'
 import GroupChat from './components/GroupChat'
@@ -239,12 +241,12 @@ function App() {
 
     // Connect signaling service when wallet connects
     useEffect(() => {
-        if (connected && account && (window as any).aptos) {
+        if (connected && account && window.aptos) {
             const signaling = getSignalingService()
 
             // Function to sign signaling registration message
             const signMessage = async (message: string) => {
-                const response = await (window as any).aptos.signMessage({
+                const response = await window.aptos!.signMessage({
                     message,
                     nonce: 'inbox3-registration'
                 });
@@ -822,138 +824,145 @@ function App() {
             >
                 <div className="flex-1 flex flex-col min-h-0">
                     <main className="flex-1 flex flex-col min-h-0" id="main-content">
-                        {currentView === 'dm' && (
-                            <div className="h-full flex flex-col overflow-hidden">
-                                {selectedRecipient && selectedRecipient.trim().length > 5 ? (
-                                    <div className="flex-1 flex flex-col min-h-0 bg-background/30">
-                                        <div className="px-5 py-3 border-b border-border/30 bg-card/40 backdrop-blur-md flex justify-between items-center transition-all shrink-0">
-                                            <div className="flex items-center gap-3">
-                                                <Avatar address={selectedRecipient} size="sm" status="online" />
-                                                <div className="min-w-0">
-                                                    <h3 className="text-xs font-black text-foreground uppercase tracking-wide">
-                                                        {selectedRecipient.slice(0, 10)}...{selectedRecipient.slice(-8)}
-                                                    </h3>
+                        <AnimatePresence mode="wait">
+                            {currentView === 'dm' && (
+                                <motion.div
+                                    key="dm"
+                                    initial={{ opacity: 0, y: 8 }}
+                                    animate={{ opacity: 1, y: 0 }}
+                                    exit={{ opacity: 0, y: -8 }}
+                                    transition={{ duration: 0.25, ease: "easeInOut" }}
+                                    className="h-full flex flex-col overflow-hidden"
+                                >
+                                    {selectedRecipient && selectedRecipient.trim().length > 5 ? (
+                                        <div className="flex-1 flex flex-col min-h-0 bg-background/30">
+                                            <div className="px-5 py-3 border-b border-border/30 bg-card/40 backdrop-blur-md flex justify-between items-center transition-all shrink-0">
+                                                <div className="flex items-center gap-3">
+                                                    <Avatar address={selectedRecipient} size="sm" status="online" />
+                                                    <div className="min-w-0">
+                                                        <h3 className="text-xs font-black text-foreground uppercase tracking-wide">
+                                                            {selectedRecipient.slice(0, 10)}...{selectedRecipient.slice(-8)}
+                                                        </h3>
+                                                    </div>
                                                 </div>
-                                            </div>
-                                            <button
-                                                onClick={() => setSelectedRecipient('')}
-                                                className="p-1.5 rounded-lg hover:bg-black/5 hover:dark:bg-white/5 text-muted-foreground hover:text-orange-500 transition-all active:scale-90"
-                                            >
-                                                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3">
-                                                    <path d="M18 6L6 18M6 6l12 12" />
-                                                </svg>
-                                            </button>
-                                        </div>
-
-                                        <div className="flex-1 overflow-hidden flex flex-col">
-                                            <Inbox
-                                                refreshKey={refreshKey}
-                                                filterBySender={selectedRecipient}
-                                                displayMode="conversation"
-                                                onMessages={setLoadedMessages}
-                                            />
-                                        </div>
-
-                                        <div className="bg-card/30 backdrop-blur-md">
-                                            <SendMessage
-                                                contractAddress={CONTRACT_ADDRESS}
-                                                onMessageSent={handleMessageSentAndReset}
-                                                onClose={() => setSelectedRecipient('')}
-                                                initialRecipient={selectedRecipient}
-                                            />
-                                        </div>
-                                    </div>
-                                ) : selectedRecipient === ' ' ? (
-                                    <div className="flex-1 flex flex-col items-center justify-center p-4 bg-background/50">
-                                        <div className="w-full max-w-2xl">
-                                            <SendMessage
-                                                contractAddress={CONTRACT_ADDRESS}
-                                                onMessageSent={handleMessageSentAndReset}
-                                                onClose={() => setSelectedRecipient('')}
-                                                initialRecipient=""
-                                            />
-                                        </div>
-                                    </div>
-                                ) : (
-                                    <div className="h-full flex items-center justify-center p-8">
-                                        <div className="text-center max-w-sm w-full">
-                                            <div className="w-14 h-14 rounded-2xl bg-linear-to-br from-orange-400 to-orange-600 flex items-center justify-center mx-auto mb-5 shadow-lg shadow-orange-500/20">
-                                                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2.5">
-                                                    <path d="M22 2L11 13M22 2L15 22L11 13L2 9L22 2Z" />
-                                                </svg>
-                                            </div>
-                                            <h2 className="text-2xl font-bold text-foreground mb-2 tracking-tight">No conversation selected</h2>
-                                            <p className="text-sm text-muted-foreground mb-6">Choose a contact from the sidebar or start a new message</p>
-                                            <Button
-                                                onClick={() => setSelectedRecipient(' ')}
-                                                className="rounded-xl! px-6! py-2.5! bg-primary! text-white! font-semibold text-sm!"
-                                            >
-                                                New Message
-                                            </Button>
-                                        </div>
-                                    </div>
-                                )}
-                            </div>
-                        )}
-
-                        {currentView === 'groups' && (
-                            <div className="h-full flex flex-col overflow-hidden">
-                                {selectedGroup ? (
-                                    <GroupChat groupAddr={selectedGroup} contractAddress={CONTRACT_ADDRESS} onBack={() => setSelectedGroup(null)} />
-                                ) : (
-                                    <div className="h-full flex items-center justify-center p-8 bg-background">
-                                        <div className="text-center max-w-lg w-full">
-                                            {/* Modern Icon Container */}
-                                            <div className="relative inline-block mb-8">
-                                                <div className="absolute inset-0 bg-purple-500/20 blur-3xl rounded-full" />
-                                                <div className="relative w-24 h-24 rounded-4xl bg-linear-to-br from-purple-500 to-indigo-600 flex items-center justify-center mx-auto shadow-2xl shadow-purple-500/10 border border-white/10">
-                                                    <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                                                        <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2" />
-                                                        <circle cx="9" cy="7" r="4" />
-                                                        <path d="M23 21v-2a4 4 0 0 0-3-3.87" />
-                                                        <path d="M16 3.13a4 4 0 0 1 0 7.75" />
+                                                <button
+                                                    onClick={() => setSelectedRecipient('')}
+                                                    className="p-1.5 rounded-lg hover:bg-black/5 hover:dark:bg-white/5 text-muted-foreground hover:text-primary transition-all active:scale-90"
+                                                >
+                                                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3">
+                                                        <path d="M18 6L6 18M6 6l12 12" />
                                                     </svg>
+                                                </button>
+                                            </div>
+
+                                            <div className="flex-1 overflow-hidden flex flex-col">
+                                                <Inbox
+                                                    refreshKey={refreshKey}
+                                                    filterBySender={selectedRecipient}
+                                                    displayMode="conversation"
+                                                    onMessages={setLoadedMessages}
+                                                />
+                                            </div>
+
+                                            <div className="bg-card/30 backdrop-blur-md">
+                                                <SendMessage
+                                                    contractAddress={CONTRACT_ADDRESS}
+                                                    onMessageSent={handleMessageSentAndReset}
+                                                    onClose={() => setSelectedRecipient('')}
+                                                    initialRecipient={selectedRecipient}
+                                                />
+                                            </div>
+                                        </div>
+                                    ) : selectedRecipient === ' ' ? (
+                                        <div className="flex-1 flex flex-col items-center justify-center p-4 bg-background/50">
+                                            <div className="w-full max-w-2xl">
+                                                <SendMessage
+                                                    contractAddress={CONTRACT_ADDRESS}
+                                                    onMessageSent={handleMessageSentAndReset}
+                                                    onClose={() => setSelectedRecipient('')}
+                                                    initialRecipient=""
+                                                />
+                                            </div>
+                                        </div>
+                                    ) : (
+                                        <EmptyChatView onStartNewChat={() => setSelectedRecipient(' ')} />
+                                    )}
+                                </motion.div>
+                            )}
+
+                            {currentView === 'groups' && (
+                                <motion.div
+                                    key="groups"
+                                    initial={{ opacity: 0, y: 8 }}
+                                    animate={{ opacity: 1, y: 0 }}
+                                    exit={{ opacity: 0, y: -8 }}
+                                    transition={{ duration: 0.25, ease: "easeInOut" }}
+                                    className="h-full flex flex-col overflow-hidden"
+                                >
+                                    {selectedGroup ? (
+                                        <GroupChat groupAddr={selectedGroup} contractAddress={CONTRACT_ADDRESS} onBack={() => setSelectedGroup(null)} />
+                                    ) : (
+                                        <div className="h-full flex items-center justify-center p-8 bg-background/30">
+                                            <div className="text-center max-w-lg w-full">
+                                                {/* Modern Icon Container */}
+                                                <div className="relative inline-block mb-8">
+                                                    <div className="absolute inset-0 bg-purple-500/20 blur-3xl rounded-full" />
+                                                    <div className="relative w-24 h-24 rounded-4xl bg-linear-to-br from-purple-500 to-indigo-600 flex items-center justify-center mx-auto shadow-2xl shadow-purple-500/10 border border-white/10">
+                                                        <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                                                            <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2" />
+                                                            <circle cx="9" cy="7" r="4" />
+                                                            <path d="M23 21v-2a4 4 0 0 0-3-3.87" />
+                                                            <path d="M16 3.13a4 4 0 0 1 0 7.75" />
+                                                        </svg>
+                                                    </div>
                                                 </div>
-                                            </div>
 
-                                            <h2 className="text-3xl font-bold text-foreground mb-3 tracking-tight">
-                                                Decentralized Groups
-                                            </h2>
-                                            <p className="text-muted-foreground mb-8 text-base font-normal max-w-sm mx-auto leading-relaxed">
-                                                Secure, community-owned communication spaces powered by blockchain technology.
-                                            </p>
+                                                <h2 className="text-3xl font-bold text-foreground mb-3 tracking-tight">
+                                                    Decentralized Groups
+                                                </h2>
+                                                <p className="text-muted-foreground mb-8 text-base font-normal max-w-sm mx-auto leading-relaxed">
+                                                    Secure, community-owned communication spaces powered by blockchain technology.
+                                                </p>
 
-                                            <div className="flex flex-col sm:flex-row gap-6 items-center justify-center">
-                                                <button
-                                                    onClick={() => setIsJoinGroupModalOpen(true)}
-                                                    className="w-full sm:w-auto px-10 py-4 rounded-2xl bg-secondary border border-border text-foreground font-black text-[10px] uppercase tracking-[0.2em] hover:border-primary hover:bg-card transition-all shadow-sm"
-                                                >
-                                                    Join Group
-                                                </button>
-                                                <button
-                                                    onClick={() => setIsCreateGroupModalOpen(true)}
-                                                    className="w-full sm:w-auto px-10 py-4 rounded-2xl bg-linear-to-r from-purple-600 to-indigo-600 text-white font-black text-[10px] uppercase tracking-[0.2em] shadow-xl shadow-purple-500/20 hover:shadow-purple-500/40 hover:-translate-y-0.5 transition-all"
-                                                >
-                                                    + Create New
-                                                </button>
-                                            </div>
+                                                <div className="flex flex-col sm:flex-row gap-6 items-center justify-center">
+                                                    <button
+                                                        onClick={() => setIsJoinGroupModalOpen(true)}
+                                                        className="w-full sm:w-auto px-10 py-4 rounded-2xl bg-secondary border border-border text-foreground font-black text-[10px] uppercase tracking-[0.2em] hover:border-primary hover:bg-card transition-all shadow-sm cursor-pointer"
+                                                    >
+                                                        Join Group
+                                                    </button>
+                                                    <button
+                                                        onClick={() => setIsCreateGroupModalOpen(true)}
+                                                        className="w-full sm:w-auto px-10 py-4 rounded-2xl bg-gradient-to-r from-[#A855F7] to-[#FF6B35] text-white font-black text-[10px] uppercase tracking-[0.2em] shadow-xl shadow-purple-500/20 hover:shadow-purple-500/40 hover:-translate-y-0.5 transition-all cursor-pointer"
+                                                    >
+                                                        + Create New
+                                                    </button>
+                                                </div>
 
-                                            <div className="mt-16 pt-8 border-t border-border/50">
-                                                <div className="flex items-center justify-center gap-6 opacity-60">
-                                                    <span className="text-[9px] font-black uppercase tracking-[0.4em] text-muted-foreground animate-pulse">Aptos Protocol Secured</span>
+                                                <div className="mt-16 pt-8 border-t border-border/50">
+                                                    <div className="flex items-center justify-center gap-6 opacity-60">
+                                                        <span className="text-[9px] font-black uppercase tracking-[0.4em] text-muted-foreground animate-pulse">Aptos Protocol Secured</span>
+                                                    </div>
                                                 </div>
                                             </div>
                                         </div>
-                                    </div>
-                                )}
-                            </div>
-                        )}
+                                    )}
+                                </motion.div>
+                            )}
 
-                        {currentView === 'showcase' && (
-                            <div className="h-full overflow-y-auto custom-scrollbar bento-card p-10">
-                                <ComponentShowcase />
-                            </div>
-                        )}
+                            {currentView === 'showcase' && (
+                                <motion.div
+                                    key="showcase"
+                                    initial={{ opacity: 0, y: 8 }}
+                                    animate={{ opacity: 1, y: 0 }}
+                                    exit={{ opacity: 0, y: -8 }}
+                                    transition={{ duration: 0.25, ease: "easeInOut" }}
+                                    className="h-full overflow-y-auto custom-scrollbar bento-card p-10"
+                                >
+                                    <ComponentShowcase />
+                                </motion.div>
+                            )}
+                        </AnimatePresence>
                     </main>
                 </div>
 

@@ -270,16 +270,16 @@ export const ChatComposer: React.FC<ChatComposerProps> = ({
             {/* Input Form */}
             <form onSubmit={handleSubmit} className="flex items-end gap-3">
                 {/* Text Input Container */}
-                <div className="flex-1 relative bg-secondary rounded-2xl border border-border focus-within:border-primary focus-within:ring-2 focus-within:ring-primary/20 transition-all liquid-glass">
+                <div className="flex-1 relative bg-black/25 rounded-2xl border border-border/30 focus-within:border-[#FF6B35]/65 focus-within:ring-4 focus-within:ring-[#FF6B35]/20 focus-within:shadow-[0_0_15px_rgba(255,107,53,0.15)] transition-all liquid-glass">
                     <textarea
                         ref={inputRef}
                         value={message}
                         onChange={(e) => setMessage(e.target.value)}
                         onKeyDown={handleKeyDown}
-                        placeholder={isRecording ? 'ÃƒÂ°Ã…Â¸Ã…Â½Ã‚Â¤ Recording audio...' : placeholder}
+                        placeholder={isRecording ? '🎙 Recording audio...' : placeholder}
                         disabled={disabled || sending || isRecording}
                         rows={1}
-                        className="w-full px-4 py-3 pr-24 bg-transparent text-foreground text-foreground placeholder:text-muted-foreground outline-none resize-none text-[15px] leading-relaxed"
+                        className="w-full px-4 py-3 pr-24 bg-transparent text-foreground placeholder:text-muted-foreground outline-none resize-none text-[15px] leading-relaxed"
                         style={{ minHeight: '48px', maxHeight: '120px' }}
                     />
 
@@ -303,9 +303,9 @@ export const ChatComposer: React.FC<ChatComposerProps> = ({
                             <button
                                 type="button"
                                 onClick={() => setShowGiphyPicker(!showGiphyPicker)}
-                                className={`px-2.5 py-1.5 rounded-lg text-[10px] font-bold uppercase tracking-wider transition-all ${showGiphyPicker
-                                        ? 'bg-primary text-white'
-                                        : 'bg-muted text-foreground text-foreground hover:bg-muted-foreground/20'
+                                className={`px-2.5 py-1.5 rounded-lg text-[10px] font-bold uppercase tracking-wider transition-all cursor-pointer ${showGiphyPicker
+                                        ? 'bg-[#FF6B35] text-white'
+                                        : 'bg-muted text-foreground hover:bg-muted-foreground/20'
                                     }`}
                             >
                                 GIF
@@ -319,7 +319,7 @@ export const ChatComposer: React.FC<ChatComposerProps> = ({
                     type="button"
                     onClick={isRecording ? stopRecording : startRecording}
                     disabled={disabled || sending}
-                    className={`flex items-center justify-center gap-2 px-4 py-3 rounded-2xl font-bold text-[12px] uppercase tracking-wide transition-all min-w-[56px] h-[48px] ${isRecording
+                    className={`flex items-center justify-center gap-2 px-4 py-3 rounded-2xl font-bold text-[12px] uppercase tracking-wide transition-all min-w-[56px] h-[48px] cursor-pointer ${isRecording
                             ? 'bg-red-500 text-white shadow-lg shadow-red-500/30 animate-pulse'
                             : 'bg-muted text-foreground border border-border hover:bg-muted-foreground/20'
                         }`}
@@ -343,9 +343,9 @@ export const ChatComposer: React.FC<ChatComposerProps> = ({
                 <button
                     type="submit"
                     disabled={!canSend}
-                    className={`flex items-center justify-center px-5 py-3 rounded-2xl font-bold text-[12px] uppercase tracking-wide transition-all h-[48px] ${canSend
-                            ? 'bg-gradient-to-r from-primary to-orange-600 text-white shadow-lg shadow-primary/30 hover:shadow-primary/50 hover:-translate-y-0.5 active:scale-95'
-                            : 'bg-muted text-foreground text-muted-foreground cursor-not-allowed'
+                    className={`flex items-center justify-center px-5 py-3 rounded-2xl font-bold text-[12px] uppercase tracking-wide transition-all h-[48px] cursor-pointer ${canSend
+                            ? 'bg-gradient-to-r from-[#A855F7] to-[#FF6B35] text-white shadow-lg shadow-[#A855F7]/30 hover:shadow-[#A855F7]/50 hover:-translate-y-0.5 active:scale-95'
+                            : 'bg-muted text-muted-foreground cursor-not-allowed'
                         }`}
                 >
                     {sending ? (

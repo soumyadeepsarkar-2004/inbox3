@@ -40,8 +40,33 @@ jobs:
     
     - name: Run tests
       working-directory: frontend
-      run: pnpm test --run
-  
+      run: pnpm test
+
+  landing:
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: actions/checkout@v4
+
+    - name: Setup Node.js
+      uses: actions/setup-node@v4
+      with:
+        node-version: 20.x
+        cache: 'npm'
+        cache-dependency-path: landing/package-lock.json
+
+    - name: Install dependencies
+      working-directory: landing
+      run: npm ci
+
+    - name: Lint
+      working-directory: landing
+      run: npm run lint
+
+    - name: Build
+      working-directory: landing
+      run: npm run build
+
   signaling-server:
     runs-on: ubuntu-latest
     

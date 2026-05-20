@@ -1,5 +1,6 @@
 import React, { useState, useRef } from 'react';
 import { Avatar } from './ui/Avatar';
+import { motion } from 'framer-motion';
 
 export interface MessageData {
     id: string | number;
@@ -108,12 +109,22 @@ export const MessageBubble: React.FC<MessageBubbleProps> = ({
                 </button>
 
                 {/* Waveform Visualization */}
-                <div className="flex-1 flex items-center gap-[2px]">
+                <div className="flex-1 flex items-center gap-[3px] h-[32px] justify-center">
                     {waveformBars.map((height, i) => (
-                        <div
+                        <motion.div
                             key={i}
-                            className={`w-[3px] rounded-full ${message.isMe ? 'bg-white/60' : 'bg-primary/40'}`}
-                            style={{ height: `${height}px` }}
+                            animate={audioPlaying ? {
+                                height: [height * 0.4, height * 1.2, height * 0.4],
+                            } : {
+                                height: height
+                            }}
+                            transition={{
+                                duration: 1.2,
+                                repeat: Infinity,
+                                ease: "easeInOut",
+                                delay: i * 0.05
+                            }}
+                            className={`w-[3px] rounded-full ${message.isMe ? 'bg-white/70' : 'bg-gradient-to-t from-[#A855F7] to-[#FF6B35]'}`}
                         />
                     ))}
                 </div>
@@ -300,7 +311,15 @@ export const MessageBubble: React.FC<MessageBubbleProps> = ({
     );
 
     return (
-        <div
+        <motion.div
+            initial={{ opacity: 0, y: 12, scale: 0.97 }}
+            animate={{ opacity: 1, y: 0, scale: 1 }}
+            transition={{ 
+                type: "spring", 
+                stiffness: 260, 
+                damping: 24,
+                duration: 0.35
+            }}
             className={`flex flex-col ${message.isMe ? 'items-end' : 'items-start'} group`}
             onMouseEnter={() => setIsHovered(true)}
             onMouseLeave={() => setIsHovered(false)}
@@ -309,7 +328,7 @@ export const MessageBubble: React.FC<MessageBubbleProps> = ({
             {parentMessage && (
                 <div className={`mb-2 max-w-[80%] px-3 py-2 rounded-xl border-l-2 bg-secondary border-primary/40`}>
                     <p className="text-xs font-medium text-muted-foreground">
-                        â†© {parentMessage.sender.slice(0, 6)}...
+                        ← {parentMessage.sender.slice(0, 6)}...
                     </p>
                     <p className="text-sm text-muted-foreground truncate mt-0.5">
                         {truncateSnippet(parentMessage.content)}
@@ -381,7 +400,7 @@ export const MessageBubble: React.FC<MessageBubbleProps> = ({
                     </div>
                 </div>
             </div>
-        </div>
+        </motion.div>
     );
 };
 

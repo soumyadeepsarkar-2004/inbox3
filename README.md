@@ -2,15 +2,9 @@
 
 <div align="center">
 
-[![Aptos](https://img.shields.io/badge/Aptos-Blockchain-00D4FF?style=flat-square)](https://aptoslabs.com/)
-[![IPFS](https://img.shields.io/badge/IPFS-Storage-65C2CB?style=flat-square)](https://ipfs.io/)
-[![React](https://img.shields.io/badge/React-19-61dafb?style=flat-square&logo=react)](https://react.dev/)
-[![TypeScript](https://img.shields.io/badge/TypeScript-5-3178c6?style=flat-square&logo=typescript)](https://www.typescriptlang.org/)
-[![License: MIT](https://img.shields.io/badge/License-MIT-yellow?style=flat-square)](LICENSE)
+**End-to-end encrypted messaging with blockchain verification and IPFS storage**
 
-**End-to-end encrypted messaging on the blockchain**
-
-[**Try Live Demo →**](https://inbox3-aptos.vercel.app) • [Features](#-features) • [Quick Start](#-quick-start) • [Documentation](#-documentation)
+[**Open App**](https://inbox3-aptos.vercel.app) • [Documentation](#documentation) • [Features](#features) • [Tech Stack](#tech-stack)
 
 </div>
 

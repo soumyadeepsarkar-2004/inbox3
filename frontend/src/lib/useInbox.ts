@@ -1,7 +1,15 @@
 import { useState, useCallback } from 'react';
 import { useWallet } from '@aptos-labs/wallet-adapter-react';
 import { aptos, CONTRACT_ADDRESS } from '../config';
-import { upload, getFromPinata } from './ipfs';
+import { upload, getFromPinata, type ResolvedMessageData } from './ipfs';
+
+interface OnChainMessage {
+    id: number;
+    sender: string;
+    cid: string;
+    timestamp: number;
+    read: boolean;
+}
 import { useMetrics } from '../components/PerformanceDashboard';
 
 export interface ProcessedMessage {
@@ -43,14 +51,14 @@ export function useInbox() {
                 }).catch(() => [[]])
             ]);
 
-            const rawReceived = (inboxRes[0] as any[]).map(m => ({ ...m, direction: 'received' as const }));
-            const rawSent = (outboxRes[0] as any[]).map(m => ({ ...m, direction: 'sent' as const }));
+            const rawReceived = (inboxRes[0] as OnChainMessage[]).map(m => ({ ...m, direction: 'received' as const }));
+            const rawSent = (outboxRes[0] as OnChainMessage[]).map(m => ({ ...m, direction: 'sent' as const }));
             const combined = [...rawReceived, ...rawSent];
 
             const processed = await Promise.all(
                 combined.map(async (m) => {
                     const cached = localStorage.getItem(`ipfs-${m.cid}`);
-                    let data: any;
+                    let data: ResolvedMessageData;
                     if (cached) {
                         try { data = JSON.parse(cached); } catch { data = { content: cached }; }
                     } else {
@@ -63,7 +71,7 @@ export function useInbox() {
                         id: m.cid,
                         onChainId: m.id,
                         content: data.content,
-                        type: data.type || 'text',
+                        type: ('type' in data && data.type) || 'text',
                         direction: m.direction,
                         read: m.direction === 'sent' ? true : (m.read || localStorage.getItem(`read_${m.cid}`) === 'true'),
                     };

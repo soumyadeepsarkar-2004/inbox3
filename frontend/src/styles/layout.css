@@ -1,20 +1,32 @@
-/* ===== BENTO APP SHELL ===== */
+/* ===== DYSTOPIAN GLASS APP SHELL ===== */
 .app-shell {
     display: flex;
     flex-direction: column;
     height: 100vh;
     height: 100dvh;
-    background: var(--bg-main);
+    background: radial-gradient(circle at top right, #1A102D, #0B0515 40%, #000 100%);
     overflow: hidden;
     position: relative;
+    color: var(--text-primary);
+}
+
+.app-shell::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background-image: radial-gradient(rgba(168, 85, 247, 0.05) 1px, transparent 1px);
+    background-size: 40px 40px;
+    z-index: 0;
+    pointer-events: none;
 }
 
 .app-shell__topnav {
-    height: var(--topnav-height, 64px);
+    height: var(--topnav-height, 72px);
     flex-shrink: 0;
-    z-index: var(--z-fixed);
-    background: var(--bg-card);
-    border-bottom: 1px solid var(--border-color);
+    z-index: 50;
+    background: rgba(11, 5, 21, 0.8);
+    backdrop-filter: blur(16px);
+    border-bottom: 1px solid rgba(255, 255, 255, 0.05);
 }
 
 .app-shell__grid {
@@ -23,15 +35,15 @@
     flex: 1;
     min-height: 0;
     position: relative;
+    z-index: 10;
 }
 
-/* Desktop Grid (1024px+) */
+/* Desktop Glass Grid (1024px+) */
 @media (min-width: 1024px) {
     .app-shell__grid {
         grid-template-columns: repeat(12, 1fr);
-        gap: 1rem;
-        padding: 1rem;
-        background: var(--bg-main);
+        gap: 0;
+        padding: 0;
     }
 
     .app-shell__left-pane {
@@ -39,10 +51,11 @@
         display: flex;
         flex-direction: column;
         min-width: 0;
-        background: var(--bg-card);
-        border-radius: 1rem;
-        border: 1px solid var(--border-color);
+        background: rgba(30, 20, 50, 0.3);
+        backdrop-filter: blur(20px);
+        border-right: 1px solid rgba(255, 255, 255, 0.05);
         overflow: hidden;
+        transition: all 0.4s ease-out;
     }
 
     .app-shell__center-pane {
@@ -50,9 +63,7 @@
         display: flex;
         flex-direction: column;
         min-width: 0;
-        background: var(--bg-card);
-        border-radius: 1rem;
-        border: 1px solid var(--border-color);
+        background: rgba(11, 5, 21, 0.2);
         overflow: hidden;
     }
 
@@ -61,9 +72,9 @@
         display: flex;
         flex-direction: column;
         min-width: 0;
-        background: var(--bg-card);
-        border-radius: 1rem;
-        border: 1px solid var(--border-color);
+        background: rgba(30, 20, 50, 0.2);
+        backdrop-filter: blur(20px);
+        border-left: 1px solid rgba(255, 255, 255, 0.05);
         overflow: hidden;
     }
 }
@@ -175,6 +186,7 @@
     overflow: hidden;
     position: relative;
     box-shadow: var(--shadow-sm);
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
 @media (min-width: 1024px) {
@@ -183,14 +195,18 @@
     .app-shell__center-pane,
     .app-shell__right-pane {
         border-color: rgba(0, 0, 0, 0.05);
-        backdrop-filter: blur(8px);
+        backdrop-filter: blur(12px);
     }
 
     [data-theme='dark'] .app-shell__left-pane,
     [data-theme='dark'] .app-shell__center-pane,
     [data-theme='dark'] .app-shell__right-pane {
-        border-color: rgba(255, 255, 255, 0.05);
-        background: rgba(24, 24, 27, 0.8);
+        border-color: rgba(168, 85, 247, 0.18);
+        background: rgba(22, 14, 45, 0.45);
+        backdrop-filter: blur(24px) saturate(180%);
+        -webkit-backdrop-filter: blur(24px) saturate(180%);
+        box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.37),
+                    inset 0 1px 1px 0 rgba(255, 255, 255, 0.05);
     }
 }
 

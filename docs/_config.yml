@@ -1,0 +1,35 @@
+theme: jekyll-theme-minimal
+title: Inbox3 Documentation
+description: Decentralized messaging on Aptos blockchain
+show_downloads: false
+
+# Navigation
+nav_links:
+  - Quick Start: docs/GETTING_STARTED.md
+  - Deployment: docs/DEPLOYMENT.md
+  - Features: docs/FEATURES.md
+  - Architecture: docs/ARCHITECTURE.md
+  - All Docs: docs/README.md
+
+# GitHub
+github:
+  is_project_page: true
+  repository_name: inbox-3
+  repository_url: https://github.com/tumansutradhar/inbox-3
+
+# Build settings
+markdown: kramdown
+highlighter: rouge
+plugins:
+  - jekyll-seo-tag
+  - jekyll-feed
+
+# Exclude files
+exclude:
+  - frontend/
+  - landing/
+  - smart-contract/
+  - signaling-server/
+  - node_modules/
+  - .github/
+  - LICENSE
