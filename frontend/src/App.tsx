@@ -713,93 +713,95 @@ function App() {
         })
 
         return (
-            <div className="hero-container">
-                <WalletModal
-                    isOpen={isWalletModalOpen}
-                    onClose={() => setIsWalletModalOpen(false)}
-                    wallets={filteredWallets}
-                    onConnect={connect}
-                    title={walletModalMode === 'social' ? 'Sign in with Social' : 'Connect Wallet'}
-                />
+            <main>
+                <div className="hero-container">
+                    <WalletModal
+                        isOpen={isWalletModalOpen}
+                        onClose={() => setIsWalletModalOpen(false)}
+                        wallets={filteredWallets}
+                        onConnect={connect}
+                        title={walletModalMode === 'social' ? 'Sign in with Social' : 'Connect Wallet'}
+                    />
 
-                <div className="absolute top-6 right-6 z-60">
-                    <button onClick={toggleDarkMode} className="p-3 rounded-2xl bg-card border border-border text-foreground hover:border-primary transition-all shadow-sm">
-                        {darkMode ? (
-                            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><circle cx="12" cy="12" r="5" /><line x1="12" y1="1" x2="12" y2="3" /><line x1="12" y1="21" x2="12" y2="23" /><path d="M4.22 4.22L5.64 5.64M18.36 18.36L19.78 19.78M1 12H3M21 12H23M4.22 19.78L5.64 18.36M18.36 5.64L19.78 4.22" /></svg>
-                        ) : (
-                            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z" /></svg>
-                        )}
-                    </button>
-                </div>
-
-                <div className="hero-left">
-                    <div className="login-card text-center">
-                        <div className="mb-10">
-                            <img src="/logo.png" alt="Inbox3" className="w-20 h-20 mx-auto mb-6 rounded-2xl shadow-lg" />
-                            <h1 className="text-4xl font-extrabold text-foreground tracking-tight mb-2">Inbox3</h1>
-                            <p className="text-muted-foreground text-sm">
-                                Your decentralized home for secure communication.
-                            </p>
-                        </div>
-
-                        <div className="flex flex-col gap-3">
-                            <button
-                                onClick={() => { setWalletModalMode('wallet'); setIsWalletModalOpen(true); }}
-                                className="w-full py-4 rounded-2xl font-bold text-white shadow-lg active:scale-[0.98] transition-all"
-                                style={{ background: 'var(--gradient-brand)' }}
-                            >
-                                Connect Wallet
-                            </button>
-                            <button
-                                onClick={() => { setWalletModalMode('social'); setIsWalletModalOpen(true); }}
-                                className="w-full py-4 rounded-2xl font-bold border border-border text-foreground hover:bg-secondary transition-all active:scale-[0.98]"
-                            >
-                                Social Sign-in
-                            </button>
-                        </div>
+                    <div className="absolute top-6 right-6 z-60">
+                        <button onClick={toggleDarkMode} className="p-3 rounded-2xl bg-card border border-border text-foreground hover:border-primary transition-all shadow-sm">
+                            {darkMode ? (
+                                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><circle cx="12" cy="12" r="5" /><line x1="12" y1="1" x2="12" y2="3" /><line x1="12" y1="21" x2="12" y2="23" /><path d="M4.22 4.22L5.64 5.64M18.36 18.36L19.78 19.78M1 12H3M21 12H23M4.22 19.78L5.64 18.36M18.36 5.64L19.78 4.22" /></svg>
+                            ) : (
+                                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z" /></svg>
+                            )}
+                        </button>
                     </div>
-                </div>
 
-                <div className="hero-right">
-                    <div className="max-w-lg text-center relative z-10">
-                        <h2 className="text-5xl font-black text-foreground tracking-tighter mb-6 leading-tight">
-                            Private. Secure.<br />
-                            <span style={{ background: 'var(--gradient-brand)', WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent', backgroundClip: 'text' }} className="font-black">Decentralized.</span>
-                        </h2>
-                        <div className="grid grid-cols-2 gap-4">
-                            <div className="p-6 bento-card text-left space-y-3">
-                                <div className="w-10 h-10 rounded-xl" style={{ background: 'var(--primary-brand-light)', color: 'var(--primary-brand)' }}>
-                                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z" /></svg>
-                                </div>
-                                <h3 className="font-bold text-foreground">E2E Encrypted</h3>
-                                <p className="text-xs text-muted-foreground leading-relaxed">Your data belongs to you. Only the recipient can decrypt messages.</p>
+                    <div className="hero-left">
+                        <div className="login-card text-center">
+                            <div className="mb-10">
+                                <img src="/logo.png" alt="Inbox3" className="w-20 h-20 mx-auto mb-6 rounded-2xl shadow-lg" />
+                                <h1 className="text-4xl font-extrabold text-foreground tracking-tight mb-2">Inbox3</h1>
+                                <p className="text-muted-foreground text-sm">
+                                    Your decentralized home for secure communication.
+                                </p>
                             </div>
-                            <div className="p-6 bento-card text-left space-y-3">
-                                <div className="w-10 h-10 rounded-xl" style={{ background: 'var(--accent-orange-light)', color: 'var(--accent-orange)' }}>
-                                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5"><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z" /></svg>
-                                </div>
-                                <h3 className="font-bold text-foreground">Blockchain Powered</h3>
-                                <p className="text-xs text-muted-foreground leading-relaxed">Built on Aptos for high speed and decentralized verification.</p>
+
+                            <div className="flex flex-col gap-3">
+                                <button
+                                    onClick={() => { setWalletModalMode('wallet'); setIsWalletModalOpen(true); }}
+                                    className="w-full py-4 rounded-2xl font-bold text-white shadow-lg active:scale-[0.98] transition-all"
+                                    style={{ background: 'var(--gradient-brand)' }}
+                                >
+                                    Connect Wallet
+                                </button>
+                                <button
+                                    onClick={() => { setWalletModalMode('social'); setIsWalletModalOpen(true); }}
+                                    className="w-full py-4 rounded-2xl font-bold border border-border text-foreground hover:bg-secondary transition-all active:scale-[0.98]"
+                                >
+                                    Social Sign-in
+                                </button>
                             </div>
                         </div>
                     </div>
+
+                    <div className="hero-right">
+                        <div className="max-w-lg text-center relative z-10">
+                            <h2 className="text-5xl font-black text-foreground tracking-tighter mb-6 leading-tight">
+                                Private. Secure.<br />
+                                <span style={{ background: 'var(--gradient-brand)', WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent', backgroundClip: 'text' }} className="font-black">Decentralized.</span>
+                            </h2>
+                            <div className="grid grid-cols-2 gap-4">
+                                <div className="p-6 bento-card text-left space-y-3">
+                                    <div className="w-10 h-10 rounded-xl" style={{ background: 'var(--primary-brand-light)', color: 'var(--primary-brand)' }}>
+                                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z" /></svg>
+                                    </div>
+                                    <h3 className="font-bold text-foreground">E2E Encrypted</h3>
+                                    <p className="text-xs text-muted-foreground leading-relaxed">Your data belongs to you. Only the recipient can decrypt messages.</p>
+                                </div>
+                                <div className="p-6 bento-card text-left space-y-3">
+                                    <div className="w-10 h-10 rounded-xl" style={{ background: 'var(--accent-orange-light)', color: 'var(--accent-orange)' }}>
+                                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5"><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z" /></svg>
+                                    </div>
+                                    <h3 className="font-bold text-foreground">Blockchain Powered</h3>
+                                    <p className="text-xs text-muted-foreground leading-relaxed">Built on Aptos for high speed and decentralized verification.</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
                 </div>
-            </div>
+            </main>
         )
     }
 
     if (loading) {
         return (
-            <div className="flex flex-col items-center justify-center min-h-screen" style={{ background: 'var(--bg-main)' }}>
+            <main className="flex flex-col items-center justify-center min-h-screen" style={{ background: 'var(--bg-main)' }}>
                 <div className="w-16 h-16 rounded-full animate-spin mb-6" style={{ border: '4px solid var(--border-color)', borderTopColor: 'var(--primary-brand)' }} />
                 <h2 className="text-2xl font-black text-foreground animate-pulse">Initializing Workspace...</h2>
-            </div>
+            </main>
         )
     }
 
     if (!hasInbox) {
         return (
-            <div className="min-h-screen flex items-center justify-center p-4" style={{ background: 'var(--bg-main)' }}>
+            <main className="min-h-screen flex items-center justify-center p-4" style={{ background: 'var(--bg-main)' }}>
                 <Card className="p-12 text-center bento-card space-y-8 max-w-lg w-full">
                     <div className="w-20 h-20 rounded-3xl flex items-center justify-center mx-auto" style={{ background: 'var(--primary-brand-light)', color: 'var(--primary-brand)' }}>
                         <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z" /><polyline points="22,6 12,13 2,6" /></svg>
@@ -815,7 +817,7 @@ function App() {
                         {loading ? 'Initializing...' : 'Initialize My Inbox'}
                     </button>
                 </Card>
-            </div>
+            </main>
         )
     }
 
