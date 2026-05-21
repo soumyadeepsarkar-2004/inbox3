@@ -50,7 +50,7 @@ export default function Inbox({ refreshKey, onMessages, onSelectContact, filterB
       const inboxRes = await aptos.view({
         payload: {
           function: `${CONTRACT_ADDRESS}::Inbox3::inbox_of`,
-          functionArguments: [account.address.toString(), "1000", "0"],
+          functionArguments: [account.address.toString()],
         },
       });
 
@@ -60,7 +60,7 @@ export default function Inbox({ refreshKey, onMessages, onSelectContact, filterB
         const outboxRes = await aptos.view({
           payload: {
             function: `${CONTRACT_ADDRESS}::Inbox3::outbox_of`,
-            functionArguments: [account.address.toString(), "1000", "0"],
+            functionArguments: [account.address.toString()],
           },
         });
         rawSent = (outboxRes[0] as Message[]).map(m => ({ ...m, direction: 'sent' as const }));
