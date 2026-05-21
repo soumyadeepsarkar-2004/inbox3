@@ -5,6 +5,11 @@
 
 set -e
 
+echo "--- Installing pnpm (if needed) ---"
+if ! command -v pnpm &> /dev/null; then
+  npm install -g pnpm
+fi
+
 echo "--- Building Landing Page ---"
 cd "$(dirname "$0")/landing"
 npm install
@@ -13,14 +18,8 @@ cd ..
 
 echo "--- Building Product App ---"
 cd "$(dirname "$0")/frontend"
-# Use pnpm if available, fall back to npm
-if command -v pnpm &> /dev/null; then
-  pnpm install
-  pnpm run build
-else
-  npm install
-  npm run build
-fi
+pnpm install
+pnpm run build
 cd ..
 
 echo "--- Organizing Deployment Structure ---"
