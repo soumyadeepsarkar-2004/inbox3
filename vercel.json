@@ -1,8 +1,13 @@
 {
   "version": 2,
-  "buildCommand": "cd frontend && npm install && npm run build",
-  "outputDirectory": "frontend/dist",
+  "installCommand": "npm install --prefix landing && cd frontend && npm install",
+  "buildCommand": "npm run build --prefix landing && cd frontend && npm run build && mkdir -p ../public && cp -r ../landing/dist/* ../public/ && mkdir -p ../public/app && cp -r dist/* ../public/app/",
+  "outputDirectory": "public",
   "rewrites": [
+    {
+      "source": "/app/(.*)",
+      "destination": "/app/index.html"
+    },
     {
       "source": "/(.*)",
       "destination": "/index.html"
