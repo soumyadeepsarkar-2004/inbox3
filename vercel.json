@@ -1,12 +1,8 @@
 {
   "version": 2,
-  "buildCommand": "bash build.sh",
-  "outputDirectory": "public",
+  "buildCommand": "cd frontend && npm install && npm run build",
+  "outputDirectory": "frontend/dist",
   "rewrites": [
-    {
-      "source": "/app/(.*)",
-      "destination": "/app/index.html"
-    },
     {
       "source": "/(.*)",
       "destination": "/index.html"
