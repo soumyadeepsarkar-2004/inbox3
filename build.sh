@@ -3,16 +3,24 @@
 # This script builds both the landing page and the product app,
 # then organizes them into a single structure for deployment.
 
+set -e
+
 echo "--- Building Landing Page ---"
-cd landing
+cd "$(dirname "$0")/landing"
 npm install
 npm run build
 cd ..
 
 echo "--- Building Product App ---"
-cd frontend
-npm install
-npm run build
+cd "$(dirname "$0")/frontend"
+# Use pnpm if available, fall back to npm
+if command -v pnpm &> /dev/null; then
+  pnpm install
+  pnpm run build
+else
+  npm install
+  npm run build
+fi
 cd ..
 
 echo "--- Organizing Deployment Structure ---"
@@ -24,5 +32,11 @@ cp -r landing/dist/* public/
 
 # Copy app to /app subfolder
 cp -r frontend/dist/* public/app/
+
+# Verify build artifacts exist
+if [ ! -f public/index.html ] || [ ! -f public/app/index.html ]; then
+  echo "ERROR: Build artifacts missing!"
+  exit 1
+fi
 
 echo "--- Deployment Structure Ready ---"
