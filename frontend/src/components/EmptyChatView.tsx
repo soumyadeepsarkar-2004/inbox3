@@ -1,7 +1,17 @@
-import React, { useState, Suspense } from 'react';
+import React, { useState, Suspense, Component, type ReactNode } from 'react';
 import Spline from '@splinetool/react-spline';
 import { motion } from 'framer-motion';
 import { Spinner } from './ui';
+
+class SplineErrorBoundary extends Component<{ children: ReactNode; onError: () => void }, { hasError: boolean }> {
+    constructor(props: { children: ReactNode; onError: () => void }) {
+        super(props);
+        this.state = { hasError: false };
+    }
+    static getDerivedStateFromError() { return { hasError: true }; }
+    componentDidCatch() { this.props.onError(); }
+    render() { return this.state.hasError ? null : this.props.children; }
+}
 
 interface EmptyChatViewProps {
     onStartNewChat: () => void;
@@ -70,14 +80,16 @@ export const EmptyChatView: React.FC<EmptyChatViewProps> = ({ onStartNewChat }) 
                     {!splineError && (
                         <div className={`absolute inset-0 transition-opacity duration-1000 z-10 ${splineLoaded ? 'opacity-100' : 'opacity-0'}`}>
                             <Suspense fallback={null}>
-                                <Spline 
-                                    scene="https://prod.spline.design/kZi12hP5v72-H568/scene.splinecode" 
-                                    onLoad={() => setSplineLoaded(true)}
-                                    onError={() => {
-                                        setSplineError(true);
-                                        setSplineLoaded(false);
-                                    }}
-                                />
+                                <SplineErrorBoundary onError={() => { setSplineError(true); setSplineLoaded(false); }}>
+                                    <Spline 
+                                        scene="https://prod.spline.design/kZi12hP5v72-H568/scene.splinecode" 
+                                        onLoad={() => setSplineLoaded(true)}
+                                        onError={() => {
+                                            setSplineError(true);
+                                            setSplineLoaded(false);
+                                        }}
+                                    />
+                                </SplineErrorBoundary>
                             </Suspense>
                         </div>
                     )}
