@@ -24,6 +24,11 @@ export default {
                     light: 'var(--primary-brand-light)',
                     dark: 'var(--primary-brand-dark)',
                 },
+                accent: {
+                    orange: 'var(--accent-orange)',
+                    hover: 'var(--accent-orange-hover)',
+                    light: 'var(--accent-orange-light)',
+                },
                 background: {
                     main: 'var(--bg-main)',
                     card: 'var(--bg-card)',

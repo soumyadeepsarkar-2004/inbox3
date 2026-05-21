@@ -34,7 +34,7 @@ import { getWebRTCService, type CallSignal, type CallType } from './lib/webrtc'
 import { getSignalingService } from './lib/signaling'
 import { useNotifications } from './lib/notifications'
 import { aptos, CONTRACT_ADDRESS, NETWORK } from './config'
-import { Button, Card, SkipLink, Avatar, Modal } from './components/ui'
+import { Card, SkipLink, Avatar, Modal } from './components/ui'
 import './App.css'
 
 type AppView = 'dm' | 'groups' | 'showcase'
@@ -692,7 +692,7 @@ function App() {
 
                     <button
                         onClick={disconnect}
-                        className="px-5 py-2.5 rounded-xl text-xs font-semibold border border-red-200 dark:border-red-500/30 text-red-500 hover:bg-red-50 dark:hover:bg-red-500/10 transition-all active:scale-95 flex items-center gap-2"
+                        className="px-5 py-2.5 rounded-xl text-xs font-semibold border border-border text-muted-foreground hover:text-destructive hover:border-destructive/30 hover:bg-destructive/10 transition-all active:scale-95 flex items-center gap-2"
                     >
                         <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4" /><polyline points="16 17 21 12 16 7" /><line x1="21" y1="12" x2="9" y2="12" /></svg>
                         Disconnect
@@ -713,7 +713,7 @@ function App() {
         })
 
         return (
-            <div className="hero-container bg-background">
+            <div className="hero-container">
                 <WalletModal
                     isOpen={isWalletModalOpen}
                     onClose={() => setIsWalletModalOpen(false)}
@@ -723,7 +723,7 @@ function App() {
                 />
 
                 <div className="absolute top-6 right-6 z-60">
-                    <button onClick={toggleDarkMode} className="p-3 rounded-full bento-card text-foreground">
+                    <button onClick={toggleDarkMode} className="p-3 rounded-2xl bg-card border border-border text-foreground hover:border-primary transition-all shadow-sm">
                         {darkMode ? (
                             <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><circle cx="12" cy="12" r="5" /><line x1="12" y1="1" x2="12" y2="3" /><line x1="12" y1="21" x2="12" y2="23" /><path d="M4.22 4.22L5.64 5.64M18.36 18.36L19.78 19.78M1 12H3M21 12H23M4.22 19.78L5.64 18.36M18.36 5.64L19.78 4.22" /></svg>
                         ) : (
@@ -732,48 +732,52 @@ function App() {
                     </button>
                 </div>
 
-                <div className="hero-left flex items-center justify-center p-6">
-                    <div className="w-full max-w-sm text-center">
-                        <div className="mb-12">
-                            <img src="/logo.png" alt="Inbox3" className="w-24 mx-auto mb-8 shadow-sm rounded-2xl" />
-                            <h1 className="text-4xl font-extrabold text-foreground tracking-tight mb-3">Inbox3</h1>
-                            <p className="text-muted-foreground text-sm font-medium leading-relaxed max-w-[280px] mx-auto">
+                <div className="hero-left">
+                    <div className="login-card text-center">
+                        <div className="mb-10">
+                            <img src="/logo.png" alt="Inbox3" className="w-20 h-20 mx-auto mb-6 rounded-2xl shadow-lg" />
+                            <h1 className="text-4xl font-extrabold text-foreground tracking-tight mb-2">Inbox3</h1>
+                            <p className="text-muted-foreground text-sm">
                                 Your decentralized home for secure communication.
                             </p>
                         </div>
 
-                        <div className="flex flex-col gap-4">
-                            <Button
+                        <div className="flex flex-col gap-3">
+                            <button
                                 onClick={() => { setWalletModalMode('wallet'); setIsWalletModalOpen(true); }}
-                                className="w-full py-4! rounded-2xl! font-bold bg-[#FF6B35]! text-white! shadow-lg shadow-orange-500/20 active:scale-[0.98] transition-all"
+                                className="w-full py-4 rounded-2xl font-bold text-white shadow-lg active:scale-[0.98] transition-all"
+                                style={{ background: 'var(--gradient-brand)' }}
                             >
                                 Connect Wallet
-                            </Button>
-                            <Button
+                            </button>
+                            <button
                                 onClick={() => { setWalletModalMode('social'); setIsWalletModalOpen(true); }}
-                                variant="outline"
-                                className="w-full py-4! rounded-2xl! font-bold border-gray-200! dark:border-white/10! text-foreground! hover:bg-gray-50! dark:hover:bg-white/5! transition-all"
+                                className="w-full py-4 rounded-2xl font-bold border border-border text-foreground hover:bg-secondary transition-all active:scale-[0.98]"
                             >
                                 Social Sign-in
-                            </Button>
+                            </button>
                         </div>
                     </div>
                 </div>
 
-                <div className="hero-right bg-secondary/30 backdrop-blur-xl border-l border-border/50 flex items-center justify-center p-12">
-                    <div className="max-w-lg text-center">
+                <div className="hero-right">
+                    <div className="max-w-lg text-center relative z-10">
                         <h2 className="text-5xl font-black text-foreground tracking-tighter mb-6 leading-tight">
                             Private. Secure.<br />
-                            <span className="bg-linear-to-r from-primary to-purple-500 bg-clip-text text-transparent font-black">Decentralized.</span>
+                            <span style={{ background: 'var(--gradient-brand)', WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent', backgroundClip: 'text' }} className="font-black">Decentralized.</span>
                         </h2>
                         <div className="grid grid-cols-2 gap-4">
                             <div className="p-6 bento-card text-left space-y-3">
-                                <div className="w-10 h-10 rounded-xl bg-blue-100 text-blue-600 flex items-center justify-center"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z" /></svg></div>
+                                <div className="w-10 h-10 rounded-xl" style={{ background: 'var(--primary-brand-light)', color: 'var(--primary-brand)' }}>
+                                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z" /></svg>
+                                </div>
                                 <h3 className="font-bold text-foreground">E2E Encrypted</h3>
                                 <p className="text-xs text-muted-foreground leading-relaxed">Your data belongs to you. Only the recipient can decrypt messages.</p>
                             </div>
                             <div className="p-6 bento-card text-left space-y-3">
-                                <div className="w-10 h-10 rounded-xl bg-purple-100 text-purple-600 flex items-center justify-center"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5"><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z" /></svg></div>
+                                <div className="w-10 h-10 rounded-xl" style={{ background: 'var(--accent-orange-light)', color: 'var(--accent-orange)' }}>
+                                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5"><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z" /></svg>
+                                </div>
                                 <h3 className="font-bold text-foreground">Blockchain Powered</h3>
                                 <p className="text-xs text-muted-foreground leading-relaxed">Built on Aptos for high speed and decentralized verification.</p>
                             </div>
@@ -786,8 +790,8 @@ function App() {
 
     if (loading) {
         return (
-            <div className="flex flex-col items-center justify-center min-h-screen bg-background">
-                <div className="w-20 h-20 border-4 border-primary border-t-transparent rounded-full animate-spin mb-6" />
+            <div className="flex flex-col items-center justify-center min-h-screen" style={{ background: 'var(--bg-main)' }}>
+                <div className="w-16 h-16 rounded-full animate-spin mb-6" style={{ border: '4px solid var(--border-color)', borderTopColor: 'var(--primary-brand)' }} />
                 <h2 className="text-2xl font-black text-foreground animate-pulse">Initializing Workspace...</h2>
             </div>
         )
@@ -795,12 +799,21 @@ function App() {
 
     if (!hasInbox) {
         return (
-            <div className="container max-w-2xl mx-auto px-4 py-24">
-                <Card className="p-12 text-center bento-card space-y-8">
-                    <div className="w-24 h-24 bg-primary/10 rounded-3xl flex items-center justify-center mx-auto text-primary"><svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z" /><polyline points="22,6 12,13 2,6" /></svg></div>
-                    <h1 className="text-4xl font-black tracking-tighter">Setup Required</h1>
+            <div className="min-h-screen flex items-center justify-center p-4" style={{ background: 'var(--bg-main)' }}>
+                <Card className="p-12 text-center bento-card space-y-8 max-w-lg w-full">
+                    <div className="w-20 h-20 rounded-3xl flex items-center justify-center mx-auto" style={{ background: 'var(--primary-brand-light)', color: 'var(--primary-brand)' }}>
+                        <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z" /><polyline points="22,6 12,13 2,6" /></svg>
+                    </div>
+                    <h1 className="text-4xl font-black tracking-tighter text-foreground">Setup Required</h1>
                     <p className="text-lg text-muted-foreground">Your account does not have a decentralized inbox yet. Initializing one will allow you to participate in private messaging.</p>
-                    <Button onClick={createInbox} loading={loading} className="w-full py-5! text-xl font-bold rounded-2xl! shadow-xl shadow-primary/20">Initialize My Inbox</Button>
+                    <button
+                        onClick={createInbox}
+                        disabled={loading}
+                        className="w-full py-5 text-xl font-bold rounded-2xl text-white shadow-lg active:scale-[0.98] transition-all disabled:opacity-50"
+                        style={{ background: 'var(--gradient-brand)' }}
+                    >
+                        {loading ? 'Initializing...' : 'Initialize My Inbox'}
+                    </button>
                 </Card>
             </div>
         )
@@ -933,7 +946,8 @@ function App() {
                                                     </button>
                                                     <button
                                                         onClick={() => setIsCreateGroupModalOpen(true)}
-                                                        className="w-full sm:w-auto px-10 py-4 rounded-2xl bg-gradient-to-r from-[#A855F7] to-[#FF6B35] text-white font-black text-[10px] uppercase tracking-[0.2em] shadow-xl shadow-purple-500/20 hover:shadow-purple-500/40 hover:-translate-y-0.5 transition-all cursor-pointer"
+                                                        className="w-full sm:w-auto px-10 py-4 rounded-2xl text-white font-black text-[10px] uppercase tracking-[0.2em] shadow-xl hover:-translate-y-0.5 transition-all cursor-pointer"
+                                                        style={{ background: 'var(--gradient-brand)', boxShadow: '0 4px 15px rgba(168, 85, 247, 0.3)' }}
                                                     >
                                                         + Create New
                                                     </button>

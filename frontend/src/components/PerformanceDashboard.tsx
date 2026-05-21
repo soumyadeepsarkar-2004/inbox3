@@ -224,7 +224,7 @@ export default function PerformanceDashboard({ isOpen, onClose, standalone = fal
         <div className="fixed inset-0 z-100 flex items-center justify-center p-4 bg-black/50 animate-fade-in backdrop-blur-sm">
             <div className="bg-card rounded-3xl shadow-2xl w-full max-w-4xl max-h-[90vh] overflow-hidden border border-border/50">
                 {/* Header */}
-                <div className="flex items-center justify-between p-8 border-b border-white/10 bg-gradient-to-br from-[#8B5CF6] via-[#7C3AED] to-[#6D28D9] text-white relative overflow-hidden">
+                <div className="flex items-center justify-between p-8 border-b border-white/10 text-white relative overflow-hidden" style={{ background: 'var(--gradient-brand)' }}>
                     <div className="absolute inset-0 bg-[url('https://www.transparenttextures.com/patterns/cubes.png')] opacity-10 pointer-events-none"></div>
                     <div className="relative z-10">
                         <h2 className="text-3xl font-black tracking-tighter uppercase italic">

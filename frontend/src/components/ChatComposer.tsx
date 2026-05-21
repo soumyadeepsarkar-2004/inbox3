@@ -270,7 +270,7 @@ export const ChatComposer: React.FC<ChatComposerProps> = ({
             {/* Input Form */}
             <form onSubmit={handleSubmit} className="flex items-end gap-3">
                 {/* Text Input Container */}
-                <div className="flex-1 relative bg-black/25 rounded-2xl border border-border/30 focus-within:border-[#FF6B35]/65 focus-within:ring-4 focus-within:ring-[#FF6B35]/20 focus-within:shadow-[0_0_15px_rgba(255,107,53,0.15)] transition-all liquid-glass">
+                <div className="flex-1 relative bg-black/25 rounded-2xl border border-border/30 focus-within:border-accent-orange/65 focus-within:ring-4 focus-within:ring-accent-orange/20 transition-all liquid-glass">
                     <textarea
                         ref={inputRef}
                         value={message}
@@ -304,9 +304,10 @@ export const ChatComposer: React.FC<ChatComposerProps> = ({
                                 type="button"
                                 onClick={() => setShowGiphyPicker(!showGiphyPicker)}
                                 className={`px-2.5 py-1.5 rounded-lg text-[10px] font-bold uppercase tracking-wider transition-all cursor-pointer ${showGiphyPicker
-                                        ? 'bg-[#FF6B35] text-white'
+                                        ? 'text-white'
                                         : 'bg-muted text-foreground hover:bg-muted-foreground/20'
                                     }`}
+                                style={showGiphyPicker ? { background: 'var(--accent-orange)' } : undefined}
                             >
                                 GIF
                             </button>
@@ -344,9 +345,10 @@ export const ChatComposer: React.FC<ChatComposerProps> = ({
                     type="submit"
                     disabled={!canSend}
                     className={`flex items-center justify-center px-5 py-3 rounded-2xl font-bold text-[12px] uppercase tracking-wide transition-all h-[48px] cursor-pointer ${canSend
-                            ? 'bg-gradient-to-r from-[#A855F7] to-[#FF6B35] text-white shadow-lg shadow-[#A855F7]/30 hover:shadow-[#A855F7]/50 hover:-translate-y-0.5 active:scale-95'
+                            ? 'text-white shadow-lg hover:-translate-y-0.5 active:scale-95'
                             : 'bg-muted text-muted-foreground cursor-not-allowed'
                         }`}
+                    style={canSend ? { background: 'var(--gradient-brand)', boxShadow: '0 4px 12px rgba(168, 85, 247, 0.3)' } : undefined}
                 >
                     {sending ? (
                         <Spinner size="xs" />

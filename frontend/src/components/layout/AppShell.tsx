@@ -102,7 +102,8 @@ export function AppShell({ topNav, sidebar, children, rightPane }: AppShellProps
                             ease: "easeInOut",
                             delay: 2
                         }}
-                        className="absolute bottom-[-10%] right-[10%] w-[55vw] h-[55vw] max-w-[700px] rounded-full bg-[#FF6B35]/8 blur-[150px]"
+                        className="absolute bottom-[-10%] right-[10%] w-[55vw] h-[55vw] max-w-[700px] rounded-full blur-[150px]"
+                        style={{ background: 'rgba(255, 107, 53, 0.08)' }}
                     />
                     <motion.div
                         animate={{

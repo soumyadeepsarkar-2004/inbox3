@@ -31,6 +31,8 @@
     --radius: 0.75rem;
     --hero-heading: 40 10% 96%;
     --hero-sub: 40 6% 82%;
+    --orange: 16 100% 60%;
+    --orange-foreground: 0 0% 100%;
   }
 
   * {
@@ -100,5 +102,16 @@
     -webkit-background-clip: text;
     -webkit-text-fill-color: transparent;
     background-clip: text;
+  }
+
+  .text-gradient-orange {
+    background: linear-gradient(135deg, #A855F7 0%, #FF6B35 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+  }
+
+  .glow-orange {
+    box-shadow: 0 0 30px rgba(168, 85, 247, 0.15), 0 0 60px rgba(255, 107, 53, 0.1);
   }
 }

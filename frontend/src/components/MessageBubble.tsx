@@ -124,7 +124,8 @@ export const MessageBubble: React.FC<MessageBubbleProps> = ({
                                 ease: "easeInOut",
                                 delay: i * 0.05
                             }}
-                            className={`w-[3px] rounded-full ${message.isMe ? 'bg-white/70' : 'bg-gradient-to-t from-[#A855F7] to-[#FF6B35]'}`}
+                            className={`w-[3px] rounded-full ${message.isMe ? 'bg-white/70' : ''}`}
+                                            style={!message.isMe ? { background: 'var(--gradient-brand)' } : undefined}
                         />
                     ))}
                 </div>

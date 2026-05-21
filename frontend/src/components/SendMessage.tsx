@@ -344,14 +344,14 @@ export default function SendMessage({ contractAddress, onMessageSent, onClose, i
         <form onSubmit={handleSubmit} className="p-8 flex flex-col gap-6">
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-4">
-              <div className="w-12 h-12 rounded-2xl bg-gradient-to-br from-[#A855F7] to-[#FF6B35] flex items-center justify-center shadow-lg shadow-[#FF6B35]/20">
+              <div className="w-12 h-12 rounded-2xl flex items-center justify-center shadow-lg" style={{ background: 'var(--gradient-brand)', boxShadow: '0 4px 15px rgba(168, 85, 247, 0.2)' }}>
                 <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="3">
                   <path d="M22 2L11 13M22 2L15 22L11 13L2 9L22 2Z" />
                 </svg>
               </div>
               <div>
                 <h2 className="text-xl font-black text-foreground tracking-tight">New Secure Channel</h2>
-                <p className="text-[10px] font-black uppercase tracking-widest text-[#FF6B35]">Quantum-Resistant Layer</p>
+                <p className="text-[10px] font-black uppercase tracking-widest text-accent-orange">Quantum-Resistant Layer</p>
               </div>
             </div>
             {onClose && (
@@ -369,14 +369,14 @@ export default function SendMessage({ contractAddress, onMessageSent, onClose, i
                 value={recipient}
                 onChange={(e) => setRecipient(e.target.value)}
                 placeholder="0x... (Aptos Address)"
-                className="w-full px-5 py-4 bg-black/25 border border-border/30 rounded-2xl focus:border-[#FF6B35] focus:ring-4 focus:ring-[#FF6B35]/20 focus:shadow-[0_0_15px_rgba(255,107,53,0.15)] outline-none transition-all text-sm font-mono text-foreground"
+                className="w-full px-5 py-4 bg-black/25 border border-border/30 rounded-2xl focus:border-accent-orange focus:ring-4 focus:ring-accent-orange/20 outline-none transition-all text-sm font-mono text-foreground"
                 required
               />
             </div>
 
             <div className="space-y-1.5 px-1">
               <label className="text-[10px] font-black uppercase tracking-wider text-muted-foreground opacity-70">Message Content</label>
-              <div className="relative flex flex-col min-h-0 bg-black/20 border border-border/30 rounded-[1.5rem] focus-within:border-[#FF6B35] focus-within:ring-4 focus-within:ring-[#FF6B35]/20 focus-within:shadow-[0_0_15px_rgba(255,107,53,0.15)] transition-all">
+              <div className="relative flex flex-col min-h-0 bg-black/20 border border-border/30 rounded-[1.5rem] focus-within:border-accent-orange focus-within:ring-4 focus-within:ring-accent-orange/20 transition-all">
                 <textarea
                   value={message}
                   onChange={(e) => setMessage(e.target.value)}
@@ -390,7 +390,7 @@ export default function SendMessage({ contractAddress, onMessageSent, onClose, i
                   <div className="px-5 pb-4 flex flex-wrap gap-3 animate-scale-in">
                     {selectedGif && (
                       <div className="relative group">
-                        <img src={selectedGif} className="h-20 w-auto rounded-lg border-2 border-[#FF6B35]/30 shadow-sm" alt="GIF" />
+                        <img src={selectedGif} className="h-20 w-auto rounded-lg border-2 border-accent-orange/30 shadow-sm" alt="GIF" />
                         <button type="button" onClick={() => setSelectedGif(null)} className="absolute -top-2 -right-2 w-5 h-5 bg-red-500 text-white rounded-full flex items-center justify-center shadow-md cursor-pointer"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3"><path d="M18 6L6 18M6 6l12 12" /></svg></button>
                       </div>
                     )}
@@ -400,9 +400,9 @@ export default function SendMessage({ contractAddress, onMessageSent, onClose, i
                       return (
                         <div key={file.id} className="relative group">
                           {isImg ? (
-                            <img src={file.url} className="h-20 w-auto rounded-lg border-2 border-[#FF6B35]/30 shadow-sm" alt="img" />
+                            <img src={file.url} className="h-20 w-auto rounded-lg border-2 border-accent-orange/30 shadow-sm" alt="img" />
                           ) : isVid ? (
-                            <div className="h-20 aspect-video rounded-lg bg-black/20 border-2 border-[#FF6B35]/30 flex items-center justify-center relative overflow-hidden">
+                            <div className="h-20 aspect-video rounded-lg bg-black/20 border-2 border-accent-orange/30 flex items-center justify-center relative overflow-hidden">
                               <video src={file.url} className="w-full h-full object-cover" />
                               <svg width="20" height="20" viewBox="0 0 24 24" fill="white" className="absolute z-10"><path d="M8 5v14l11-7z" /></svg>
                             </div>
@@ -421,7 +421,7 @@ export default function SendMessage({ contractAddress, onMessageSent, onClose, i
                   <FileUpload disabled={loading || isRecording} onFileUploaded={async (url, type, fileName) => {
                     setAttachedFiles(prev => [...prev, { url, type, name: fileName, id: Math.random().toString(36).substr(2, 9) }])
                   }} />
-                  <button type="button" onClick={() => setShowGiphy(!showGiphy)} className={`px-4 py-1.5 rounded-lg font-black text-[10px] uppercase transition-all cursor-pointer ${showGiphy ? 'bg-[#FF6B35] text-white shadow-md shadow-[#FF6B35]/20' : 'hover:bg-black/5 text-muted-foreground border border-border/40'}`}>GIF</button>
+                  <button type="button" onClick={() => setShowGiphy(!showGiphy)} className={`px-4 py-1.5 rounded-lg font-black text-[10px] uppercase transition-all cursor-pointer ${showGiphy ? 'bg-accent-orange text-white shadow-md shadow-accent-orange/20' : 'hover:bg-black/5 text-muted-foreground border border-border/40'}`}>GIF</button>
                   {showGiphy && (
                     <div className="absolute bottom-full left-0 mb-4 z-50">
                       <GiphyPicker onSelect={(url) => { setSelectedGif(url); setShowGiphy(false); }} onClose={() => setShowGiphy(false)} />
@@ -444,7 +444,7 @@ export default function SendMessage({ contractAddress, onMessageSent, onClose, i
                 onClick={isRecording ? stopRecording : startRecording}
                 className={`flex items-center gap-3 px-8 py-4 rounded-[1.5rem] font-black text-[12px] uppercase tracking-widest transition-all active:scale-95 shadow-lg cursor-pointer ${isRecording
                   ? 'bg-red-500 text-white animate-pulse shadow-red-500/40 ring-8 ring-red-500/10'
-                  : 'bg-black/30 border border-border/30 hover:bg-[#FF6B35]/15 hover:text-[#FF6B35] hover:border-[#FF6B35]/40'}`}
+                  : 'bg-black/30 border border-border/30 hover:bg-accent-orange/15 hover:text-accent-orange hover:border-accent-orange/40'}`}
               >
                 <div className={`w-2.5 h-2.5 rounded-full ${isRecording ? 'bg-white shadow-[0_0_10px_white]' : 'bg-red-500'} animate-pulse`} />
                 {isRecording ? formatTime(recordingTime) : 'Encrypted Audio'}
@@ -453,7 +453,8 @@ export default function SendMessage({ contractAddress, onMessageSent, onClose, i
               <button
                 type="submit"
                 disabled={loading || !recipient || (!message.trim() && !isRecording && !selectedGif && attachedFiles.length === 0)}
-                className="flex items-center gap-3 px-10 py-4 bg-gradient-to-br from-[#A855F7] via-[#D946EF] to-[#FF6B35] text-white rounded-[1.5rem] font-black text-[13px] uppercase tracking-[0.15em] shadow-2xl shadow-[#FF6B35]/20 hover:shadow-[#FF6B35]/40 hover:-translate-y-1.5 transition-all disabled:opacity-40 disabled:grayscale disabled:translate-y-0 active:scale-95 cursor-pointer"
+                className="flex items-center gap-3 px-10 py-4 text-white rounded-[1.5rem] font-black text-[13px] uppercase tracking-[0.15em] shadow-2xl hover:-translate-y-1.5 transition-all disabled:opacity-40 disabled:grayscale disabled:translate-y-0 active:scale-95 cursor-pointer"
+                style={{ background: 'var(--gradient-brand)', boxShadow: '0 4px 15px rgba(168, 85, 247, 0.2)' }}
               >
                 {!loading ? (
                   <>

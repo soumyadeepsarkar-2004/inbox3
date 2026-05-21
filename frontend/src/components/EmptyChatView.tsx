@@ -42,8 +42,8 @@ export const EmptyChatView: React.FC<EmptyChatViewProps> = ({ onStartNewChat }) 
                 className="w-full flex justify-between items-center z-10"
             >
                 <div className="flex items-center gap-2 px-3 py-1.5 rounded-full bg-white/5 border border-white/10 backdrop-blur-md">
-                    <div className="w-1.5 h-1.5 rounded-full bg-[#FF6B35] animate-pulse" />
-                    <span className="text-[9px] font-black uppercase tracking-widest text-[#C084FC]">Network: Active</span>
+                    <div className="w-1.5 h-1.5 rounded-full bg-accent-orange animate-pulse" />
+                    <span className="text-[9px] font-black uppercase tracking-widest text-purple-400">Network: Active</span>
                 </div>
                 <span className="text-[9px] font-black uppercase tracking-[0.2em] text-muted">E2E Secure Channel v3.0</span>
             </motion.div>
@@ -58,13 +58,13 @@ export const EmptyChatView: React.FC<EmptyChatViewProps> = ({ onStartNewChat }) 
                     className="text-3xl md:text-4xl font-extrabold text-center tracking-tight text-transparent bg-clip-text bg-gradient-to-r from-white via-purple-100 to-indigo-200 drop-shadow-md mb-8"
                 >
                     We are securing <br />
-                    <span className="text-transparent bg-clip-text bg-gradient-to-r from-[#A855F7] to-[#FF6B35]">your digital identity.</span>
+                    <span className="text-transparent bg-clip-text" style={{ backgroundImage: 'var(--gradient-brand)' }}>your digital identity.</span>
                 </motion.h2>
 
                 {/* Interactive Sphere Visual Container */}
                 <div className="relative w-[300px] h-[300px] flex items-center justify-center">
                     {/* Glowing Background Radial Halo */}
-                    <div className="absolute inset-0 bg-gradient-to-tr from-purple-600/10 to-[#FF6B35]/10 rounded-full blur-3xl scale-125 pointer-events-none" />
+                    <div className="absolute inset-0 rounded-full blur-3xl scale-125 pointer-events-none" style={{ background: 'linear-gradient(135deg, rgba(168, 85, 247, 0.1), rgba(255, 107, 53, 0.1))' }} />
 
                     {/* Spline 3D Scene */}
                     {!splineError && (
@@ -115,8 +115,8 @@ export const EmptyChatView: React.FC<EmptyChatViewProps> = ({ onStartNewChat }) 
                     transition={{ duration: 1, delay: 0.4 }}
                     className="mt-6 flex flex-col items-center gap-1.5"
                 >
-                    <span className="text-[10px] font-semibold uppercase tracking-[0.3em] text-[#C084FC] animate-pulse">Touch Identity</span>
-                    <div className="w-8 h-[1px] bg-gradient-to-r from-transparent via-[#C084FC]/40 to-transparent" />
+                    <span className="text-[10px] font-semibold uppercase tracking-[0.3em] text-purple-300 animate-pulse">Touch Identity</span>
+                    <div className="w-8 h-[1px] bg-gradient-to-r from-transparent via-purple-300/40 to-transparent" />
                 </motion.div>
             </div>
 
@@ -129,7 +129,8 @@ export const EmptyChatView: React.FC<EmptyChatViewProps> = ({ onStartNewChat }) 
             >
                 <button
                     onClick={onStartNewChat}
-                    className="w-full py-3.5 px-6 rounded-2xl font-bold text-sm tracking-wide text-white bg-gradient-to-r from-[#A855F7] to-[#FF6B35] shadow-lg shadow-purple-500/10 hover:shadow-[#FF6B35]/20 hover:scale-[1.02] active:scale-[0.98] transition-all duration-300 flex items-center justify-center gap-2 group cursor-pointer"
+                    className="w-full py-3.5 px-6 rounded-2xl font-bold text-sm tracking-wide text-white shadow-lg hover:scale-[1.02] active:scale-[0.98] transition-all duration-300 flex items-center justify-center gap-2 group cursor-pointer"
+                    style={{ background: 'var(--gradient-brand)', boxShadow: '0 4px 15px rgba(168, 85, 247, 0.2)' }}
                 >
                     <span>New Secure Message</span>
                     <svg 

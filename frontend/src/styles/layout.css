@@ -1,10 +1,10 @@
-/* ===== DYSTOPIAN GLASS APP SHELL ===== */
+/* ===== APP SHELL LAYOUT ===== */
 .app-shell {
     display: flex;
     flex-direction: column;
     height: 100vh;
     height: 100dvh;
-    background: radial-gradient(circle at top right, #1A102D, #0B0515 40%, #000 100%);
+    background: var(--bg-main);
     overflow: hidden;
     position: relative;
     color: var(--text-primary);
@@ -14,8 +14,9 @@
     content: '';
     position: absolute;
     inset: 0;
-    background-image: radial-gradient(rgba(168, 85, 247, 0.05) 1px, transparent 1px);
+    background-image: radial-gradient(var(--primary-brand) 1px, transparent 1px);
     background-size: 40px 40px;
+    opacity: 0.05;
     z-index: 0;
     pointer-events: none;
 }
@@ -24,9 +25,9 @@
     height: var(--topnav-height, 72px);
     flex-shrink: 0;
     z-index: 50;
-    background: rgba(11, 5, 21, 0.8);
+    background: var(--bg-card);
     backdrop-filter: blur(16px);
-    border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+    border-bottom: 1px solid var(--border-color);
 }
 
 .app-shell__grid {
@@ -51,9 +52,9 @@
         display: flex;
         flex-direction: column;
         min-width: 0;
-        background: rgba(30, 20, 50, 0.3);
+        background: var(--bg-card);
         backdrop-filter: blur(20px);
-        border-right: 1px solid rgba(255, 255, 255, 0.05);
+        border-right: 1px solid var(--border-color);
         overflow: hidden;
         transition: all 0.4s ease-out;
     }
@@ -63,7 +64,7 @@
         display: flex;
         flex-direction: column;
         min-width: 0;
-        background: rgba(11, 5, 21, 0.2);
+        background: var(--bg-main);
         overflow: hidden;
     }
 
@@ -72,9 +73,9 @@
         display: flex;
         flex-direction: column;
         min-width: 0;
-        background: rgba(30, 20, 50, 0.2);
+        background: var(--bg-card);
         backdrop-filter: blur(20px);
-        border-left: 1px solid rgba(255, 255, 255, 0.05);
+        border-left: 1px solid var(--border-color);
         overflow: hidden;
     }
 }
@@ -170,7 +171,7 @@
     font-weight: 800;
     font-size: 1.25rem;
     letter-spacing: -0.025em;
-    background: linear-gradient(to right, var(--primary-brand), #8b5cf6);
+    background: var(--gradient-brand);
     -webkit-background-clip: text;
     background-clip: text;
     -webkit-text-fill-color: transparent;
@@ -194,15 +195,14 @@
     .app-shell__left-pane,
     .app-shell__center-pane,
     .app-shell__right-pane {
-        border-color: rgba(0, 0, 0, 0.05);
+        border-color: var(--border-color);
         backdrop-filter: blur(12px);
     }
 
     [data-theme='dark'] .app-shell__left-pane,
     [data-theme='dark'] .app-shell__center-pane,
     [data-theme='dark'] .app-shell__right-pane {
-        border-color: rgba(168, 85, 247, 0.18);
-        background: rgba(22, 14, 45, 0.45);
+        background: var(--glass-bg);
         backdrop-filter: blur(24px) saturate(180%);
         -webkit-backdrop-filter: blur(24px) saturate(180%);
         box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.37),
@@ -232,12 +232,7 @@
 
 /* UTILITY CLASSES */
 .glass {
-    background: rgba(255, 255, 255, 0.7);
+    background: var(--glass-bg);
     backdrop-filter: blur(12px);
-    border: 1px solid rgba(255, 255, 255, 0.2);
-}
-
-[data-theme='dark'] .glass {
-    background: rgba(30, 30, 30, 0.7);
-    border: 1px solid rgba(255, 255, 255, 0.1);
+    border: 1px solid var(--glass-border);
 }
