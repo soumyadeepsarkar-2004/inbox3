@@ -1,0 +1,26 @@
+{
+  "name": "inbox3",
+  "version": "1.0.0",
+  "description": "Decentralized messaging platform built on Aptos blockchain with IPFS storage",
+  "private": true,
+  "scripts": {
+    "dev": "cd frontend && pnpm dev",
+    "build": "cd frontend && pnpm build",
+    "test": "cd frontend && pnpm test",
+    "lint": "cd frontend && pnpm lint",
+    "signaling": "cd signaling-server && node server.js"
+  },
+  "engines": {
+    "node": ">=18"
+  },
+  "keywords": [
+    "aptos",
+    "blockchain",
+    "decentralized",
+    "messaging",
+    "ipfs",
+    "web3",
+    "webrtc"
+  ],
+  "license": "MIT"
+}

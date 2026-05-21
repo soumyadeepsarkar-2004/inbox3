@@ -1,379 +1,1025 @@
-import { useState, useEffect, useCallback } from 'react'
+import { useState, useEffect, useCallback, useMemo } from 'react'
 import { useWallet } from '@aptos-labs/wallet-adapter-react'
-import { Aptos, AptosConfig, Network } from '@aptos-labs/ts-sdk'
+import { motion, AnimatePresence } from 'framer-motion'
+
+// Layout Components
+import { AppShell, TopNav } from './components/layout'
+
+// Feature Components
 import SendMessage from './components/SendMessage'
-import Inbox from './components/Inbox'
+import Inbox, { type ProcessedMessage } from './components/Inbox'
+import ContactsList from './components/ContactsList'
+import EmptyChatView from './components/EmptyChatView'
 import NotificationSystem from './components/NotificationSystem'
+import GroupList from './components/GroupList'
+import GroupChat from './components/GroupChat'
+import CreateGroupModal from './components/CreateGroupModal'
+import JoinGroupModal from './components/JoinGroupModal'
+import WalletModal from './components/WalletModal'
+import SettingsPanel from './components/SettingsPanel'
+import QRCodeModal from './components/QRCodeModal'
+import ConnectionStatus from './components/ConnectionStatus'
+
+import { useKeyboardShortcuts, ShortcutsModal, DEFAULT_SHORTCUTS } from './components/KeyboardShortcuts'
+import ExportChat from './components/ExportChat'
+import { useDrafts, DraftsModal } from './components/DraftManager'
+import ComponentShowcase from './components/ComponentShowcase'
+import PerformanceDashboard from './components/PerformanceDashboard'
+import ProfileEditor from './components/ProfileEditor'
+import { resolveAvatarUrl } from './lib/avatar'
+import { CallInterface, IncomingCallModal } from './components/CallInterface'
+import { profileManager, type UserProfile } from './lib/profileManager'
 import { getRealtimeService, type RealtimeMessage } from './lib/realtime'
+import { getWebRTCService, type CallSignal, type CallType } from './lib/webrtc'
+import { getSignalingService } from './lib/signaling'
 import { useNotifications } from './lib/notifications'
-import logo from '/public/logo.png'
+import { aptos, CONTRACT_ADDRESS, NETWORK } from './config'
+import { Card, SkipLink, Avatar, Modal } from './components/ui'
 import './App.css'
 
-const aptosConfig = new AptosConfig({ network: Network.DEVNET })
-const aptos = new Aptos(aptosConfig)
-
-const CONTRACT_ADDRESS = "0xf1768eb79d367572b8e436f8e3bcfecf938eeaf6656a65f73773c50c43b71d67"
+type AppView = 'dm' | 'groups' | 'showcase'
 
 function App() {
-  const { account, connected, connect, disconnect, wallets } = useWallet()
-  const [hasInbox, setHasInbox] = useState(false)
-  const [loading, setLoading] = useState(false)
-  const [networkError, setNetworkError] = useState<string | null>(null)
-  const [refreshKey, setRefreshKey] = useState(0)
-  const [lastMessageSent, setLastMessageSent] = useState(0)
-  const [realtimeEnabled, setRealtimeEnabled] = useState(true)
-  const { notifications, addNotification, dismissNotification } = useNotifications()
+    const { account, connected, connect, disconnect, wallets, signAndSubmitTransaction, network } = useWallet()
+    const [hasInbox, setHasInbox] = useState(false)
+    const [loading, setLoading] = useState(false)
+    const [networkError, setNetworkError] = useState<string | null>(null)
+    const [refreshKey, setRefreshKey] = useState(0)
+    const [lastMessageSent, setLastMessageSent] = useState(0)
+    const [realtimeEnabled] = useState(true)
+    const { notifications, addNotification, dismissNotification } = useNotifications()
 
-  const refreshInbox = useCallback(() => {
-    console.log('Triggering inbox refresh')
-    setRefreshKey(prev => prev + 1)
-  }, [])
-
-  const handleRealtimeEvent = useCallback((event: RealtimeMessage) => {
-    console.log('Real-time event received:', event)
-
-    if (event.type === 'message_received') {
-      console.log('📨 New message received from:', event.sender)
-      addNotification({
-        type: 'info',
-        message: `Message received from ${event.sender.slice(0, 6)}...${event.sender.slice(-4)}`,
-        duration: 5000
-      })
-    } else if (event.type === 'message_sent') {
-      console.log('📤 Message sent to:', event.recipient)
-      addNotification({
-        type: 'success',
-        message: `Message sent to ${event.recipient.slice(0, 6)}...${event.recipient.slice(-4)}`,
-        duration: 3000
-      })
-    }
-
-    refreshInbox()
-  }, [refreshInbox, addNotification])
-
-  const handleMessageSent = useCallback(() => {
-    console.log('Message sent, triggering immediate refresh')
-    refreshInbox()
-    setLastMessageSent(Date.now())
-  }, [refreshInbox])
-
-  useEffect(() => {
-    const checkNetwork = async () => {
-      if (connected && account) {
-        try {
-          const accountInfo = await aptos.getAccountInfo({ accountAddress: account.address })
-          console.log('Account info:', accountInfo)
-          setNetworkError(null)
-        } catch (error: unknown) {
-          console.error('Network error:', error)
-          if (error instanceof Error && error.message?.includes('mainnet')) {
-            setNetworkError('⚠️ Please switch your wallet to Aptos DevNet to use this app!')
-          }
+    // Group Chat State
+    const [currentView, setCurrentView] = useState<AppView>('dm')
+    const [selectedGroup, setSelectedGroup] = useState<string | null>(null)
+    const [isCreateGroupModalOpen, setIsCreateGroupModalOpen] = useState(false)
+    const [isJoinGroupModalOpen, setIsJoinGroupModalOpen] = useState(false)
+    const [isWalletModalOpen, setIsWalletModalOpen] = useState(false)
+    const [walletModalMode, setWalletModalMode] = useState<'wallet' | 'social'>('wallet')
+    const [darkMode, setDarkMode] = useState(() => {
+        if (typeof window !== 'undefined') {
+            return localStorage.getItem('theme') === 'dark' ||
+                (!localStorage.getItem('theme') && window.matchMedia('(prefers-color-scheme: dark)').matches)
         }
-      }
-    }
+        return false
+    })
+    const [groupsRefreshKey, setGroupsRefreshKey] = useState(0)
+    const [loadedMessages, setLoadedMessages] = useState<ProcessedMessage[]>([])
+    const [selectedRecipient, setSelectedRecipient] = useState('')
 
-    checkNetwork()
-  }, [connected, account])
+    // Modal & Drawer States
+    const [isSettingsOpen, setIsSettingsOpen] = useState(false)
+    const [isQRModalOpen, setIsQRModalOpen] = useState(false)
+    const [isDraftsOpen, setIsDraftsOpen] = useState(false)
+    const [isContactsOpen, setIsContactsOpen] = useState(false)
+    const [isShortcutsOpen, setIsShortcutsOpen] = useState(false)
+    const [isExportOpen, setIsExportOpen] = useState(false)
+    const [isPerformanceOpen, setIsPerformanceOpen] = useState(false)
+    const [isProfileEditorOpen, setIsProfileEditorOpen] = useState(false)
+    const [userProfile, setUserProfile] = useState<UserProfile | null>(null)
 
-  const checkInboxExists = useCallback(async () => {
-    if (!account) return
-    try {
-      console.log('Checking if inbox exists for:', account.address)
+    // Calling State
+    const [isCallActive, setIsCallActive] = useState(false)
+    const [activeCallType, setActiveCallType] = useState<CallType>('voice')
+    const [callRecipient, setCallRecipient] = useState('')
+    const [incomingCall, setIncomingCall] = useState<CallSignal | null>(null)
+    const [isIncomingCallOpen, setIsIncomingCallOpen] = useState(false)
 
-      const response = await aptos.view({
-        payload: {
-          function: `${CONTRACT_ADDRESS}::Inbox3::inbox_exists`,
-          functionArguments: [account.address]
+    // Real-time network latency (measured against Aptos RPC)
+    const [networkLatencyMs, setNetworkLatencyMs] = useState<number | null>(null)
+    const [latencyStatus, setLatencyStatus] = useState<'measuring' | 'good' | 'ok' | 'slow'>('measuring')
+
+    // Hooks
+    const { removeDraft, getAllDrafts } = useDrafts()
+    const drafts = getAllDrafts()
+
+    // Refresh callback
+    const refreshInbox = useCallback(() => {
+        console.log('Triggering inbox refresh')
+        setRefreshKey(prev => prev + 1)
+    }, [])
+
+    // Keyboard shortcuts
+    const shortcuts = useMemo(() => [
+        ...DEFAULT_SHORTCUTS.map(s => ({
+            ...s,
+            action: () => {
+                switch (s.key) {
+                    case 's':
+                        setIsSettingsOpen(true)
+                        break
+                    case 'g':
+                        setCurrentView('groups')
+                        break
+                    case 'd':
+                        setCurrentView('dm')
+                        break
+                    case '?':
+                        setIsShortcutsOpen(true)
+                        break
+                    case 'r':
+                        refreshInbox()
+                        break
+                    case 'Escape':
+                        setIsSettingsOpen(false)
+                        setIsQRModalOpen(false)
+                        setIsShortcutsOpen(false)
+                        setIsExportOpen(false)
+                        setIsDraftsOpen(false)
+                        break
+                }
+            }
+        }))
+    ], [refreshInbox])
+
+    useKeyboardShortcuts(shortcuts, connected)
+
+    useEffect(() => {
+        document.documentElement.setAttribute('data-theme', darkMode ? 'dark' : 'light')
+        localStorage.setItem('theme', darkMode ? 'dark' : 'light')
+    }, [darkMode])
+
+    const toggleDarkMode = () => setDarkMode(!darkMode)
+
+    const handleRealtimeEvent = useCallback((event: RealtimeMessage) => {
+        console.log('Real-time event received:', event)
+
+        if (event.type === 'message_received') {
+            addNotification({
+                type: 'info',
+                message: `Message received from ${event.sender.slice(0, 6)}...${event.sender.slice(-4)}`,
+                duration: 5000
+            })
+        } else if (event.type === 'message_sent') {
+            addNotification({
+                type: 'success',
+                message: `Message sent to ${event.recipient.slice(0, 6)}...${event.recipient.slice(-4)}`,
+                duration: 3000
+            })
         }
-      })
 
-      console.log('Inbox exists response:', response)
-      setHasInbox(response[0] as boolean)
-    } catch (error) {
-      console.error('Error checking inbox:', error)
-      setHasInbox(false)
-    }
-  }, [account])
-
-  useEffect(() => {
-    if (connected && account) {
-      checkInboxExists()
-    }
-  }, [connected, account, checkInboxExists])
-
-  useEffect(() => {
-    if (connected && account && realtimeEnabled) {
-      console.log('Setting up real-time event subscription')
-      const realtimeService = getRealtimeService(CONTRACT_ADDRESS)
-
-      realtimeService.subscribe(account.address.toString(), handleRealtimeEvent)
-
-      return () => {
-        console.log('Cleaning up real-time event subscription')
-        realtimeService.unsubscribe(account.address.toString())
-      }
-    }
-  }, [connected, account, realtimeEnabled, handleRealtimeEvent])
-
-  useEffect(() => {
-    if (connected && account) {
-      console.log('Setting up conservative auto-refresh')
-
-      const recentMessageSent = Date.now() - lastMessageSent < 60000
-      const refreshInterval = recentMessageSent ? 15000 : 45000
-
-      const interval = setInterval(() => {
-        console.log('Conservative auto-refresh...')
         refreshInbox()
-        checkInboxExists()
-      }, refreshInterval)
+    }, [refreshInbox, addNotification])
 
-      return () => {
-        console.log('Clearing conservative auto-refresh interval')
-        clearInterval(interval)
-      }
+    const handleMessageSent = useCallback(() => {
+        refreshInbox()
+        setLastMessageSent(Date.now())
+    }, [refreshInbox])
+
+    const handleMessageSentAndReset = useCallback(() => {
+        handleMessageSent()
+        setSelectedRecipient('')
+    }, [handleMessageSent])
+
+    const handleSelectContact = useCallback((address: string) => {
+        setSelectedRecipient(address)
+        setCurrentView('dm')
+        setIsContactsOpen(false)
+    }, [])
+
+    useEffect(() => {
+        const checkNetwork = async () => {
+            if (connected && network) {
+                const currentNetwork = network.name.toLowerCase()
+                const requiredNetwork = NETWORK.toLowerCase()
+
+                if (currentNetwork !== requiredNetwork) {
+                    setNetworkError(`Wrong Network! You are on ${network.name}. Please switch to ${NETWORK}.`)
+                } else {
+                    setNetworkError(null)
+                }
+            }
+        }
+        checkNetwork()
+    }, [connected, network])
+
+    const checkInboxExists = useCallback(async () => {
+        if (!account) return
+        try {
+            const response = await aptos.view({
+                payload: {
+                    function: `${CONTRACT_ADDRESS}::Inbox3::inbox_exists`,
+                    functionArguments: [account.address.toString()]
+                }
+            })
+
+            if (response && Array.isArray(response) && response.length > 0) {
+                setHasInbox(response[0] as boolean)
+            } else {
+                setHasInbox(false)
+            }
+        } catch (error) {
+            console.error('Error checking inbox:', error)
+            setHasInbox(false)
+        }
+    }, [account])
+
+    const fetchUserProfile = useCallback(() => {
+        if (account?.address) {
+            const profile = profileManager.getProfile(account.address.toString())
+            setUserProfile(profile)
+        }
+    }, [account])
+
+    useEffect(() => {
+        if (connected && account) {
+            checkInboxExists()
+            fetchUserProfile()
+        }
+    }, [connected, account, checkInboxExists, fetchUserProfile])
+
+    useEffect(() => {
+        if (connected && account && realtimeEnabled) {
+            const realtimeService = getRealtimeService(CONTRACT_ADDRESS)
+            realtimeService.subscribe(account.address.toString(), handleRealtimeEvent)
+
+            return () => {
+                realtimeService.unsubscribe(account.address.toString())
+            }
+        }
+    }, [connected, account, realtimeEnabled, handleRealtimeEvent])
+
+    // Connect signaling service when wallet connects
+    useEffect(() => {
+        if (connected && account && window.aptos) {
+            const signaling = getSignalingService()
+
+            // Function to sign signaling registration message
+            const signMessage = async (message: string) => {
+                const response = await window.aptos!.signMessage({
+                    message,
+                    nonce: 'inbox3-registration'
+                });
+                return {
+                    signature: response.signature,
+                    publicKey: response.fullPublicKey
+                };
+            }
+
+            signaling.connect(account.address.toString(), signMessage)
+            // Wire incoming signals to WebRTC handler
+            const webrtc = getWebRTCService()
+            webrtc.setLocalAddress(account.address.toString())
+            webrtc.setCallbacks(
+                (session) => {
+                    if (session.state === 'ended' || session.state === 'failed') {
+                        setIsCallActive(false)
+                        setCallRecipient('')
+                    }
+                },
+                () => { } // remote stream handled in CallInterface
+            )
+        }
+    }, [connected, account])
+
+    // Measure real network latency to Aptos RPC
+    useEffect(() => {
+        if (!connected) return
+        const measureLatency = async () => {
+            try {
+                const start = performance.now()
+                await aptos.view({
+                    payload: {
+                        function: `0x1::chain_id::get`,
+                        functionArguments: []
+                    }
+                })
+                const ms = Math.round(performance.now() - start)
+                setNetworkLatencyMs(ms)
+                setLatencyStatus(ms < 200 ? 'good' : ms < 600 ? 'ok' : 'slow')
+            } catch {
+                // ignore measurement failures
+            }
+        }
+        measureLatency()
+        const interval = setInterval(measureLatency, 30000)
+        return () => clearInterval(interval)
+    }, [connected])
+
+    useEffect(() => {
+        if (connected && account) {
+            const recentMessageSent = Date.now() - lastMessageSent < 120000 // 2 mins
+            const refreshInterval = recentMessageSent ? 5000 : 30000 // 5s if active, 30s otherwise
+
+            const interval = setInterval(() => {
+                refreshInbox()
+                checkInboxExists()
+            }, refreshInterval)
+
+            return () => clearInterval(interval)
+        }
+    }, [connected, account, refreshInbox, checkInboxExists, lastMessageSent])
+
+    const createInbox = async () => {
+        if (!account) return
+        setLoading(true)
+        try {
+            const response = await signAndSubmitTransaction({
+                data: {
+                    function: `${CONTRACT_ADDRESS}::Inbox3::create_inbox`,
+                    typeArguments: [],
+                    functionArguments: []
+                }
+            })
+
+            await aptos.waitForTransaction({ transactionHash: response.hash })
+            setHasInbox(true)
+            addNotification({ type: 'success', message: 'Inbox created successfully!' })
+        } catch (error) {
+            console.error('Error creating inbox:', error)
+            addNotification({ type: 'error', message: 'Failed to create inbox' })
+        } finally {
+            setLoading(false)
+        }
     }
-  }, [connected, account, refreshInbox, checkInboxExists, lastMessageSent])
 
-  const createInbox = async () => {
-    if (!account) return
-    setLoading(true)
-    try {
-      console.log('Creating inbox for account:', account.address)
-      console.log('Contract address:', CONTRACT_ADDRESS)
+    // ===== CALLING FUNCTIONS =====
+    const startVoiceCall = (recipient: string) => {
+        if (!recipient || recipient.trim().length < 5) {
+            addNotification({ type: 'error', message: 'Please select a valid recipient to call' });
+            return;
+        }
+        setCallRecipient(recipient);
+        setActiveCallType('voice');
+        setIsCallActive(true);
+        addNotification({ type: 'info', message: `Starting voice call to ${recipient.slice(0, 8)}...` });
+    };
 
-      const payload = {
-        type: "entry_function_payload",
-        function: `${CONTRACT_ADDRESS}::Inbox3::create_inbox`,
-        type_arguments: [],
-        arguments: []
-      }
+    const startVideoCall = (recipient: string) => {
+        if (!recipient || recipient.trim().length < 5) {
+            addNotification({ type: 'error', message: 'Please select a valid recipient to call' });
+            return;
+        }
+        setCallRecipient(recipient);
+        setActiveCallType('video');
+        setIsCallActive(true);
+        addNotification({ type: 'info', message: `Starting video call to ${recipient.slice(0, 8)}...` });
+    };
 
-      console.log('Transaction payload:', payload)
+    const handleAcceptCall = () => {
+        setIsIncomingCallOpen(false);
+        if (incomingCall) {
+            setCallRecipient(incomingCall.from);
+            setActiveCallType(incomingCall.callType);
+            setIsCallActive(true);
+        }
+    };
 
-      const response = await window.aptos.signAndSubmitTransaction({ payload })
-      console.log('Transaction submitted:', response)
+    const handleRejectCall = () => {
+        if (incomingCall) {
+            const webrtc = getWebRTCService();
+            webrtc.rejectCall(incomingCall);
+        }
+        setIsIncomingCallOpen(false);
+        setIncomingCall(null);
+    };
 
-      await aptos.waitForTransaction({ transactionHash: response.hash })
-      console.log('Transaction confirmed')
+    const handleEndCall = () => {
+        setIsCallActive(false);
+        setCallRecipient('');
+    };
 
-      setHasInbox(true)
-      alert('Inbox created successfully!')
-    } catch (error) {
-      console.error('Error creating inbox:', error)
-
-      if (error instanceof Error) {
-        console.error('Error message:', error.message)
-        console.error('Error stack:', error.stack)
-        alert(`Failed to create inbox: ${error.message}`)
-      } else {
-        console.error('Unknown error:', error)
-        alert('Failed to create inbox: Unknown error occurred')
-      }
-    } finally {
-      setLoading(false)
-    }
-  }
-
-  const loadMessages = useCallback(async () => {
-    if (!account || !hasInbox) return
-    try {
-      console.log('Messages updated - inbox will refresh automatically')
-    } catch (error) {
-      console.error('Error loading messages:', error)
-    }
-  }, [account, hasInbox])
-
-  useEffect(() => {
-    if (hasInbox) {
-      loadMessages()
-    }
-  }, [hasInbox, loadMessages])
-
-  if (!connected) {
-    return (
-      <div className="welcome-container">
-        <div className="welcome-card">
-          <img src={logo} alt="Inbox3 Logo" className="welcome-logo-img" />
-          <p className="welcome-subtitle">
-            Secure, decentralized messaging powered by blockchain technology.
-          </p>
-          <div className="card p-6">
-            <h2 className="text-xl font-semibold mb-4">Connect Your Wallet</h2>
-            <p className="text-secondary mb-6">
-              Choose your preferred wallet to get started with secure messaging
-            </p>
-            <div className="space-y-3">
-              {wallets.map((wallet) => (
-                <button key={wallet.name} onClick={() => connect(wallet.name)} className="btn btn-primary w-full text-sm">
-                  {wallet.name === 'Petra' ? (
-                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none">
-                      <path d="M11.3693 22.4084C7.56149 22.4084 4.47461 19.3215 4.47461 15.5137V4.0981L11.3693 1.59082V22.4084Z" fill="white" />
-                      <path d="M12.6304 13.8443C16.4382 13.8443 19.5251 10.7574 19.5251 6.94954V4.0981L12.6304 1.59082V13.8443Z" fill="white" />
-                    </svg>
-                  ) : (
-                    <img src={wallet.icon} alt={wallet.name} className="w-5 h-5" />
-                  )}
-                  Connect {wallet.name}
-                </button>
-              ))}
-            </div>
-            <div className="feature-grid">
-              <div className="feature-item">
-                <div className="feature-icon feature-icon-blue">
-                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                    <path d="M12 2L2 7v10c0 5.55 3.84 10 9 10s9-4.45 9-10V7L12 2z" />
-                  </svg>
+    // ===== NAVIGATION & CONTEXT (SIDEBAR - 25%) =====
+    const sidebarContent = (
+        <div className="flex flex-col h-full overflow-hidden bg-card">
+            {/* Dashboard Stats (Live) */}
+            <div className="px-4 py-4 grid grid-cols-2 gap-3 border-b border-border/50">
+                <div className="bg-secondary/50 p-3 rounded-2xl border border-border/30 group hover:border-primary/30 transition-all cursor-default relative overflow-hidden">
+                    <div className="absolute top-0 right-0 w-8 h-8 -mr-2 -mt-2 bg-indigo-500/5 rounded-full group-hover:scale-150 transition-transform duration-500"></div>
+                    <span className="text-[9px] font-black uppercase text-muted-foreground tracking-widest block mb-1">Messages</span>
+                    <span className="text-xl font-black text-foreground tracking-tighter">
+                        {loadedMessages.length}
+                    </span>
                 </div>
-                <div className="feature-text">Secure</div>
-                <div className="text-xs text-muted">End-to-end encrypted messages</div>
-              </div>
-              <div className="feature-item">
-                <div className="feature-icon feature-icon-green">
-                  <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                    <path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z" />
-                  </svg>
+                <div className="bg-secondary/50 p-3 rounded-2xl border border-border/30 group hover:border-green-500/30 transition-all cursor-default relative overflow-hidden">
+                    <div className="absolute top-0 right-0 w-8 h-8 -mr-2 -mt-2 bg-green-500/5 rounded-full group-hover:scale-150 transition-transform duration-500"></div>
+                    <span className="text-[9px] font-black uppercase text-muted-foreground tracking-widest block mb-1">Network</span>
+                    <div className="flex items-center gap-1.5">
+                        <span className="w-1.5 h-1.5 rounded-full bg-green-500 animate-pulse"></span>
+                        <span className="text-[10px] font-black text-green-600 uppercase">Active</span>
+                    </div>
                 </div>
-                <div className="feature-text">Fast</div>
-                <div className="text-xs text-muted">Lightning-fast blockchain transactions</div>
-              </div>
-              <div className="feature-item">
-                <div className="feature-icon feature-icon-purple">
-                  <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                    <circle cx="12" cy="12" r="10" />
-                    <path d="M12 6v6l4 2" />
-                  </svg>
-                </div>
-                <div className="feature-text">Global</div>
-                <div className="text-xs text-muted">Send messages anywhere in the world</div>
-              </div>
-              <div className="feature-item">
-                <div className="feature-icon feature-icon-orange">
-                  <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                    <path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z" />
-                    <polyline points="7.5,4.21 12,6.81 16.5,4.21" />
-                    <polyline points="7.5,19.79 7.5,14.6 3,12" />
-                    <polyline points="21,12 16.5,14.6 16.5,19.79" />
-                    <polyline points="3.27,6.96 12,12.01 20.73,6.96" />
-                    <line x1="12" y1="22.08" x2="12" y2="12" />
-                  </svg>
-                </div>
-                <div className="feature-text">Web3</div>
-                <div className="text-xs text-muted">Decentralized and trustless</div>
-              </div>
             </div>
-          </div>
-        </div>
-      </div>
-    )
-  }
 
-  return (
-    <div className="min-h-screen">
-      <NotificationSystem notifications={notifications} onDismiss={dismissNotification} />
-      <header className="header">
-        <div className="container">
-          <div className="flex items-center justify-between">
-            <div className="flex items-center gap-3">
-              <img src={logo} alt="Inbox3 Logo" className="w-28" />
-              <div>
-                <p className="text-xs text-muted">Secure Web3 Messaging</p>
-              </div>
+            {/* Tab Switcher */}
+            <div className="p-4">
+                <div className="flex p-1.5 bg-secondary/50 liquid-glass rounded-2xl border border-border/40">
+                    <button
+                        onClick={() => setCurrentView('dm')}
+                        className={`flex-1 flex items-center justify-center gap-2.5 py-3 rounded-xl text-xs font-black uppercase tracking-widest transition-all ${currentView === 'dm'
+                            ? 'bg-card text-primary shadow-xl border border-primary/20 liquid-glass'
+                            : 'text-muted-foreground hover:text-foreground hover:bg-secondary/50'}`}
+                    >
+                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3">
+                            <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z" />
+                        </svg>
+                        Messages
+                    </button>
+                    <button
+                        onClick={() => setCurrentView('groups')}
+                        className={`flex-1 flex items-center justify-center gap-2.5 py-3 rounded-xl text-xs font-black uppercase tracking-widest transition-all ${currentView === 'groups'
+                            ? 'bg-card text-primary shadow-xl border border-primary/20 liquid-glass'
+                            : 'text-muted-foreground hover:text-foreground hover:bg-secondary/50'}`}
+                    >
+                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3">
+                            <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2" /><circle cx="9" cy="7" r="4" />
+                        </svg>
+                        Groups
+                    </button>
+                </div>
             </div>
-            <div className="flex items-center gap-4">
-              <div className="flex items-center gap-2 desktop-only">
-                <div className="status-indicator status-online"></div>
-                <span className="text-sm text-secondary">Connected</span>
-              </div>
-              <span className="text-sm text-secondary">
-                {account?.address?.toString()?.slice(0, 6)}...{account?.address?.toString()?.slice(-4)}
-              </span>
-              <div className="flex items-center gap-2">
-                {realtimeEnabled && (
-                  <span className="text-sm text-secondary desktop-only">LIVE</span>
-                )}
-                <span className="text-sm text-muted desktop-only">Real-time</span>
-                <button onClick={() => setRealtimeEnabled(!realtimeEnabled)} className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors ${realtimeEnabled ? 'bg-orange-500' : 'bg-gray-300'}`}>
-                  <span className={`inline-block h-4 w-4 transform rounded-full bg-white transition-transform ${realtimeEnabled ? 'translate-x-6' : 'translate-x-1'}`} />
-                </button>
-              </div>
-              <button onClick={disconnect} className="btn btn-outline text-sm">
-                Disconnect
-              </button>
-            </div>
-          </div>
-        </div>
-      </header>
-      <main className="container py-6 mt-6">
-        {networkError && (
-          <div className="card p-4 mb-6 border-l-4 border-warning-yellow">
-            <div className="flex items-center gap-3">
-              <div className="security-notice-icon">⚠</div>
-              <div>
-                <p className="font-medium text-primary">Network Warning</p>
-                <p className="text-sm text-secondary">{networkError}</p>
-              </div>
-            </div>
-          </div>
-        )}
-        {!hasInbox ? (
-          <div className="text-center">
-            <div className="card p-8 max-w-md mx-auto">
-              <img src={logo} alt="Inbox3 Logo" className="welcome-logo-img" />
-              <h2 className="text-2xl font-bold mb-4">Welcome to Inbox3!</h2>
-              <p className="text-secondary mb-6">
-                Create your decentralized inbox to start receiving secure messages on the Aptos blockchain.
-              </p>
-              <button onClick={createInbox} disabled={loading} className="btn btn-primary w-full">
-                {loading ? (
-                  <div className="flex items-center gap-2">
-                    <div className="spinner"></div>
-                    Creating Inbox...
-                  </div>
+
+            {/* Content */}
+            <div className="flex-1 overflow-y-auto px-3 py-2 custom-scrollbar">
+                {currentView === 'dm' ? (
+                    <Inbox
+                        refreshKey={refreshKey}
+                        onMessages={setLoadedMessages}
+                        onSelectContact={handleSelectContact}
+                    />
                 ) : (
-                  'Create Your Inbox'
+                    <GroupList
+                        contractAddress={CONTRACT_ADDRESS}
+                        onSelectGroup={setSelectedGroup}
+                        onCreateGroup={() => setIsCreateGroupModalOpen(true)}
+                        onJoinGroup={() => setIsJoinGroupModalOpen(true)}
+                        refreshTrigger={groupsRefreshKey}
+                        compact={true}
+                    />
                 )}
-              </button>
             </div>
-          </div>
-        ) : (
-          <div className="grid-cols-2">
-            <div className="animate-fade-in">
-              <div className="flex items-center gap-3 mb-6">
-                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#FF591B" strokeWidth="2">
-                  <path d="M22 2L11 13" />
-                  <path d="M22 2L15 22L11 13L2 9L22 2Z" />
-                </svg>
-                <h2 className="text-xl font-semibold">Send Message</h2>
-              </div>
-              <SendMessage contractAddress={CONTRACT_ADDRESS} onMessageSent={handleMessageSent} />
-            </div>
-            <div className="animate-fade-in">
-              <div className="flex items-center justify-between mb-6">
-                <div className="flex items-center gap-3">
-                  <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#FF591B" strokeWidth="2">
-                    <path d="M22 12H16L14 15H10L8 12H2" />
-                    <path d="M5.45 5.11L2 12V18A2 2 0 0 0 4 20H20A2 2 0 0 0 22 18V12L18.55 5.11A2 2 0 0 0 16.84 4H7.16A2 2 0 0 0 5.45 5.11Z" />
-                  </svg>
-                  <h2 className="text-xl font-semibold">Inbox</h2>
-                </div>
-                <button onClick={refreshInbox} className="btn btn-outline text-sm">
-                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                    <path d="M23 4V10H17" />
-                    <path d="M1 20V14H7" />
-                    <path d="M20.49 9A9 9 0 0 0 5.64 5.64L1 10M23 14L18.36 18.36A9 9 0 0 1 3.51 15" />
-                  </svg>
-                  Refresh
+
+            {/* Footer */}
+            <div className="p-3 border-t border-border flex flex-col gap-2">
+                <button
+                    onClick={() => setIsPerformanceOpen(true)}
+                    className="w-full py-2.5 rounded-xl bg-secondary text-muted-foreground hover:text-primary hover:bg-primary/10 transition-all flex items-center justify-center gap-2 text-[10px] font-black uppercase tracking-widest"
+                >
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
+                        <line x1="12" y1="20" x2="12" y2="10" /><line x1="18" y1="20" x2="18" y2="4" /><line x1="6" y1="20" x2="6" y2="16" />
+                    </svg>
+                    Performance Metrics
                 </button>
-              </div>
-              <Inbox refreshKey={refreshKey} />
+                <ConnectionStatus compact={false} />
             </div>
-          </div>
-        )}
-      </main>
-    </div>
-  )
+        </div>
+    )
+
+
+    // ===== PROFILE & UTILITIES (RIGHT PANE - 25%) =====
+    const rightPaneContent = (
+        <div className="flex flex-col h-full bg-background border-l border-border/40 p-6 gap-8 overflow-y-auto custom-scrollbar">
+            {/* Profile Header */}
+            <div className="flex items-center justify-between">
+                <h2 className="text-xl font-bold text-foreground">Profile</h2>
+                <div className="relative group">
+                    <button className="w-8 h-8 rounded-lg flex items-center justify-center text-muted-foreground hover:text-foreground hover:bg-white/5 transition-all">
+                        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
+                            <circle cx="12" cy="12" r="1" /><circle cx="19" cy="12" r="1" /><circle cx="5" cy="12" r="1" />
+                        </svg>
+                    </button>
+                    <div className="absolute right-0 mt-2 w-48 bg-card border border-border rounded-xl shadow-xl opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all z-20 overflow-hidden liquid-glass">
+                        <button
+                            onClick={() => setIsProfileEditorOpen(true)}
+                            className="w-full px-4 py-3 text-left text-sm font-medium text-foreground hover:bg-secondary flex items-center gap-3"
+                        >
+                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                                <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7" />
+                                <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z" />
+                            </svg>
+                            Edit Profile
+                        </button>
+                        <button
+                            onClick={disconnect}
+                            className="w-full px-4 py-3 text-left text-sm font-medium text-destructive hover:bg-destructive/10 flex items-center gap-3"
+                        >
+                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                                <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4" /><polyline points="16 17 21 12 16 7" /><line x1="21" y1="12" x2="9" y2="12" />
+                            </svg>
+                            Log Out
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            {/* Profile Card */}
+            <div className="bg-card/50 liquid-glass rounded-3xl p-6 text-center shadow-xl border border-white/5 relative overflow-hidden">
+                <div className="flex justify-center mb-6 relative z-10">
+                    <Avatar
+                        address={account?.address?.toString() || ''}
+                        src={resolveAvatarUrl(userProfile?.avatar)}
+                        size="xl"
+                        status="online"
+                        showStatus={true}
+                    />
+                </div>
+                <h3 className="text-xl font-bold text-foreground tracking-tight relative z-10">
+                    {account?.address?.toString().slice(0, 8)}...{account?.address?.toString().slice(-6)}
+                </h3>
+                <p className="text-md font-medium text-primary mt-1 relative z-10">
+                    @{userProfile?.username || 'inbox3user'}
+                </p>
+
+                {/* Profile Action Buttons */}
+                <div className="flex justify-center gap-4 mt-8 relative z-10">
+                    <button
+                        onClick={() => startVoiceCall(selectedRecipient || '')}
+                        className={`w-12 h-12 rounded-full flex items-center justify-center transition-all border ${selectedRecipient && selectedRecipient.trim().length > 5
+                            ? 'bg-green-500/10 text-green-500 hover:bg-green-500 hover:text-white border-green-500/30 shadow-lg shadow-green-500/10 liquid-glass'
+                            : 'bg-secondary text-muted-foreground border-transparent hover:bg-primary/10 hover:text-primary hover:border-primary/20 liquid-glass'
+                            }`}
+                        title={selectedRecipient ? 'Start Voice Call' : 'Select a contact first'}
+                    >
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                            <path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z" />
+                        </svg>
+                    </button>
+                    <button
+                        onClick={() => startVideoCall(selectedRecipient || '')}
+                        className={`w-12 h-12 rounded-full flex items-center justify-center transition-all border ${selectedRecipient && selectedRecipient.trim().length > 5
+                            ? 'bg-primary/10 text-primary hover:bg-primary hover:text-white border-primary/30 shadow-lg shadow-primary/10 liquid-glass'
+                            : 'bg-secondary text-muted-foreground border-transparent hover:bg-primary/10 hover:text-primary hover:border-primary/20 liquid-glass'
+                            }`}
+                        title={selectedRecipient ? 'Start Video Call' : 'Select a contact first'}
+                    >
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                            <polygon points="23 7 16 12 23 17 23 7" /><rect x="1" y="5" width="15" height="14" rx="2" ry="2" />
+                        </svg>
+                    </button>
+                    <button
+                        onClick={() => setSelectedRecipient(' ')}
+                        className="w-12 h-12 rounded-full bg-secondary liquid-glass text-muted-foreground flex items-center justify-center hover:bg-primary/10 hover:text-primary transition-all border border-transparent hover:border-primary/20"
+                    >
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                            <path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z" /><polyline points="22,6 12,13 2,6" />
+                        </svg>
+                    </button>
+                    <button
+                        onClick={() => setIsExportOpen(true)}
+                        className="w-12 h-12 rounded-full bg-secondary liquid-glass text-muted-foreground flex items-center justify-center hover:bg-primary/10 hover:text-primary transition-all border border-transparent hover:border-primary/20"
+                    >
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                            <path d="M4 12v8a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-8" /><polyline points="16 6 12 2 8 6" /><line x1="12" y1="2" x2="12" y2="15" />
+                        </svg>
+                    </button>
+                </div>
+            </div>
+
+            {/* Quick Actions */}
+            <div className="space-y-4">
+                <h3 className="text-[11px] font-black text-muted-foreground uppercase tracking-[0.2em] px-1">Quick Actions</h3>
+                <div className="grid grid-cols-2 gap-4">
+                    <button
+                        onClick={() => setIsContactsOpen(true)}
+                        className="p-5 bg-card/50 liquid-glass border border-white/5 rounded-2xl flex flex-col items-center justify-center gap-3 group hover:border-primary/50 hover:shadow-lg hover:shadow-primary/20 transition-all w-full"
+                    >
+                        <div className="w-11 h-11 rounded-full bg-secondary text-primary flex items-center justify-center group-hover:bg-primary group-hover:text-white transition-all">
+                            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5"><path d="M16 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2" /><circle cx="9" cy="7" r="4" /></svg>
+                        </div>
+                        <span className="text-xs font-bold text-foreground">Contacts</span>
+                    </button>
+
+                    <button
+                        onClick={() => setIsQRModalOpen(true)}
+                        className="p-5 bg-card/50 liquid-glass border border-white/5 rounded-2xl flex flex-col items-center justify-center gap-3 group hover:border-primary/50 hover:shadow-lg hover:shadow-primary/20 transition-all w-full"
+                    >
+                        <div className="w-11 h-11 rounded-full bg-secondary text-muted-foreground flex items-center justify-center group-hover:bg-primary group-hover:text-white transition-all">
+                            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5"><rect x="3" y="3" width="7" height="7" /><rect x="14" y="3" width="7" height="7" /><rect x="3" y="14" width="7" height="7" /><rect x="14" y="14" width="3" height="3" /></svg>
+                        </div>
+                        <span className="text-xs font-bold text-foreground">QR Code</span>
+                    </button>
+                </div>
+            </div>
+
+            {/* Settings Button (Bottom) */}
+            <div className="mt-auto pt-4">
+                <button
+                    onClick={() => setIsSettingsOpen(true)}
+                    className="w-full py-3 bg-card/50 liquid-glass border border-white/5 rounded-xl text-sm font-semibold text-foreground hover:border-primary/50 hover:text-primary transition-all flex items-center justify-center gap-2.5 shadow-sm"
+                >
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
+                        <circle cx="12" cy="12" r="3" /><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z" />
+                    </svg>
+                    Settings
+                </button>
+            </div>
+
+            {/* Network Vitals */}
+            <div className="bg-linear-to-br from-card to-background liquid-glass rounded-3xl p-6 text-foreground relative overflow-hidden shadow-2xl border border-white/5">
+                <div className="absolute top-0 right-0 w-32 h-32 -mr-16 -mt-16 bg-primary/20 rounded-full blur-3xl animate-pulse"></div>
+                <div className="relative z-10">
+                    <div className="flex items-center gap-3 mb-6">
+                        <div className="w-10 h-10 rounded-2xl bg-secondary/50 backdrop-blur-md flex items-center justify-center border border-white/10">
+                            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" className="text-primary">
+                                <path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5" />
+                            </svg>
+                        </div>
+                        <div>
+                            <h4 className="text-[10px] font-black uppercase tracking-[0.2em] text-muted-foreground">Protocol Status</h4>
+                            <p className="text-sm font-bold tracking-tight uppercase text-foreground">{NETWORK.charAt(0).toUpperCase() + NETWORK.slice(1)}</p>
+                        </div>
+                    </div>
+
+                    <div className="space-y-4">
+                        <div className="flex items-center justify-between">
+                            <span className="text-[10px] font-bold uppercase text-muted-foreground">Latency</span>
+                            <span className={`text-xs font-black ${latencyStatus === 'good' ? 'text-green-400' :
+                                latencyStatus === 'ok' ? 'text-yellow-400' :
+                                    latencyStatus === 'slow' ? 'text-destructive' : 'text-muted-foreground'
+                                }`}>
+                                {networkLatencyMs !== null ? `${networkLatencyMs} ms` : 'â€”'}
+                            </span>
+                        </div>
+                        <div className="h-1 bg-secondary rounded-full overflow-hidden">
+                            <div
+                                className={`h-full transition-all duration-700 ${latencyStatus === 'good' ? 'bg-green-500 w-[90%]' :
+                                    latencyStatus === 'ok' ? 'bg-yellow-500 w-[60%]' :
+                                        latencyStatus === 'slow' ? 'bg-destructive w-[30%]' : 'bg-muted w-[10%] animate-pulse'
+                                    }`}
+                            />
+                        </div>
+                        <div className="flex items-center justify-between">
+                            <span className="text-[10px] font-bold uppercase text-muted-foreground">Status</span>
+                            <span className="text-xs font-black italic uppercase text-foreground">
+                                {latencyStatus === 'measuring' ? 'Pinging...' :
+                                    latencyStatus === 'good' ? 'Optimal' :
+                                        latencyStatus === 'ok' ? 'Moderate' : 'High Latency'}
+                            </span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    )
+
+
+    const topNavContent = (
+        <TopNav
+            logo={
+                <div className="flex items-center gap-2.5 group cursor-pointer">
+                    <div className="relative">
+                        <div className="absolute inset-0 bg-primary/20 blur-lg rounded-full group-hover:bg-primary/30 transition-all" />
+                        <img src="/favicon.png" alt="Inbox3" className="w-9 h-9 rounded-xl shadow-md relative z-10 border border-white/10" />
+                    </div>
+                    <span className="text-xl font-bold tracking-tight text-foreground">
+                        Inbox<span className="text-primary">3</span>
+                    </span>
+                </div>
+            }
+
+            right={
+                <div className="flex items-center gap-4">
+                    <button
+                        onClick={() => setIsShortcutsOpen(true)}
+                        className="p-2.5 rounded-xl text-muted-foreground hover:bg-secondary hover:text-primary transition-all group"
+                        title="Keyboard Shortcuts (Ctrl+K)">
+                        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" className="group-hover:rotate-12 transition-transform">
+                            <path d="M18 3a3 3 0 0 0-3 3v12a3 3 0 0 0 3 3 3 3 0 0 0 3-3V6a3 3 0 0 0-3-3z" />
+                            <path d="M3 18a3 3 0 0 0 3 3h12a3 3 0 0 0 3-3 3 3 0 0 0-3-3H6a3 3 0 0 0-3 3z" />
+                        </svg>
+                    </button>
+
+                    <button
+                        onClick={toggleDarkMode}
+                        className="p-2.5 rounded-xl bg-card border border-border text-foreground hover:border-primary transition-all shadow-sm group active:scale-95"
+                    >
+                        {darkMode ? (
+                            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" className="group-hover:rotate-45 transition-transform"><circle cx="12" cy="12" r="5" /><path d="M12 1V3M12 21V23M4.22 4.22L5.64 5.64M18.36 18.36L19.78 19.78M1 12H3M21 12H23M4.22 19.78L5.64 18.36M18.36 5.64L19.78 4.22" /></svg>
+                        ) : (
+                            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" className="group-hover:-rotate-12 transition-transform"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z" /></svg>
+                        )}
+                    </button>
+
+                    <button
+                        onClick={disconnect}
+                        className="px-5 py-2.5 rounded-xl text-xs font-semibold border border-border text-muted-foreground hover:text-destructive hover:border-destructive/30 hover:bg-destructive/10 transition-all active:scale-95 flex items-center gap-2"
+                    >
+                        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4" /><polyline points="16 17 21 12 16 7" /><line x1="21" y1="12" x2="9" y2="12" /></svg>
+                        Disconnect
+                    </button>
+                </div>
+            }
+        />
+    )
+
+    // ===== MAIN RENDER LOGIC =====
+    if (!connected) {
+        const filteredWallets = wallets.filter(w => {
+            const isSocial = w.name.toLowerCase().includes('google') ||
+                w.name.toLowerCase().includes('apple') ||
+                w.name.toLowerCase().includes('keyless') ||
+                w.name.toLowerCase().includes('continue')
+            return walletModalMode === 'social' ? isSocial : !isSocial
+        })
+
+        return (
+            <main>
+                <div className="hero-container">
+                    <WalletModal
+                        isOpen={isWalletModalOpen}
+                        onClose={() => setIsWalletModalOpen(false)}
+                        wallets={filteredWallets}
+                        onConnect={connect}
+                        title={walletModalMode === 'social' ? 'Sign in with Social' : 'Connect Wallet'}
+                    />
+
+                    <div className="absolute top-6 right-6 z-60">
+                        <button onClick={toggleDarkMode} className="p-3 rounded-2xl bg-card border border-border text-foreground hover:border-primary transition-all shadow-sm">
+                            {darkMode ? (
+                                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><circle cx="12" cy="12" r="5" /><line x1="12" y1="1" x2="12" y2="3" /><line x1="12" y1="21" x2="12" y2="23" /><path d="M4.22 4.22L5.64 5.64M18.36 18.36L19.78 19.78M1 12H3M21 12H23M4.22 19.78L5.64 18.36M18.36 5.64L19.78 4.22" /></svg>
+                            ) : (
+                                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z" /></svg>
+                            )}
+                        </button>
+                    </div>
+
+                    <div className="hero-left">
+                        <div className="login-card text-center">
+                            <div className="mb-10">
+                                <img src="/logo.png" alt="Inbox3" className="w-20 h-20 mx-auto mb-6 rounded-2xl shadow-lg" />
+                                <h1 className="text-4xl font-extrabold text-foreground tracking-tight mb-2">Inbox3</h1>
+                                <p className="text-muted-foreground text-sm">
+                                    Your decentralized home for secure communication.
+                                </p>
+                            </div>
+
+                            <div className="flex flex-col gap-3">
+                                <button
+                                    onClick={() => { setWalletModalMode('wallet'); setIsWalletModalOpen(true); }}
+                                    className="w-full py-4 rounded-2xl font-bold text-white shadow-lg active:scale-[0.98] transition-all"
+                                    style={{ background: 'var(--gradient-brand)' }}
+                                >
+                                    Connect Wallet
+                                </button>
+                                <button
+                                    onClick={() => { setWalletModalMode('social'); setIsWalletModalOpen(true); }}
+                                    className="w-full py-4 rounded-2xl font-bold border border-border text-foreground hover:bg-secondary transition-all active:scale-[0.98]"
+                                >
+                                    Social Sign-in
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div className="hero-right">
+                        <div className="max-w-lg text-center relative z-10">
+                            <h2 className="text-5xl font-black text-foreground tracking-tighter mb-6 leading-tight">
+                                Private. Secure.<br />
+                                <span style={{ background: 'var(--gradient-brand)', WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent', backgroundClip: 'text' }} className="font-black">Decentralized.</span>
+                            </h2>
+                            <div className="grid grid-cols-2 gap-4">
+                                <div className="p-6 bento-card text-left space-y-3">
+                                    <div className="w-10 h-10 rounded-xl" style={{ background: 'var(--primary-brand-light)', color: 'var(--primary-brand)' }}>
+                                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z" /></svg>
+                                    </div>
+                                    <h3 className="font-bold text-foreground">E2E Encrypted</h3>
+                                    <p className="text-xs text-muted-foreground leading-relaxed">Your data belongs to you. Only the recipient can decrypt messages.</p>
+                                </div>
+                                <div className="p-6 bento-card text-left space-y-3">
+                                    <div className="w-10 h-10 rounded-xl" style={{ background: 'var(--accent-orange-light)', color: 'var(--accent-orange)' }}>
+                                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5"><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z" /></svg>
+                                    </div>
+                                    <h3 className="font-bold text-foreground">Blockchain Powered</h3>
+                                    <p className="text-xs text-muted-foreground leading-relaxed">Built on Aptos for high speed and decentralized verification.</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </main>
+        )
+    }
+
+    if (loading) {
+        return (
+            <main className="flex flex-col items-center justify-center min-h-screen" style={{ background: 'var(--bg-main)' }}>
+                <div className="w-16 h-16 rounded-full animate-spin mb-6" style={{ border: '4px solid var(--border-color)', borderTopColor: 'var(--primary-brand)' }} />
+                <h2 className="text-2xl font-black text-foreground animate-pulse">Initializing Workspace...</h2>
+            </main>
+        )
+    }
+
+    if (!hasInbox) {
+        return (
+            <main className="min-h-screen flex items-center justify-center p-4" style={{ background: 'var(--bg-main)' }}>
+                <Card className="p-12 text-center bento-card space-y-8 max-w-lg w-full">
+                    <div className="w-20 h-20 rounded-3xl flex items-center justify-center mx-auto" style={{ background: 'var(--primary-brand-light)', color: 'var(--primary-brand)' }}>
+                        <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z" /><polyline points="22,6 12,13 2,6" /></svg>
+                    </div>
+                    <h1 className="text-4xl font-black tracking-tighter text-foreground">Setup Required</h1>
+                    <p className="text-lg text-muted-foreground">Your account does not have a decentralized inbox yet. Initializing one will allow you to participate in private messaging.</p>
+                    <button
+                        onClick={createInbox}
+                        disabled={loading}
+                        className="w-full py-5 text-xl font-bold rounded-2xl text-white shadow-lg active:scale-[0.98] transition-all disabled:opacity-50"
+                        style={{ background: 'var(--gradient-brand)' }}
+                    >
+                        {loading ? 'Initializing...' : 'Initialize My Inbox'}
+                    </button>
+                </Card>
+            </main>
+        )
+    }
+
+    return (
+        <>
+            <SkipLink targetId="main-content" />
+            <NotificationSystem notifications={notifications} onDismiss={dismissNotification} />
+
+            {networkError && (
+                <div className="fixed top-0 left-0 right-0 bg-red-600 text-white p-2 text-center text-xs font-bold z-100 animate-slide-down">
+                    {networkError}
+                </div>
+            )}
+
+            <AppShell
+                topNav={topNavContent}
+                sidebar={sidebarContent}
+                rightPane={rightPaneContent}
+            >
+                <div className="flex-1 flex flex-col min-h-0">
+                    <main className="flex-1 flex flex-col min-h-0" id="main-content">
+                        <AnimatePresence mode="wait">
+                            {currentView === 'dm' && (
+                                <motion.div
+                                    key="dm"
+                                    initial={{ opacity: 0, y: 8 }}
+                                    animate={{ opacity: 1, y: 0 }}
+                                    exit={{ opacity: 0, y: -8 }}
+                                    transition={{ duration: 0.25, ease: "easeInOut" }}
+                                    className="h-full flex flex-col overflow-hidden"
+                                >
+                                    {selectedRecipient && selectedRecipient.trim().length > 5 ? (
+                                        <div className="flex-1 flex flex-col min-h-0 bg-background/30">
+                                            <div className="px-5 py-3 border-b border-border/30 bg-card/40 backdrop-blur-md flex justify-between items-center transition-all shrink-0">
+                                                <div className="flex items-center gap-3">
+                                                    <Avatar address={selectedRecipient} size="sm" status="online" />
+                                                    <div className="min-w-0">
+                                                        <h3 className="text-xs font-black text-foreground uppercase tracking-wide">
+                                                            {selectedRecipient.slice(0, 10)}...{selectedRecipient.slice(-8)}
+                                                        </h3>
+                                                    </div>
+                                                </div>
+                                                <button
+                                                    onClick={() => setSelectedRecipient('')}
+                                                    className="p-1.5 rounded-lg hover:bg-black/5 hover:dark:bg-white/5 text-muted-foreground hover:text-primary transition-all active:scale-90"
+                                                >
+                                                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3">
+                                                        <path d="M18 6L6 18M6 6l12 12" />
+                                                    </svg>
+                                                </button>
+                                            </div>
+
+                                            <div className="flex-1 overflow-hidden flex flex-col">
+                                                <Inbox
+                                                    refreshKey={refreshKey}
+                                                    filterBySender={selectedRecipient}
+                                                    displayMode="conversation"
+                                                    onMessages={setLoadedMessages}
+                                                />
+                                            </div>
+
+                                            <div className="bg-card/30 backdrop-blur-md">
+                                                <SendMessage
+                                                    contractAddress={CONTRACT_ADDRESS}
+                                                    onMessageSent={handleMessageSentAndReset}
+                                                    onClose={() => setSelectedRecipient('')}
+                                                    initialRecipient={selectedRecipient}
+                                                />
+                                            </div>
+                                        </div>
+                                    ) : selectedRecipient === ' ' ? (
+                                        <div className="flex-1 flex flex-col items-center justify-center p-4 bg-background/50">
+                                            <div className="w-full max-w-2xl">
+                                                <SendMessage
+                                                    contractAddress={CONTRACT_ADDRESS}
+                                                    onMessageSent={handleMessageSentAndReset}
+                                                    onClose={() => setSelectedRecipient('')}
+                                                    initialRecipient=""
+                                                />
+                                            </div>
+                                        </div>
+                                    ) : (
+                                        <EmptyChatView onStartNewChat={() => setSelectedRecipient(' ')} />
+                                    )}
+                                </motion.div>
+                            )}
+
+                            {currentView === 'groups' && (
+                                <motion.div
+                                    key="groups"
+                                    initial={{ opacity: 0, y: 8 }}
+                                    animate={{ opacity: 1, y: 0 }}
+                                    exit={{ opacity: 0, y: -8 }}
+                                    transition={{ duration: 0.25, ease: "easeInOut" }}
+                                    className="h-full flex flex-col overflow-hidden"
+                                >
+                                    {selectedGroup ? (
+                                        <GroupChat groupAddr={selectedGroup} contractAddress={CONTRACT_ADDRESS} onBack={() => setSelectedGroup(null)} />
+                                    ) : (
+                                        <div className="h-full flex items-center justify-center p-8 bg-background/30">
+                                            <div className="text-center max-w-lg w-full">
+                                                {/* Modern Icon Container */}
+                                                <div className="relative inline-block mb-8">
+                                                    <div className="absolute inset-0 bg-purple-500/20 blur-3xl rounded-full" />
+                                                    <div className="relative w-24 h-24 rounded-4xl bg-linear-to-br from-purple-500 to-indigo-600 flex items-center justify-center mx-auto shadow-2xl shadow-purple-500/10 border border-white/10">
+                                                        <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                                                            <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2" />
+                                                            <circle cx="9" cy="7" r="4" />
+                                                            <path d="M23 21v-2a4 4 0 0 0-3-3.87" />
+                                                            <path d="M16 3.13a4 4 0 0 1 0 7.75" />
+                                                        </svg>
+                                                    </div>
+                                                </div>
+
+                                                <h2 className="text-3xl font-bold text-foreground mb-3 tracking-tight">
+                                                    Decentralized Groups
+                                                </h2>
+                                                <p className="text-muted-foreground mb-8 text-base font-normal max-w-sm mx-auto leading-relaxed">
+                                                    Secure, community-owned communication spaces powered by blockchain technology.
+                                                </p>
+
+                                                <div className="flex flex-col sm:flex-row gap-6 items-center justify-center">
+                                                    <button
+                                                        onClick={() => setIsJoinGroupModalOpen(true)}
+                                                        className="w-full sm:w-auto px-10 py-4 rounded-2xl bg-secondary border border-border text-foreground font-black text-[10px] uppercase tracking-[0.2em] hover:border-primary hover:bg-card transition-all shadow-sm cursor-pointer"
+                                                    >
+                                                        Join Group
+                                                    </button>
+                                                    <button
+                                                        onClick={() => setIsCreateGroupModalOpen(true)}
+                                                        className="w-full sm:w-auto px-10 py-4 rounded-2xl text-white font-black text-[10px] uppercase tracking-[0.2em] shadow-xl hover:-translate-y-0.5 transition-all cursor-pointer"
+                                                        style={{ background: 'var(--gradient-brand)', boxShadow: '0 4px 15px rgba(168, 85, 247, 0.3)' }}
+                                                    >
+                                                        + Create New
+                                                    </button>
+                                                </div>
+
+                                                <div className="mt-16 pt-8 border-t border-border/50">
+                                                    <div className="flex items-center justify-center gap-6 opacity-60">
+                                                        <span className="text-[9px] font-black uppercase tracking-[0.4em] text-muted-foreground animate-pulse">Aptos Protocol Secured</span>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    )}
+                                </motion.div>
+                            )}
+
+                            {currentView === 'showcase' && (
+                                <motion.div
+                                    key="showcase"
+                                    initial={{ opacity: 0, y: 8 }}
+                                    animate={{ opacity: 1, y: 0 }}
+                                    exit={{ opacity: 0, y: -8 }}
+                                    transition={{ duration: 0.25, ease: "easeInOut" }}
+                                    className="h-full overflow-y-auto custom-scrollbar bento-card p-10"
+                                >
+                                    <ComponentShowcase />
+                                </motion.div>
+                            )}
+                        </AnimatePresence>
+                    </main>
+                </div>
+
+                <Modal isOpen={isContactsOpen} onClose={() => setIsContactsOpen(false)} title="Contacts Directory" size="md">
+                    <div className="p-2"><ContactsList onSelectContact={handleSelectContact} /></div>
+                </Modal>
+
+                {isSettingsOpen && <SettingsPanel isOpen={isSettingsOpen} onClose={() => setIsSettingsOpen(false)} />}
+                {isQRModalOpen && <QRCodeModal isOpen={isQRModalOpen} onClose={() => setIsQRModalOpen(false)} address={account?.address?.toString() || ''} />}
+                {isShortcutsOpen && <ShortcutsModal isOpen={isShortcutsOpen} onClose={() => setIsShortcutsOpen(false)} shortcuts={shortcuts} />}
+                {isExportOpen && <ExportChat isOpen={isExportOpen} onClose={() => setIsExportOpen(false)} messages={loadedMessages} chatName={currentView === 'dm' ? 'Direct Messages' : selectedGroup || 'Group Chat'} />}
+                {isDraftsOpen && <DraftsModal isOpen={isDraftsOpen} onClose={() => setIsDraftsOpen(false)} drafts={drafts} onDeleteDraft={removeDraft} onSelectDraft={(d) => d.recipient && setSelectedRecipient(d.recipient)} />}
+
+                <CreateGroupModal isOpen={isCreateGroupModalOpen} onClose={() => setIsCreateGroupModalOpen(false)} contractAddress={CONTRACT_ADDRESS} onGroupCreated={() => setGroupsRefreshKey(prev => prev + 1)} />
+                <JoinGroupModal isOpen={isJoinGroupModalOpen} onClose={() => setIsJoinGroupModalOpen(false)} contractAddress={CONTRACT_ADDRESS} onGroupJoined={() => setGroupsRefreshKey(prev => prev + 1)} />
+                <PerformanceDashboard isOpen={isPerformanceOpen} onClose={() => setIsPerformanceOpen(false)} />
+                <Modal isOpen={isProfileEditorOpen} onClose={() => { setIsProfileEditorOpen(false); fetchUserProfile(); }} title="Profile Settings" size="lg">
+                    <div className="p-6"><ProfileEditor /></div>
+                </Modal>
+
+                {/* Voice/Video Calling Interface */}
+                <CallInterface
+                    isOpen={isCallActive}
+                    onClose={handleEndCall}
+                    remoteAddress={callRecipient}
+                    localAddress={account?.address?.toString() || ''}
+                    callType={activeCallType}
+                    isIncoming={isIncomingCallOpen}
+                    incomingSignal={incomingCall || undefined}
+                />
+
+                {/* Incoming Call Modal */}
+                <IncomingCallModal
+                    isOpen={isIncomingCallOpen && !isCallActive}
+                    signal={incomingCall}
+                    onAccept={handleAcceptCall}
+                    onReject={handleRejectCall}
+                />
+            </AppShell>
+        </>
+    )
 }
 
 export default App
